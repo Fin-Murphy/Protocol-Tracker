@@ -9,6 +9,44 @@ import SwiftUI
 import CoreData
 
 struct ContentView: View {
+    
+    
+    @State var DisplayHabitMaker: Bool = false
+    @State var DisplayTaskMaker: Bool = false
+
+    @State var Today = Date()
+    @State var SelectedDate: Date = Date()
+    
+    let valueRange = 1 ... 10
+    let calendar = Calendar(identifier: .gregorian)
+    
+    @State var HabitNameSet: String = ""
+    @State var HabitValueSet: Int16 = 0
+    @State var HabitGoalSet: Int16 = 1
+    @State var HabitProtocolSet: String = "Daily"
+    @State var HabitUnitSet: String = "units"
+    @State var HabitRepetitionSet: Int = 1
+    @State var HabitDescriptionSet: String = "This is a Habit"
+    @State var HabitHasStatusSet: Bool = false
+    @State var HabitRewardSet: Int = 1
+    @State var HabitStartDateSet: Date = Date()
+    
+    @State var TaskNameSet: String = ""
+    @State var TaskDescriptionSet: String = "This is a Task"
+    @State var TaskRewardSet: Int16 = 1
+    @State var TaskDueDateSet: Date = Date()
+    @State var TaskUnitSet: String = "units"
+    @State var TaskGoalSet: Int16 = 1
+    
+    @State var Celebrate: Int16 = 0
+    
+    @State var updateItemStatus: Int16 = 0
+
+    //-------------------------------------------
+    @State var range:Int = 4
+    //----------------------------------------------------------
+    
+    
     @Environment(\.managedObjectContext) private var viewContext
 
     @FetchRequest(
@@ -90,13 +128,6 @@ struct ContentView: View {
         }
     }
 }
-
-private let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .medium
-    return formatter
-}()
 
 #Preview {
     ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
