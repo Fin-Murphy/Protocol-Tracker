@@ -29,11 +29,10 @@ struct ContentView: View {
                 .onDelete(perform: deleteItems)
             }
             .toolbar {
-#if os(iOS)
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()
                 }
-#endif
                 ToolbarItem {
                     Button(action: addItem) {
                         Label("Add Item", systemImage: "plus")
@@ -43,7 +42,20 @@ struct ContentView: View {
             Text("Select an item")
         }
     }
-
+    
+/*    ------------------------------------------------
+    
+               BEGIN PRIVATE FUNCTIONS
+    
+ ------------------------------------------------     */
+    
+    
+    
+    
+    /*    ------------------------------------------------
+                   ADD ITEM
+     ------------------------------------------------     */
+    
     private func addItem() {
         withAnimation {
             let newItem = Item(context: viewContext)
@@ -60,6 +72,11 @@ struct ContentView: View {
         }
     }
 
+    /*    ------------------------------------------------
+                   DELETE ITEM
+     ------------------------------------------------     */
+    
+    
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
             offsets.map { items[$0] }.forEach(viewContext.delete)
