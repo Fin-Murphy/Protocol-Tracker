@@ -14,10 +14,18 @@ struct PersistenceController {
     static let preview: PersistenceController = {
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
-        for _ in 0..<10 {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
-        }
+        
+        
+        let newItem = Item(context: viewContext)
+        newItem.timestamp = Date()
+        newItem.name = "Glitch prevention item"
+        newItem.value = 0
+        newItem.goal = 1
+        newItem.unit = "unit"
+        newItem.whichProtocol = "Daily"
+        newItem.hasStatus = true
+            
+            
         do {
             try viewContext.save()
         } catch {

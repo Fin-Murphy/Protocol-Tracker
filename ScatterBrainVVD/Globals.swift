@@ -28,9 +28,15 @@ class GlobalVars {
 } // END CLASS GlobalVars
 
 
-let valueRange = 1 ... 10
+let valueRange = 1 ... 100
 let Today: Date = Date()
 let calendar: Calendar = .current
+
+
+struct HabitProtocol: Identifiable, Codable {
+    var id: UUID = UUID()
+    var ProtocolName: String
+}
 
 
 struct Task: Identifiable, Codable {

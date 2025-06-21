@@ -53,23 +53,23 @@ struct TabBar: View {
             //Spacer()
             //-----------------------------------------------
             
-            if selectedTab == .Smart {
-
-                    Button  {
-                        selectedTab = .Smart
-                    } label: {
-                        SymbolButton(bIcon: "book.closed.fill", bTxt: "Mental")
-                    }.foregroundColor(.black)
-
-            } else {
-
-                    Button  {
-                        selectedTab = .Smart
-                    } label: {
-                        SymbolButton(bIcon: "book.closed", bTxt: "")
-                    }.foregroundColor(.black)
-
-            }
+//            if selectedTab == .Smart {
+//
+//                    Button  {
+//                        selectedTab = .Smart
+//                    } label: {
+//                        SymbolButton(bIcon: "book.closed.fill", bTxt: "Mental")
+//                    }.foregroundColor(.black)
+//
+//            } else {
+//
+//                    Button  {
+//                        selectedTab = .Smart
+//                    } label: {
+//                        SymbolButton(bIcon: "book.closed", bTxt: "")
+//                    }.foregroundColor(.black)
+//
+//            }
                 
             //-----------------------------------------------
 
