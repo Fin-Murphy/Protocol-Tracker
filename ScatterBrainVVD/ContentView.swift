@@ -252,7 +252,7 @@ struct ContentView: View {
                                     Section {
                                         Button {addItem()} label: {Text("Save Habit")}
                                     }
-                                }
+                                }.ignoresSafeArea(.keyboard)
                                 
                             } // VSTACK
                             .frame(width:300,height:700)
@@ -385,7 +385,7 @@ struct ContentView: View {
                             Form {
                                 
                                 Section(header: Text("Task Name:")) {
-                                    TextField("", text: $TaskNameSet)
+                                    TextField("", text: $TaskNameSet).ignoresSafeArea(.keyboard)
                                 }
                                 Section(header: Text("Task Goal:")) {
                                     TextField("", value: $TaskGoalSet, format: .number)
@@ -409,9 +409,13 @@ struct ContentView: View {
                                 Section {
                                     Button {addTask()} label: {Text("Save Task")}
                                 }
-                            }
+                            }.ignoresSafeArea(.keyboard)
                             
                         } // VSTACK
+                        .onTapGesture {
+                            hideKeyboard()
+                        }
+                        .ignoresSafeArea(.keyboard)
                         .frame(width:300,height:700)
                         .cornerRadius(10)
                         .background(Rectangle()
@@ -492,7 +496,7 @@ struct ContentView: View {
                                                        
                                                     TextField("", value: $updateItemStatus, format: .number)
                                                         .frame(maxWidth: 100, alignment: .center)
-                                                }
+                                                }.ignoresSafeArea(.keyboard)
                                                 .padding()
                                                 .foregroundColor(.black)
                                                 .overlay(
