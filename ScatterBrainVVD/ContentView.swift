@@ -212,48 +212,53 @@ struct ContentView: View {
                                         .bold()
                                 }.padding()
                                 
-                                Form {
-                                    
-                                    Section(header: Text("Habit Name:")) {
-                                        TextField("", text: $HabitNameSet)
-                                    }
-                                    Section(header: Text("Habit Goal:")) {
-                                        TextField("", value: $HabitGoalSet, format: .number)
-                                    }
-                                    Section(header: Text("Habit Unit:")) {
-                                        TextField("", text: $HabitUnitSet)
-                                    }
-                                    Section(header: Text("Habit Protocol:")) {
-                                        TextField("", text: $HabitProtocolSet)
-                                    }
-                                    Section(header: Text("Habit Interval (1 = Daily, 7 = Weekly, etc):")) {
-                                        TextField("", value: $HabitRepetitionSet, format: .number)
-                                    }
-                                    Section(header: Text("Habit Details")) {
-                                        TextEditor(text: $HabitDescriptionSet)
-                                            .frame(minHeight: 100)
-                                                          .overlay(
-                                                              RoundedRectangle(cornerRadius: 8)
-                                                                  .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                                          )
-                                    }
-                                    Section("Habit Start Date") {
-                                                        DatePicker("Select Date",
-                                                                  selection: $HabitStartDateSet,
-                                                                  displayedComponents: .date)
-                                                        .datePickerStyle(.compact)
-                                                    }
-                                    Section(header: Text("Habit Reward (Points for completion)")) {
-                                        TextField("", value: $HabitRewardSet, format: .number)
-                                    }
-                                    Toggle("Include staus update", isOn: $HabitHasStatusSet)
-                                    
-                                    
-                                    Section {
-                                        Button {addItem()} label: {Text("Save Habit")}
-                                    }
-                                }.ignoresSafeArea(.keyboard)
                                 
+                                    
+                                    Form {
+                                        
+                                        Section(header: Text("Habit Name:")) {
+                                            TextField("", text: $HabitNameSet)
+                                        }
+                                        Section(header: Text("Habit Goal:")) {
+                                            TextField("", value: $HabitGoalSet, format: .number)
+                                        }
+                                        Section(header: Text("Habit Unit:")) {
+                                            TextField("", text: $HabitUnitSet)
+                                        }
+                                        Section(header: Text("Habit Protocol:")) {
+                                            TextField("", text: $HabitProtocolSet)
+                                        }
+                                        Section(header: Text("Habit Interval (1 = Daily, 7 = Weekly, etc):")) {
+                                            TextField("", value: $HabitRepetitionSet, format: .number)
+                                        }
+                                        Section(header: Text("Habit Details")) {
+                                            TextEditor(text: $HabitDescriptionSet)
+                                                .frame(minHeight: 100)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 8)
+                                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                                )
+                                        }
+                                        Section("Habit Start Date") {
+                                            DatePicker("Select Date",
+                                                       selection: $HabitStartDateSet,
+                                                       displayedComponents: .date)
+                                            .datePickerStyle(.compact)
+                                        }
+                                        Section(header: Text("Habit Reward (Points for completion)")) {
+                                            TextField("", value: $HabitRewardSet, format: .number)
+                                        }
+                                        Toggle("Include staus update", isOn: $HabitHasStatusSet)
+                                        
+                                        
+                                        Section {
+                                            Button {addItem()} label: {Text("Save Habit")}
+                                            
+                                            
+                                        }
+                                        
+                                    }.ignoresSafeArea(.keyboard)
+                      
                             } // VSTACK
                             .frame(width:300,height:700)
                             .cornerRadius(10)
