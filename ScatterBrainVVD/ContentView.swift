@@ -20,7 +20,7 @@ struct ContentView: View {
     @State var Today = Date()
     @State var SelectedDate: Date = Date()
     
-    let valueRange = 1 ... 10
+    let valueRange = 1 ... 1000
     let calendar = Calendar(identifier: .gregorian)
     
     @State var HabitNameSet: String = ""
@@ -109,7 +109,7 @@ struct ContentView: View {
                        BOOK TAB
 ****************************************************** */
                 
-            } else if selectedTab == .Smart {
+            } else if selectedTab == .Settings {
                 
              
 /* *******************************************************
@@ -128,8 +128,7 @@ struct ContentView: View {
                                     .fontWeight(.bold)
                                     .font(.title)
                                     .padding(.bottom)
-                                
-                                
+                                                                
                                 Button {
                                     DisplayHabitMaker = true
                                 } label: {
@@ -139,7 +138,6 @@ struct ContentView: View {
                                         .padding(.bottom)
 
                                 }
-                                
                             }
                                                             
                                 if let listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") {
@@ -169,7 +167,6 @@ struct ContentView: View {
                                                                     Text("Item goal value: \(habitNdx.HabitGoal) \(habitNdx.HabitUnit)" )
                                                                     Text("Item repeats every \(habitNdx.HabitRepeatValue) days." )
                                                                     Text("Item Description: \n\n \(habitNdx.HabitDescription)" )
-
                                                                 }
 
                                                              
@@ -180,7 +177,15 @@ struct ContentView: View {
                                                                     Text("Remove this habit")
                                                                 }
                                                             } label: {
-                                                                Text(habitNdx.HabitName)
+                                                                
+                                                                HStack {
+                                                                    Text(habitNdx.HabitName)
+                                                                    
+                                                                    Spacer()
+                                                                    
+                                                                    
+                                                                    Text("\(habitNdx.HabitGoal) \(habitNdx.HabitUnit)")
+                                                                }
                                                             }
                                                             
                                                         } else {}
@@ -189,7 +194,6 @@ struct ContentView: View {
                                             }
                                         }
                                     } else {Text("No Habits yet")}
-                                
                                 }
                             }
                         
@@ -463,7 +467,7 @@ struct ContentView: View {
                         
                         List {
                             ForEach(items) { item in
-
+                                
                                 if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true {
                                 
                                     NavigationLink {
@@ -577,8 +581,6 @@ struct ContentView: View {
                                                 .cornerRadius(10)
                                             
                                         }
-                                        
-                                        //Spacer()
                                         
                                         HStack{
                                             
@@ -794,7 +796,6 @@ struct ContentView: View {
     
     private func setStatus(refItem: Item) {
         refItem.status = updateItemStatus
-        updateItemStatus = 0
         do {
             try viewContext.save()
         } catch {

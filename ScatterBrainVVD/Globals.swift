@@ -21,11 +21,15 @@ class GlobalVars {
     static let shared = GlobalVars()
     private init() {}
     
-    //@Environment(\.managedObjectContext) var viewContext
-
-    
     
 } // END CLASS GlobalVars
+
+
+
+
+
+
+
 
 
 let valueRange = 1 ... 100

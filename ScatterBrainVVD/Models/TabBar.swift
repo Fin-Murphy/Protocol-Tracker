@@ -9,7 +9,7 @@ import SwiftUI
 
 enum Tabs: Int {
     case Calendar = 0
-    case Smart = 1
+    case Settings = 1
     case HUB = 2
     case Protocols = 3
     case Goals = 4
@@ -53,23 +53,6 @@ struct TabBar: View {
             //Spacer()
             //-----------------------------------------------
             
-//            if selectedTab == .Smart {
-//
-//                    Button  {
-//                        selectedTab = .Smart
-//                    } label: {
-//                        SymbolButton(bIcon: "book.closed.fill", bTxt: "Mental")
-//                    }.foregroundColor(.black)
-//
-//            } else {
-//
-//                    Button  {
-//                        selectedTab = .Smart
-//                    } label: {
-//                        SymbolButton(bIcon: "book.closed", bTxt: "")
-//                    }.foregroundColor(.black)
-//
-//            }
                 
             //-----------------------------------------------
 
@@ -131,6 +114,30 @@ struct TabBar: View {
                         SymbolButton(bIcon: "checklist.unchecked", bTxt: "")
                     }.foregroundColor(.black)
             
+            }
+            
+            
+            //-----------------------------------------------
+            //Spacer()
+            //-----------------------------------------------
+            
+            
+            if selectedTab == .Settings {
+
+                    Button  {
+                        selectedTab = .Settings
+                    } label: {
+                        SymbolButton(bIcon: "gearshape.fill", bTxt: "Settings")
+                    }.foregroundColor(.black)
+
+            } else {
+
+                    Button  {
+                        selectedTab = .Settings
+                    } label: {
+                        SymbolButton(bIcon: "gearshape", bTxt: "")
+                    }.foregroundColor(.black)
+
             }
             
      
