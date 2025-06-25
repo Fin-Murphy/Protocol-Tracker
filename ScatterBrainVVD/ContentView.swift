@@ -116,7 +116,7 @@ struct ContentView: View {
                 
             } else if selectedTab == .Settings {
                 
-                PracticeView()
+                //PracticeView()
                 
              
 /* *******************************************************
@@ -477,7 +477,10 @@ struct ContentView: View {
                             .fontWeight(.bold)
                             .font(.title2)
                                             }
-                }.colorScheme(.light)
+                }
+                .colorScheme(.light)
+                .background(Rectangle()
+                        .foregroundColor(.white))
                 // TOP DATE BAR ---------------------------------------------------------------------
 
                 
@@ -712,13 +715,10 @@ struct ContentView: View {
     
  ------------------------------------------------     */
 
-    
-    
-    
     private func move(from source: IndexSet, to destination: Int) {
         habitData.move(fromOffsets: source, toOffset: destination)
-        print(habitData)
         UserDefaults.standard.setEncodable(habitData, forKey: "habitList")
+        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
     }
     
     private func celebrationProcedure () {
@@ -842,8 +842,7 @@ struct ContentView: View {
         
         if var protocolArray: [HabitProtocol] = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") {
         
-            if let outData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") {
-                for ndx in outData {
+                for ndx in habitData {
                     var inArray = false
                     print("Executing for item ", ndx.HabitName)
                     for ndx2 in protocolArray {
@@ -855,7 +854,7 @@ struct ContentView: View {
                         protocolArray.append(HabitProtocol(ProtocolName: ndx.HabitProtocol))
                     }
                 }
-            }
+            
             
             UserDefaults.standard.setEncodable(protocolArray, forKey: "protocol")
             
@@ -951,11 +950,9 @@ struct ContentView: View {
     
     private func displayHabitDescription (identifier: String) -> String {
         
-        if let outData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") {
-            for index in outData {
-                if index.HabitName == identifier {
-                    return index.HabitDescription
-                }
+        for index in habitData {
+            if index.HabitName == identifier {
+                return index.HabitDescription
             }
         }
         return "No description"
@@ -988,28 +985,25 @@ struct ContentView: View {
             } else {}
         }
 
-        if let outData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") {
-
-            for index in outData {
-                
-                if (daysBetween(start: index.HabitStartDate,end: Date()) % index.HabitRepeatValue) == 0 {
-                                            
-                    let newItem = Item(context: viewContext)
-                    newItem.timestamp = Date()
-                    newItem.name = index.HabitName
-                    newItem.value = index.HabitValue
-                    newItem.goal = index.HabitGoal
-                    newItem.unit = index.HabitUnit
-                    newItem.whichProtocol = index.HabitProtocol
-                    newItem.complete = false
-                    newItem.reward = index.HabitReward
-                    newItem.id = UUID()
-                    newItem.hasStatus = index.HabitHasStatus
-                 
-                }
-                
+        for index in habitData {
+            
+            if (daysBetween(start: index.HabitStartDate,end: Date()) % index.HabitRepeatValue) == 0 {
+                                        
+                let newItem = Item(context: viewContext)
+                newItem.timestamp = Date()
+                newItem.name = index.HabitName
+                newItem.value = index.HabitValue
+                newItem.goal = index.HabitGoal
+                newItem.unit = index.HabitUnit
+                newItem.whichProtocol = index.HabitProtocol
+                newItem.complete = false
+                newItem.reward = index.HabitReward
+                newItem.id = UUID()
+                newItem.hasStatus = index.HabitHasStatus
+             
             }
-        } else {print("Failure in PopulateTasks")}
+            
+        }
 
         do {
             try viewContext.save()

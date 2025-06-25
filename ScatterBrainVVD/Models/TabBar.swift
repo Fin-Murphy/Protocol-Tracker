@@ -146,8 +146,10 @@ struct TabBar: View {
             Spacer()
             //-----------------------------------------------
             
-        }.colorScheme(.light)
-
+        }
+        .colorScheme(.light)
+        .background(Rectangle()
+            .foregroundColor(.white))
         
         
         
