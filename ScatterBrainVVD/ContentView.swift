@@ -477,7 +477,7 @@ struct ContentView: View {
                     NavigationView {
                         
                         List {
-                            ForEach(copy) { item in
+                            ForEach(items) { item in
                                 
                                 if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true {
                                 
@@ -689,7 +689,6 @@ struct ContentView: View {
                         }
                     }
                     .environment(\.editMode, .constant(.active))
-                    onAppear{copy = items}
                     
                 }.onAppear{checkDate()}
             }
