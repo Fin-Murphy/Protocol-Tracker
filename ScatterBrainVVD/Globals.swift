@@ -61,7 +61,7 @@ struct Task: Identifiable, Codable {
 }
 
 
-struct Habit: Identifiable, Codable {
+struct Habit: Identifiable, Codable, Hashable {
     
     var id: UUID = UUID()
     var HabitName:String

@@ -112,6 +112,8 @@ struct ContentView: View {
                 
             } else if selectedTab == .Settings {
                 
+                PracticeView()
+                
              
 /* *******************************************************
              MONEY TAB
