@@ -33,6 +33,7 @@ struct ContentView: View {
     @State var HabitHasStatusSet: Bool = false
     @State var HabitRewardSet: Int = 1
     @State var HabitStartDateSet: Date = Date()
+    @State var HabitIsSubtaskSet: Bool = false
     
     @State var TaskNameSet: String = ""
     @State var TaskDescriptionSet: String = "This is a Task"
@@ -248,7 +249,8 @@ struct ContentView: View {
                                         Section(header: Text("Habit Reward (Points for completion)")) {
                                             TextField("", value: $HabitRewardSet, format: .number)
                                         }
-                                        Toggle("Include staus update", isOn: $HabitHasStatusSet)
+                                        Toggle("Include status update", isOn: $HabitHasStatusSet)
+                                        Toggle("Make this habit a subtask of another habit?", isOn: $HabitIsSubtaskSet)
                                         
                                         
                                         Section {
@@ -475,7 +477,7 @@ struct ContentView: View {
                     NavigationView {
                         
                         List {
-                            ForEach(items) { item in
+                            ForEach(copy) { item in
                                 
                                 if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true {
                                 
@@ -671,6 +673,7 @@ struct ContentView: View {
                                     
                                 } else {}
                             }
+//                            .onMove(perform: moveItems)
                             .onDelete(perform: deleteItems)
                             
                         }
@@ -685,6 +688,8 @@ struct ContentView: View {
                             }
                         }
                     }
+                    .environment(\.editMode, .constant(.active))
+                    onAppear{copy = items}
                     
                 }.onAppear{checkDate()}
             }
@@ -700,7 +705,10 @@ struct ContentView: View {
                BEGIN PRIVATE FUNCTIONS
     
  ------------------------------------------------     */
-    
+//    
+//    private func moveItems(from source: IndexSet, to destination: Int) {
+//           items.move(fromOffsets: source, toOffset: destination)
+//    }
     
     private func celebrationProcedure () {
                 
