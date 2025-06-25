@@ -115,9 +115,7 @@ struct ContentView: View {
 ****************************************************** */
                 
             } else if selectedTab == .Settings {
-                
-                //PracticeView()
-                
+                                
              
 /* *******************************************************
              MONEY TAB
@@ -710,10 +708,8 @@ struct ContentView: View {
     }
 
 /*    ------------------------------------------------
-    
-               BEGIN PRIVATE FUNCTIONS
-    
- ------------------------------------------------     */
+                   BEGIN PRIVATE FUNCTIONS
+     ------------------------------------------------     */
 
     private func move(from source: IndexSet, to destination: Int) {
         habitData.move(fromOffsets: source, toOffset: destination)
@@ -1095,9 +1091,11 @@ struct ContentView: View {
         HabitStartDateSet = Date()
         
         
-        indexProtocols()
         
         habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+        
+        indexProtocols()
+
         
     }
 
