@@ -146,7 +146,7 @@ struct TabBar: View {
             Spacer()
             //-----------------------------------------------
             
-        }
+        }.colorScheme(.light)
 
         
         

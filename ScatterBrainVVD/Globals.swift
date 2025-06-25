@@ -135,18 +135,6 @@ extension UserDefaults {
 
 
 
-func rmHabit(id: UUID) {
-    if var outHabitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") {
-        var iterator = 0
-        for index in outHabitData {
-            if index.id == id {
-                outHabitData.remove(at: iterator)
-            }
-            iterator += 1
-        }
-        UserDefaults.standard.setEncodable(outHabitData, forKey: "habitList")
-    }
-}
 
 
 func rmTask(id: UUID) {

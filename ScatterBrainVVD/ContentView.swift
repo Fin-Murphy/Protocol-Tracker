@@ -45,10 +45,14 @@ struct ContentView: View {
     @State var Celebrate: Int16 = 0
     
     @State var updateItemStatus: Int16 = 0
+    
+    @State var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
 
     //-------------------------------------------
     @State var range:Int = 4
     //----------------------------------------------------------
+    
+    
     
     
     @Environment(\.managedObjectContext) private var viewContext
@@ -144,7 +148,7 @@ struct ContentView: View {
                             }
                                                             
                                 if let listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") {
-                                    if let ProtocolTaskData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") {
+                                    if habitData.isEmpty != true {
                                         NavigationView {
                                             List {
                                                 ForEach(listOfProtocols) { index in
@@ -155,7 +159,7 @@ struct ContentView: View {
                                                         .fontWeight(.bold)
                                                         .padding(.top)
                                                     
-                                                    ForEach(ProtocolTaskData) { habitNdx in
+                                                    ForEach(habitData) { habitNdx in
                                                         
                                                         if habitNdx.HabitProtocol == index.ProtocolName {
                                                             
@@ -192,8 +196,11 @@ struct ContentView: View {
                                                             }
                                                             
                                                         } else {}
-                                                    }
+                                                    }.onMove(perform: move)
                                                 }
+                                            }
+                                            .toolbar {
+                                                EditButton()
                                             }
                                         }
                                     } else {Text("No Habits yet")}
@@ -470,7 +477,7 @@ struct ContentView: View {
                             .fontWeight(.bold)
                             .font(.title2)
                                             }
-                }
+                }.colorScheme(.light)
                 // TOP DATE BAR ---------------------------------------------------------------------
 
                 
@@ -674,9 +681,7 @@ struct ContentView: View {
                                     }
                                     
                                 } else {}
-                            }
-//                            .onMove(perform: moveItems)
-                            .onDelete(perform: deleteItems)
+                            }         .onDelete(perform: deleteItems)
                             
                         }
                         .toolbar {
@@ -706,10 +711,15 @@ struct ContentView: View {
                BEGIN PRIVATE FUNCTIONS
     
  ------------------------------------------------     */
-//    
-//    private func moveItems(from source: IndexSet, to destination: Int) {
-//           items.move(fromOffsets: source, toOffset: destination)
-//    }
+
+    
+    
+    
+    private func move(from source: IndexSet, to destination: Int) {
+        habitData.move(fromOffsets: source, toOffset: destination)
+        print(habitData)
+        UserDefaults.standard.setEncodable(habitData, forKey: "habitList")
+    }
     
     private func celebrationProcedure () {
                 
@@ -1093,11 +1103,27 @@ struct ContentView: View {
         
         indexProtocols()
         
+        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+        
     }
 
     
     
-    
+    private func rmHabit(id: UUID) {
+        if var outHabitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") {
+            var iterator = 0
+            for index in outHabitData {
+                if index.id == id {
+                    outHabitData.remove(at: iterator)
+                }
+                iterator += 1
+            }
+            UserDefaults.standard.setEncodable(outHabitData, forKey: "habitList")
+        }
+        
+        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+    }
+
     
     
     
