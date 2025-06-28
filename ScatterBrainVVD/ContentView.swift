@@ -1097,9 +1097,7 @@ struct ContentView: View {
     }
     
     private func celebrationProcedure () {
-                
-        print("Goal for the day has been completed!")
-        
+            print("Goal for the day has been completed!")
     }
     
     
@@ -1259,13 +1257,6 @@ struct ContentView: View {
     }
     
     
-    
-    
-    
-    
-    
-    
-    
     /*    ------------------------------------------------
                     ADD ONE
      ------------------------------------------------     */
@@ -1364,7 +1355,7 @@ struct ContentView: View {
     
     private func populateTasks() {
         
-        
+        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
         
         for taskFinder in items {
             print("PopulateTasks checking item \(taskFinder.name ?? "")")
@@ -1471,9 +1462,6 @@ struct ContentView: View {
 //
     }
     
-
-
-
 
     /*    ------------------------------------------------
                    DELETE ITEM
