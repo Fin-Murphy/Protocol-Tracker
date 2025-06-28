@@ -59,43 +59,9 @@ struct ContentView: View {
  ****************************************************** */
             
            if selectedTab == .Calendar {
-                VStack{
-                   
-                    Button {SelectedDate = Date() } label: {Text("Current Date: \(Date(), formatter: itemFormatter)") }
-                    
-                    LazyHStack{
-                        
-                        ScrollView() {
-                            LazyVStack {
-                                ForEach(backward_Calendar, id: \.self){ day in
-                                    
-                                    Button{
-                                        SelectedDate = day
-                                        selectedTab = .HUB
-                                    } label: {
-                                        Text("\(day, formatter: itemFormatter)    ")
-                                    }
-                                }
-                            }.padding()
-                        }
-                        
-                        ScrollView() {
-                            LazyVStack {
-                                ForEach(forward_Calendar, id: \.self){ day in
-                                    
-                                    Button{
-                                        SelectedDate = day
-                                        selectedTab = .HUB
-                                    } label: {
-                                        Text("\(day, formatter: itemFormatter)    ")
-                                    }
-                                }
-                            }.padding()
-                        }
-                        
-                        
-                    } // END LAZY HSTACK
-                }
+               
+               
+               CalendarView(SelectedDate: $SelectedDate, selectedTab: $selectedTab)
                 
                
 /* *******************************************************
@@ -892,7 +858,9 @@ struct ContentView: View {
                                 
                                 
                             }
-                            .onAppear{moveCompleteHabits = UserDefaults.standard.bool(forKey: "displayCompletedHabits")}
+                            .onAppear{
+                                moveCompleteHabits = UserDefaults.standard.bool(forKey: "displayCompletedHabits")
+                            }
                             .toolbar {
                                 ToolbarItem(placement: .navigationBarTrailing) {
                                     EditButton()
