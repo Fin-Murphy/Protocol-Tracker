@@ -11,8 +11,6 @@ import CoreData
 struct ContentView: View {
     
     @State var selectedTab: Tabs = .HUB
-
-    
     
     @State var DisplayHabitMaker: Bool = false
     @State var DisplayTaskMaker: Bool = false
@@ -20,11 +18,12 @@ struct ContentView: View {
     @State var Today = Date()
     @State var SelectedDate: Date = Date()
     
-    let valueRange = 1 ... 1000
+    let valueRange = 1 ... 10
     let calendar = Calendar(identifier: .gregorian)
     
+    @State var moveCompleteHabits: Bool = false
+    
     @State var HabitNameSet: String = ""
-    @State var HabitValueSet: Int16 = 0
     @State var HabitGoalSet: Int16 = 1
     @State var HabitProtocolSet: String = "Daily"
     @State var HabitUnitSet: String = "units"
@@ -34,13 +33,16 @@ struct ContentView: View {
     @State var HabitRewardSet: Int = 1
     @State var HabitStartDateSet: Date = Date()
     @State var HabitIsSubtaskSet: Bool = false
+    @State var HabitHasCheckboxSet: Bool = true
     
-    @State var TaskNameSet: String = ""
+    @State var TaskNameSet: String = "Task"
     @State var TaskDescriptionSet: String = "This is a Task"
     @State var TaskRewardSet: Int16 = 1
     @State var TaskDueDateSet: Date = Date()
     @State var TaskUnitSet: String = "units"
     @State var TaskGoalSet: Int16 = 1
+    @State var TaskHasCheckboxSet: Bool = true
+
     
     @State var Celebrate: Int16 = 0
     
@@ -115,7 +117,8 @@ struct ContentView: View {
 ****************************************************** */
                 
             } else if selectedTab == .Settings {
-                                
+                                    
+                GoalSetView()
              
 /* *******************************************************
              MONEY TAB
@@ -227,11 +230,14 @@ struct ContentView: View {
                                         Section(header: Text("Habit Name:")) {
                                             TextField("", text: $HabitNameSet)
                                         }
-                                        Section(header: Text("Habit Goal:")) {
-                                            TextField("", value: $HabitGoalSet, format: .number)
-                                        }
-                                        Section(header: Text("Habit Unit:")) {
-                                            TextField("", text: $HabitUnitSet)
+                                        Toggle("Use checkbox instead of units",isOn: $HabitHasCheckboxSet)
+                                        if HabitHasCheckboxSet == false {
+                                            Section(header: Text("Habit Goal:")) {
+                                                TextField("", value: $HabitGoalSet, format: .number)
+                                            }
+                                            Section(header: Text("Habit Unit:")) {
+                                                TextField("", text: $HabitUnitSet)
+                                            }
                                         }
                                         Section(header: Text("Habit Protocol:")) {
                                             TextField("", text: $HabitProtocolSet)
@@ -333,6 +339,8 @@ struct ContentView: View {
                                                     Text("Item Description: \n")
                                                         .font(.title2)
                                                     Text("\(taskNdx.TaskDescription)" )
+                                                    
+                                                    Text("Item due date: \(taskNdx.TaskDueDate)")
 
                                                     
                                                     Spacer()
@@ -401,20 +409,30 @@ struct ContentView: View {
                                 Section(header: Text("Task Name:")) {
                                     TextField("", text: $TaskNameSet).ignoresSafeArea(.keyboard)
                                 }
-                                Section(header: Text("Task Goal:")) {
-                                    TextField("", value: $TaskGoalSet, format: .number)
+                                Toggle("Use checkbox instead of units", isOn: $TaskHasCheckboxSet)
+                                if TaskHasCheckboxSet == false {
+                                    Section(header: Text("Task Goal:")) {
+                                        TextField("", value: $TaskGoalSet, format: .number)
+                                    }
+                                    Section(header: Text("Task Unit:")) {
+                                        TextField("", text: $TaskUnitSet)
+                                    }
                                 }
-                                Section(header: Text("Task Unit:")) {
-                                    TextField("", text: $TaskUnitSet)
+                                
+                                Section("Task Due Date") {
+                                    DatePicker("Select Date",
+                                               selection: $TaskDueDateSet,
+                                               displayedComponents: .date)
+                                    .datePickerStyle(.compact)
                                 }
-                        
+                                
                                 Section(header: Text("Task Details")) {
                                     TextEditor(text: $TaskDescriptionSet)
                                         .frame(minHeight: 100)
-                                                      .overlay(
-                                                          RoundedRectangle(cornerRadius: 8)
-                                                              .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                                      )
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                        )
                                 }
                                 Section(header: Text("Task Reward (Points for completion)")) {
                                     TextField("", value: $TaskRewardSet, format: .number)
@@ -423,13 +441,12 @@ struct ContentView: View {
                                 Section {
                                     Button {addTask()} label: {Text("Save Task")}
                                 }
-                            }.ignoresSafeArea(.keyboard)
+                            }
                             
                         } // VSTACK
-                        .onTapGesture {
-                            hideKeyboard()
-                        }
-                        .ignoresSafeArea(.keyboard)
+//                        .onTapGesture {
+//                            hideKeyboard()
+//                        }
                         .frame(width:300,height:700)
                         .cornerRadius(10)
                         .background(Rectangle()
@@ -463,7 +480,7 @@ struct ContentView: View {
                         .fontWeight(.bold)
                         .font(.title2)
                     
-                    Text("(\(Celebrate) Points)")
+                    Text("(\(Celebrate)/\(UserDefaults.standard.integer(forKey: "dailyGoal")) Points)")
                         .fontWeight(.bold)
                         .font(.title2)
                     
@@ -486,218 +503,750 @@ struct ContentView: View {
                     
                     NavigationView {
                         
-                        List {
-                            ForEach(items) { item in
+                        VStack{
+                            
+                            List {
                                 
-                                if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true {
-                                
-                                    NavigationLink {
+                                if moveCompleteHabits == true {
+                                    ForEach(items) { item in
                                         
-                                        if item.complete == true {
-                                            Text(String(item.name ?? ""))
-                                                .font(.title)
-                                                .fontWeight(.bold)
-                                                .strikethrough()
-                                        } else {
-                                            Text(String(item.name ?? ""))
-                                                .font(.title)
-                                                .fontWeight(.bold)
-                                        }
-                                        
-                                        if item.hasStatus == true {
+                                        if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true && item.complete == false {
                                             
-                                        
-                                            VStack {
-                                                HStack {
-                                                    Text("Habit status:")
-                                                       
-                                                    TextField("", value: $updateItemStatus, format: .number)
-                                                        .frame(maxWidth: 100, alignment: .center)
-                                                }.ignoresSafeArea(.keyboard)
-                                                .padding()
-                                                .foregroundColor(.black)
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: 10)
-                                                        .stroke(Color.black, lineWidth: 3)
-                                                )
-                                                .cornerRadius(10)
+                                            NavigationLink {
                                                 
-                                                Button {setStatus(refItem: item)} label: {
-                                                    Text("Save Habit Status")
-                                                      
+                                                if item.complete == true {
+                                                    Text(String(item.name ?? ""))
+                                                        .font(.title)
+                                                        .fontWeight(.bold)
+                                                        .strikethrough()
+                                                } else {
+                                                    Text(String(item.name ?? ""))
+                                                        .font(.title)
+                                                        .fontWeight(.bold)
                                                 }
-                                                .foregroundColor(.blue)
-                                                .padding()
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: 10)
-                                                        .stroke(Color.black, lineWidth: 3)
-                                                )
-                                                .cornerRadius(10)
-                                                   
+                                                
+                                                if item.hasStatus == true {
+                                                    
+                                                    
+                                                    VStack {
+                                                        HStack {
+                                                            Text("Habit status:")
+                                                            
+                                                            TextField("", value: $updateItemStatus, format: .number)
+                                                                .frame(maxWidth: 100, alignment: .center)
+                                                        }.ignoresSafeArea(.keyboard)
+                                                            .padding()
+                                                            .foregroundColor(.black)
+                                                            .overlay(
+                                                                RoundedRectangle(cornerRadius: 10)
+                                                                    .stroke(Color.black, lineWidth: 3)
+                                                            )
+                                                            .cornerRadius(10)
+                                                        
+                                                        Button {setStatus(refItem: item)} label: {
+                                                            Text("Save Habit Status")
+                                                            
+                                                        }
+                                                        .foregroundColor(.blue)
+                                                        .padding()
+                                                        .overlay(
+                                                            RoundedRectangle(cornerRadius: 10)
+                                                                .stroke(Color.black, lineWidth: 3)
+                                                        )
+                                                        .cornerRadius(10)
+                                                        
+                                                    }
+                                                    .onAppear{updateItemStatus = item.status}
+                                                    .padding()
+                                                    .overlay(
+                                                        RoundedRectangle(cornerRadius: 10)
+                                                            .stroke(Color.black, lineWidth: 3)
+                                                    )
+                                                    .cornerRadius(10)
+                                                    
+                                                } else {}
+                                                
+                                                Spacer()
+                                                
+                                                ScrollView {
+                                                    if item.isTask != true {
+                                                        
+                                                        Text(displayHabitDescription(identifier: item.name ?? ""))
+                                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                                            .padding()
+                                                            .padding()
+                                                            .overlay(
+                                                                RoundedRectangle(cornerRadius: 10)
+                                                                    .stroke(Color.black, lineWidth: 3)
+                                                            )
+                                                            .cornerRadius(10)
+                                                        
+                                                    } else {
+                                                        
+                                                        Text(item.descriptor ?? "")
+                                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                                            .padding()
+                                                            .padding()
+                                                            .overlay(
+                                                                RoundedRectangle(cornerRadius: 10)
+                                                                    .stroke(Color.black, lineWidth: 3)
+                                                            )
+                                                            .cornerRadius(10)
+                                                    }
+                                                    
+                                                    
+                                                }.frame(width: 350)
+                                                
+                                                Spacer()
+                                                
+                                                // ---------------------- BEGIN VALUE MODIFICATION
+                                                
+                                                if item.hasCheckbox == false {
+                                                    
+                                                    if item.complete == true {
+                                                        Text("☑ \(item.value)/\(item.goal) \(item.unit ?? "")")
+                                                            .font(.title)
+                                                            .padding()
+                                                            .padding()
+                                                        //.background(Color.gray.opacity(0.2))
+                                                            .overlay(
+                                                                RoundedRectangle(cornerRadius: 10)
+                                                                    .stroke(Color.black, lineWidth: 3)
+                                                            )
+                                                            .cornerRadius(10)
+                                                    } else {
+                                                        Text("☐ \(item.value)/\(item.goal) \(item.unit ?? "")")
+                                                            .font(.title)
+                                                            .padding()
+                                                            .padding()
+                                                        //.background(Color.gray.opacity(0.2))
+                                                            .overlay(
+                                                                RoundedRectangle(cornerRadius: 10)
+                                                                    .stroke(Color.black, lineWidth: 3)
+                                                            )
+                                                            .cornerRadius(10)
+                                                        
+                                                    }
+                                                    
+                                                    HStack{
+                                                        
+                                                        Button {
+                                                            addOne(item: item)
+                                                            if item.value == item.goal {
+                                                                
+                                                            }
+                                                        }
+                                                        label: {
+                                                            Text("+ 1")
+                                                                .shadow(radius: 5)
+                                                                .padding()
+                                                                .overlay(
+                                                                    RoundedRectangle(cornerRadius: 10)
+                                                                        .stroke(Color.black, lineWidth: 3)
+                                                                )
+                                                                .cornerRadius(10)
+                                                        }
+                                                        Button {
+                                                            subOne(item: item)
+                                                            if item.value == item.goal {
+                                                                
+                                                            }
+                                                        }
+                                                        label: {
+                                                            Text("- 1")
+                                                                .shadow(radius: 5)
+                                                                .padding()
+                                                                .overlay(
+                                                                    RoundedRectangle(cornerRadius: 10)
+                                                                        .stroke(Color.black, lineWidth: 3)
+                                                                )
+                                                                .cornerRadius(10)
+                                                        }
+                                                    }
+                                                    
+                                                } else {
+                                                    
+                                                    
+                                                    if item.complete == true {
+                                                        Button{
+                                                            subOne(item: item)
+                                                        } label: {
+                                                            Text("☑")
+                                                                .font(.title)
+                                                                .padding()
+                                                                .padding()
+                                                                .overlay(
+                                                                    RoundedRectangle(cornerRadius: 10)
+                                                                        .stroke(Color.black, lineWidth: 3)
+                                                                )
+                                                                .cornerRadius(10)
+                                                        }
+                                                        
+                                                    } else {
+                                                        Button{
+                                                            addOne(item: item)
+                                                        } label: {
+                                                            Text("☐")
+                                                                .font(.title)
+                                                                .padding()
+                                                                .padding()
+                                                                .overlay(
+                                                                    RoundedRectangle(cornerRadius: 10)
+                                                                        .stroke(Color.black, lineWidth: 3)
+                                                                )
+                                                                .cornerRadius(10)
+                                                        }
+                                                    }
+                                                }
+                                                // ---------------------- END VALUE MODIFICATION
+                                                
+                                                
+                                                Spacer()
+                                                
+                                            } label: {
+                                                
+                                                
+                                                HStack{
+                                                    
+                                                    if item.isTask == true {
+                                                        Image(systemName: "t.square")
+                                                            .resizable()
+                                                            .scaledToFit()
+                                                            .frame(width: 20,height: 20)
+                                                    } else {
+                                                        Image(systemName: "h.square")
+                                                            .resizable()
+                                                            .scaledToFit()
+                                                            .frame(width: 20,height: 20)
+                                                    }
+                                                    
+                                                    if item.complete == true {
+                                                        Text(String(item.name ?? ""))
+                                                            .strikethrough()
+                                                    } else {
+                                                        Text(String(item.name ?? ""))
+                                                    }
+                                                    Spacer()
+                                                    
+                                                    if item.complete == true {
+                                                        Text("☑")
+                                                    } else {
+                                                        Text("☐")
+                                                    }
+                                                    
+                                                    if item.hasCheckbox == false {
+                                                        Text("\(item.value)/\(item.goal)")
+                                                        Text("   ")
+                                                    }
+                                                }
                                             }
-                                            .onAppear{updateItemStatus = item.status}
-                                            .padding()
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 10)
-                                                    .stroke(Color.black, lineWidth: 3)
-                                            )
-                                            .cornerRadius(10)
                                             
                                         } else {}
                                         
-                                        Spacer()
+                                    }.onDelete(perform: deleteItems)
+                                    
+                                    ForEach(items) { item in
                                         
-                                        ScrollView {
-                                            if item.isTask != true {
+                                        if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true && item.complete == true {
+                                            
+                                            NavigationLink {
                                                 
-                                                Text(displayHabitDescription(identifier: item.name ?? ""))
-                                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                                    .padding()
-                                                    .padding()
-                                                    .overlay(
-                                                        RoundedRectangle(cornerRadius: 10)
-                                                            .stroke(Color.black, lineWidth: 3)
-                                                    )
-                                                    .cornerRadius(10)
-                                                
-                                            } else {
-                                                
-                                                Text(item.descriptor ?? "")
-                                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                                    .padding()
-                                                    .padding()
-                                                    .overlay(
-                                                        RoundedRectangle(cornerRadius: 10)
-                                                            .stroke(Color.black, lineWidth: 3)
-                                                    )
-                                                    .cornerRadius(10)
-                                            }
-                                            
-                                            
-                                        }.frame(width: 350)
-                                        
-                                        Spacer()
-                                        
-                                        if item.complete == true {
-                                            Text("☑ \(item.value)/\(item.goal) \(item.unit ?? "")")
-                                                .font(.title)
-                                                .padding()
-                                                .padding()
-                                                //.background(Color.gray.opacity(0.2))
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: 10)
-                                                        .stroke(Color.black, lineWidth: 3)
-                                                )
-                                                .cornerRadius(10)
-                                        } else {
-                                            Text("☐ \(item.value)/\(item.goal) \(item.unit ?? "")")
-                                                .font(.title)
-                                                .padding()
-                                                .padding()
-                                                //.background(Color.gray.opacity(0.2))
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: 10)
-                                                        .stroke(Color.black, lineWidth: 3)
-                                                )
-                                                .cornerRadius(10)
-                                            
-                                        }
-                                        
-                                        HStack{
-                                            
-                                            Button {
-                                                addOne(item: item)
-                                                if item.value == item.goal {
-                                                    
+                                                if item.complete == true {
+                                                    Text(String(item.name ?? ""))
+                                                        .font(.title)
+                                                        .fontWeight(.bold)
+                                                        .strikethrough()
+                                                } else {
+                                                    Text(String(item.name ?? ""))
+                                                        .font(.title)
+                                                        .fontWeight(.bold)
                                                 }
-                                            }
-                                            label: {
-                                                Text("+ 1")
-                                                    .shadow(radius: 5)
-                                                    .padding()
-                                                    .overlay(
-                                                        RoundedRectangle(cornerRadius: 10)
-                                                            .stroke(Color.black, lineWidth: 3)
-                                                    )
-                                                    .cornerRadius(10)
-                                            }
-                                                Button {
-                                                    subOne(item: item)
-                                                    if item.value == item.goal {
+                                                
+                                                if item.hasStatus == true {
+                                                    
+                                                    
+                                                    VStack {
+                                                        HStack {
+                                                            Text("Habit status:")
+                                                            
+                                                            TextField("", value: $updateItemStatus, format: .number)
+                                                                .frame(maxWidth: 100, alignment: .center)
+                                                        }.ignoresSafeArea(.keyboard)
+                                                            .padding()
+                                                            .foregroundColor(.black)
+                                                            .overlay(
+                                                                RoundedRectangle(cornerRadius: 10)
+                                                                    .stroke(Color.black, lineWidth: 3)
+                                                            )
+                                                            .cornerRadius(10)
+                                                        
+                                                        Button {setStatus(refItem: item)} label: {
+                                                            Text("Save Habit Status")
+                                                            
+                                                        }
+                                                        .foregroundColor(.blue)
+                                                        .padding()
+                                                        .overlay(
+                                                            RoundedRectangle(cornerRadius: 10)
+                                                                .stroke(Color.black, lineWidth: 3)
+                                                        )
+                                                        .cornerRadius(10)
                                                         
                                                     }
-                                                }
-                                            label: {
-                                                Text("- 1")
-                                                    .shadow(radius: 5)
+                                                    .onAppear{updateItemStatus = item.status}
                                                     .padding()
                                                     .overlay(
                                                         RoundedRectangle(cornerRadius: 10)
                                                             .stroke(Color.black, lineWidth: 3)
                                                     )
                                                     .cornerRadius(10)
+                                                    
+                                                } else {}
+                                                
+                                                Spacer()
+                                                
+                                                ScrollView {
+                                                    if item.isTask != true {
+                                                        
+                                                        Text(displayHabitDescription(identifier: item.name ?? ""))
+                                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                                            .padding()
+                                                            .padding()
+                                                            .overlay(
+                                                                RoundedRectangle(cornerRadius: 10)
+                                                                    .stroke(Color.black, lineWidth: 3)
+                                                            )
+                                                            .cornerRadius(10)
+                                                        
+                                                    } else {
+                                                        
+                                                        Text(item.descriptor ?? "")
+                                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                                            .padding()
+                                                            .padding()
+                                                            .overlay(
+                                                                RoundedRectangle(cornerRadius: 10)
+                                                                    .stroke(Color.black, lineWidth: 3)
+                                                            )
+                                                            .cornerRadius(10)
+                                                    }
+                                                    
+                                                    
+                                                }.frame(width: 350)
+                                                
+                                                Spacer()
+                                                
+                                                // ---------------------- BEGIN VALUE MODIFICATION
+                                                
+                                                if item.hasCheckbox == false {
+                                                    
+                                                    if item.complete == true {
+                                                        Text("☑ \(item.value)/\(item.goal) \(item.unit ?? "")")
+                                                            .font(.title)
+                                                            .padding()
+                                                            .padding()
+                                                        //.background(Color.gray.opacity(0.2))
+                                                            .overlay(
+                                                                RoundedRectangle(cornerRadius: 10)
+                                                                    .stroke(Color.black, lineWidth: 3)
+                                                            )
+                                                            .cornerRadius(10)
+                                                    } else {
+                                                        Text("☐ \(item.value)/\(item.goal) \(item.unit ?? "")")
+                                                            .font(.title)
+                                                            .padding()
+                                                            .padding()
+                                                        //.background(Color.gray.opacity(0.2))
+                                                            .overlay(
+                                                                RoundedRectangle(cornerRadius: 10)
+                                                                    .stroke(Color.black, lineWidth: 3)
+                                                            )
+                                                            .cornerRadius(10)
+                                                        
+                                                    }
+                                                    
+                                                    HStack{
+                                                        
+                                                        Button {
+                                                            addOne(item: item)
+                                                            if item.value == item.goal {
+                                                                
+                                                            }
+                                                        }
+                                                        label: {
+                                                            Text("+ 1")
+                                                                .shadow(radius: 5)
+                                                                .padding()
+                                                                .overlay(
+                                                                    RoundedRectangle(cornerRadius: 10)
+                                                                        .stroke(Color.black, lineWidth: 3)
+                                                                )
+                                                                .cornerRadius(10)
+                                                        }
+                                                        Button {
+                                                            subOne(item: item)
+                                                            if item.value == item.goal {
+                                                                
+                                                            }
+                                                        }
+                                                        label: {
+                                                            Text("- 1")
+                                                                .shadow(radius: 5)
+                                                                .padding()
+                                                                .overlay(
+                                                                    RoundedRectangle(cornerRadius: 10)
+                                                                        .stroke(Color.black, lineWidth: 3)
+                                                                )
+                                                                .cornerRadius(10)
+                                                        }
+                                                    }
+                                                    
+                                                } else {
+                                                    
+                                                    
+                                                    if item.complete == true {
+                                                        Button{
+                                                            subOne(item: item)
+                                                        } label: {
+                                                            Text("☑")
+                                                                .font(.title)
+                                                                .padding()
+                                                                .padding()
+                                                                .overlay(
+                                                                    RoundedRectangle(cornerRadius: 10)
+                                                                        .stroke(Color.black, lineWidth: 3)
+                                                                )
+                                                                .cornerRadius(10)
+                                                        }
+                                                        
+                                                    } else {
+                                                        Button{
+                                                            addOne(item: item)
+                                                        } label: {
+                                                            Text("☐")
+                                                                .font(.title)
+                                                                .padding()
+                                                                .padding()
+                                                                .overlay(
+                                                                    RoundedRectangle(cornerRadius: 10)
+                                                                        .stroke(Color.black, lineWidth: 3)
+                                                                )
+                                                                .cornerRadius(10)
+                                                        }
+                                                    }
+                                                }
+                                                // ---------------------- END VALUE MODIFICATION
+                                                
+                                                
+                                                Spacer()
+                                                
+                                            } label: {
+                                                
+                                                
+                                                HStack{
+                                                    
+                                                    if item.isTask == true {
+                                                        Image(systemName: "t.square")
+                                                            .resizable()
+                                                            .scaledToFit()
+                                                            .frame(width: 20,height: 20)
+                                                    } else {
+                                                        Image(systemName: "h.square")
+                                                            .resizable()
+                                                            .scaledToFit()
+                                                            .frame(width: 20,height: 20)
+                                                    }
+                                                    
+                                                    if item.complete == true {
+                                                        Text(String(item.name ?? ""))
+                                                            .strikethrough()
+                                                    } else {
+                                                        Text(String(item.name ?? ""))
+                                                    }
+                                                    Spacer()
+                                                    
+                                                    if item.complete == true {
+                                                        Text("☑")
+                                                    } else {
+                                                        Text("☐")
+                                                    }
+                                                    
+                                                    if item.hasCheckbox == false {
+                                                        Text("\(item.value)/\(item.goal)")
+                                                        Text("   ")
+                                                    }
+                                                }
                                             }
-                                        }
-                                        Spacer()
+                                            
+                                        } else {}
                                         
-                                    } label: {
-                                        
-
-                                        HStack{
-                                            
-                                            if item.isTask == true {
-                                                Image(systemName: "t.square")
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .frame(width: 20,height: 20)
-                                            } else {
-                                                Image(systemName: "h.square")
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .frame(width: 20,height: 20)
-                                            }
-                                            
-                                            if item.complete == true {
-                                                Text(String(item.name ?? ""))
-                                                    .strikethrough()
-                                            } else {
-                                                Text(String(item.name ?? ""))
-                                            }
-                                            
-                                            
-                                            
-                                            Spacer()
-                                            
-                                         
-                                            if item.complete == true {
-                                                Text("☑")
-                                            } else {
-                                                Text("☐")
-                                            }
-                                                                                        
-                                            Text("\(item.value)/\(item.goal)")
-                                            Text("   ")
-
-                                        }
-                                    }
+                                    }.onDelete(perform: deleteItems)
                                     
-                                } else {}
-                            }         .onDelete(perform: deleteItems)
-                            
-                        }
-                        .toolbar {
-                            ToolbarItem(placement: .navigationBarTrailing) {
-                                EditButton()
+                                    
+                                } else {
+
+                                    ForEach(items) { item in
+                                        
+                                        if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true {
+                                            
+                                            NavigationLink {
+                                                
+                                                if item.complete == true {
+                                                    Text(String(item.name ?? ""))
+                                                        .font(.title)
+                                                        .fontWeight(.bold)
+                                                        .strikethrough()
+                                                } else {
+                                                    Text(String(item.name ?? ""))
+                                                        .font(.title)
+                                                        .fontWeight(.bold)
+                                                }
+                                                
+                                                if item.hasStatus == true {
+                                                    
+                                                    
+                                                    VStack {
+                                                        HStack {
+                                                            Text("Habit status:")
+                                                            
+                                                            TextField("", value: $updateItemStatus, format: .number)
+                                                                .frame(maxWidth: 100, alignment: .center)
+                                                        }.ignoresSafeArea(.keyboard)
+                                                            .padding()
+                                                            .foregroundColor(.black)
+                                                            .overlay(
+                                                                RoundedRectangle(cornerRadius: 10)
+                                                                    .stroke(Color.black, lineWidth: 3)
+                                                            )
+                                                            .cornerRadius(10)
+                                                        
+                                                        Button {setStatus(refItem: item)} label: {
+                                                            Text("Save Habit Status")
+                                                            
+                                                        }
+                                                        .foregroundColor(.blue)
+                                                        .padding()
+                                                        .overlay(
+                                                            RoundedRectangle(cornerRadius: 10)
+                                                                .stroke(Color.black, lineWidth: 3)
+                                                        )
+                                                        .cornerRadius(10)
+                                                        
+                                                    }
+                                                    .onAppear{updateItemStatus = item.status}
+                                                    .padding()
+                                                    .overlay(
+                                                        RoundedRectangle(cornerRadius: 10)
+                                                            .stroke(Color.black, lineWidth: 3)
+                                                    )
+                                                    .cornerRadius(10)
+                                                    
+                                                } else {}
+                                                
+                                                Spacer()
+                                                
+                                                ScrollView {
+                                                    if item.isTask != true {
+                                                        
+                                                        Text(displayHabitDescription(identifier: item.name ?? ""))
+                                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                                            .padding()
+                                                            .padding()
+                                                            .overlay(
+                                                                RoundedRectangle(cornerRadius: 10)
+                                                                    .stroke(Color.black, lineWidth: 3)
+                                                            )
+                                                            .cornerRadius(10)
+                                                        
+                                                    } else {
+                                                        
+                                                        Text(item.descriptor ?? "")
+                                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                                            .padding()
+                                                            .padding()
+                                                            .overlay(
+                                                                RoundedRectangle(cornerRadius: 10)
+                                                                    .stroke(Color.black, lineWidth: 3)
+                                                            )
+                                                            .cornerRadius(10)
+                                                    }
+                                                    
+                                                    
+                                                }.frame(width: 350)
+                                                
+                                                Spacer()
+                                                
+                                                // ---------------------- BEGIN VALUE MODIFICATION
+                                                
+                                                if item.hasCheckbox == false {
+                                                    
+                                                    if item.complete == true {
+                                                        Text("☑ \(item.value)/\(item.goal) \(item.unit ?? "")")
+                                                            .font(.title)
+                                                            .padding()
+                                                            .padding()
+                                                        //.background(Color.gray.opacity(0.2))
+                                                            .overlay(
+                                                                RoundedRectangle(cornerRadius: 10)
+                                                                    .stroke(Color.black, lineWidth: 3)
+                                                            )
+                                                            .cornerRadius(10)
+                                                    } else {
+                                                        Text("☐ \(item.value)/\(item.goal) \(item.unit ?? "")")
+                                                            .font(.title)
+                                                            .padding()
+                                                            .padding()
+                                                        //.background(Color.gray.opacity(0.2))
+                                                            .overlay(
+                                                                RoundedRectangle(cornerRadius: 10)
+                                                                    .stroke(Color.black, lineWidth: 3)
+                                                            )
+                                                            .cornerRadius(10)
+                                                        
+                                                    }
+                                                    
+                                                    HStack{
+                                                        
+                                                        Button {
+                                                            addOne(item: item)
+                                                            if item.value == item.goal {
+                                                                
+                                                            }
+                                                        }
+                                                        label: {
+                                                            Text("+ 1")
+                                                                .shadow(radius: 5)
+                                                                .padding()
+                                                                .overlay(
+                                                                    RoundedRectangle(cornerRadius: 10)
+                                                                        .stroke(Color.black, lineWidth: 3)
+                                                                )
+                                                                .cornerRadius(10)
+                                                        }
+                                                        Button {
+                                                            subOne(item: item)
+                                                            if item.value == item.goal {
+                                                                
+                                                            }
+                                                        }
+                                                        label: {
+                                                            Text("- 1")
+                                                                .shadow(radius: 5)
+                                                                .padding()
+                                                                .overlay(
+                                                                    RoundedRectangle(cornerRadius: 10)
+                                                                        .stroke(Color.black, lineWidth: 3)
+                                                                )
+                                                                .cornerRadius(10)
+                                                        }
+                                                    }
+                                                    
+                                                } else {
+                                                    
+                                                    
+                                                    if item.complete == true {
+                                                        Button{
+                                                            subOne(item: item)
+                                                        } label: {
+                                                            Text("☑")
+                                                                .font(.title)
+                                                                .padding()
+                                                                .padding()
+                                                                .overlay(
+                                                                    RoundedRectangle(cornerRadius: 10)
+                                                                        .stroke(Color.black, lineWidth: 3)
+                                                                )
+                                                                .cornerRadius(10)
+                                                        }
+                                                        
+                                                    } else {
+                                                        Button{
+                                                            addOne(item: item)
+                                                        } label: {
+                                                            Text("☐")
+                                                                .font(.title)
+                                                                .padding()
+                                                                .padding()
+                                                                .overlay(
+                                                                    RoundedRectangle(cornerRadius: 10)
+                                                                        .stroke(Color.black, lineWidth: 3)
+                                                                )
+                                                                .cornerRadius(10)
+                                                        }
+                                                    }
+                                                }
+                                                // ---------------------- END VALUE MODIFICATION
+                                                
+                                                
+                                                Spacer()
+                                                
+                                            } label: {
+                                                
+                                                
+                                                HStack{
+                                                    
+                                                    if item.isTask == true {
+                                                        Image(systemName: "t.square")
+                                                            .resizable()
+                                                            .scaledToFit()
+                                                            .frame(width: 20,height: 20)
+                                                    } else {
+                                                        Image(systemName: "h.square")
+                                                            .resizable()
+                                                            .scaledToFit()
+                                                            .frame(width: 20,height: 20)
+                                                    }
+                                                    
+                                                    if item.complete == true {
+                                                        Text(String(item.name ?? ""))
+                                                            .strikethrough()
+                                                    } else {
+                                                        Text(String(item.name ?? ""))
+                                                    }
+                                                    Spacer()
+                                                    
+                                                    if item.complete == true {
+                                                        Text("☑")
+                                                    } else {
+                                                        Text("☐")
+                                                    }
+                                                    
+                                                    if item.hasCheckbox == false {
+                                                        Text("\(item.value)/\(item.goal)")
+                                                        Text("   ")
+                                                    }
+                                                }
+                                            }
+                                            
+                                        } else {}
+                                        
+                                    }.onDelete(perform: deleteItems)
+
+                                }
+                                
+                                
+                               
+                                
+                                
                             }
-                            ToolbarItem {
-                                Button(action: resetUserDefaults) {
-                                    Label("Add Item", systemImage: "trash")
+                            .onAppear{moveCompleteHabits = UserDefaults.standard.bool(forKey: "displayCompletedHabits")}
+                            .toolbar {
+                                ToolbarItem(placement: .navigationBarTrailing) {
+                                    EditButton()
+                                }
+                                ToolbarItem {
+                                    Button(action: resetUserDefaults) {
+                                        Label("Add Item", systemImage: "trash")
+                                    }
                                 }
                             }
                         }
+                        
+                        
+                        
+                        
+                        
                     }
-                    .environment(\.editMode, .constant(.active))
-                    
                 }.onAppear{checkDate()}
             }
             
@@ -719,7 +1268,7 @@ struct ContentView: View {
     
     private func celebrationProcedure () {
                 
-        print("Item completed!")
+        print("Goal for the day has been completed!")
         
     }
     
@@ -741,6 +1290,7 @@ struct ContentView: View {
         newItem.isTask = true
         newItem.id = UUID()
         newItem.descriptor = taskToShunt.TaskDescription
+        newItem.hasCheckbox = taskToShunt.TaskHasCheckbox
         rmTask(id: taskToShunt.id)
         selectedTab = .HUB
         
@@ -752,7 +1302,6 @@ struct ContentView: View {
             let nsError = error as NSError
             fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
         }
-        
     }
     
     /*    ------------------------------------------------
@@ -770,7 +1319,8 @@ struct ContentView: View {
                                     TaskReward: item.reward,
                                     TaskDueDate: (item.timestamp ?? Date()),
                                     TaskUnit: item.unit ?? "",
-                                    TaskGoal: item.goal)
+                                    TaskGoal: item.goal,
+                                    TaskHasCheckbox: item.hasCheckbox)
             
             if var outTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") {
                 outTaskData.append(returnedTask)
@@ -891,16 +1441,24 @@ struct ContentView: View {
      ------------------------------------------------     */
     
     private func addOne(item: Item) {
-
-        item.value = item.value + 1
         
-        if item.value >= item.goal {
-            if item.complete == false {
-                Celebrate += item.reward
+        if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true {
+
+            item.value = item.value + 1
+            
+            if item.value >= item.goal {
+                if item.complete == false {
+                    Celebrate += item.reward
+                }
+                item.complete = true
+            }
+            
+            if Celebrate >= UserDefaults.standard.integer(forKey: "dailyGoal") {
                 celebrationProcedure()
             }
-            item.complete = true
         }
+            
+
      
         do {
             try viewContext.save()
@@ -920,15 +1478,18 @@ struct ContentView: View {
     
     private func subOne(item: Item) {
         
-        if item.value > 0 {
-            item.value = item.value - 1
-        }
-        
-        if item.value < item.goal {
-            if item.complete == true {
-                Celebrate -= item.reward
+        if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true {
+            
+            if item.value > 0 {
+                item.value = item.value - 1
             }
-            item.complete = false
+            
+            if item.value < item.goal {
+                if item.complete == true {
+                    Celebrate -= item.reward
+                }
+                item.complete = false
+            }
         }
         
         do {
@@ -972,6 +1533,9 @@ struct ContentView: View {
     
     
     private func populateTasks() {
+        
+        
+        
         for taskFinder in items {
             print("PopulateTasks checking item \(taskFinder.name ?? "")")
             if Calendar.current.isDate((taskFinder.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) != true {
@@ -979,6 +1543,21 @@ struct ContentView: View {
                     deshuntTask(item: taskFinder)
                 }
             } else {}
+        }
+        
+        
+//          ADD LOOP TO CHECK TASKS IN TASKLIST
+        //Does this intefere with shunt/deshunt??
+        
+        
+        if let outTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") {
+            for index in outTaskData {
+                if Calendar.current.isDate((index.TaskDueDate), equalTo: Date(), toGranularity: .day) == true {
+                    shuntTask(taskToShunt: index)
+                }
+            }
+        } else {
+            print("Failure for task due date checker")
         }
 
         for index in habitData {
@@ -988,7 +1567,6 @@ struct ContentView: View {
                 let newItem = Item(context: viewContext)
                 newItem.timestamp = Date()
                 newItem.name = index.HabitName
-                newItem.value = index.HabitValue
                 newItem.goal = index.HabitGoal
                 newItem.unit = index.HabitUnit
                 newItem.whichProtocol = index.HabitProtocol
@@ -996,6 +1574,7 @@ struct ContentView: View {
                 newItem.reward = index.HabitReward
                 newItem.id = UUID()
                 newItem.hasStatus = index.HabitHasStatus
+                newItem.hasCheckbox = index.HabitHasCheckbox
              
             }
             
@@ -1025,7 +1604,8 @@ struct ContentView: View {
                                       TaskReward: TaskRewardSet,
                                       TaskDueDate: TaskDueDateSet,
                                       TaskUnit: TaskUnitSet,
-                                      TaskGoal: TaskGoalSet)
+                                      TaskGoal: TaskGoalSet,
+                                      TaskHasCheckbox: TaskHasCheckboxSet)
             
             if var outTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") {
 
@@ -1039,12 +1619,13 @@ struct ContentView: View {
             }
             
             DisplayTaskMaker = false
-            TaskNameSet = ""
-            TaskDescriptionSet = ""
-            TaskRewardSet = 0
+            TaskNameSet = "Task"
+            TaskDescriptionSet = "This is a Task"
+            TaskRewardSet = 1
             TaskDueDateSet = Date()
-            TaskUnitSet = ""
+            TaskUnitSet = "units"
             TaskGoalSet = 1
+            TaskHasCheckboxSet = false
         }
 
     /*    ------------------------------------------------
@@ -1054,8 +1635,11 @@ struct ContentView: View {
         
     private func addItem() {
         
+        if HabitHasCheckboxSet == true {
+            HabitGoalSet = 1
+        }
+        
         let inputHabit:Habit = Habit(HabitName: HabitNameSet,
-                                  HabitValue: HabitValueSet,
                                   HabitGoal: HabitGoalSet,
                                   HabitUnit: HabitUnitSet,
                                   HabitProtocol: HabitProtocolSet,
@@ -1063,7 +1647,8 @@ struct ContentView: View {
                                   HabitRepeatValue: HabitRepetitionSet,
                                   HabitDescription: HabitDescriptionSet,
                                   HabitReward: Int16(HabitRewardSet),
-                                  HabitHasStatus: HabitHasStatusSet)
+                                  HabitHasStatus: HabitHasStatusSet,
+                                  HabitHasCheckbox: HabitHasCheckboxSet)
         
         
         if var outData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") {
@@ -1081,7 +1666,6 @@ struct ContentView: View {
         
         DisplayHabitMaker = false
         HabitNameSet = ""
-        HabitValueSet = 0
         HabitGoalSet = 1
         HabitUnitSet = "units"
         HabitProtocolSet = "Daily"
@@ -1089,6 +1673,7 @@ struct ContentView: View {
         HabitHasStatusSet = false
         HabitRewardSet = 1
         HabitStartDateSet = Date()
+        HabitHasCheckboxSet = true
         
         
         

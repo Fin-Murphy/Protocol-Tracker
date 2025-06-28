@@ -57,6 +57,7 @@ struct Task: Identifiable, Codable {
     var TaskDueDate: Date = Date()
     var TaskUnit: String
     var TaskGoal: Int16
+    var TaskHasCheckbox: Bool
     
 }
 
@@ -65,7 +66,6 @@ struct Habit: Identifiable, Codable, Hashable {
     
     var id: UUID = UUID()
     var HabitName:String
-    var HabitValue:Int16
     var HabitGoal:Int16
     var HabitUnit:String
     var HabitProtocol:String
@@ -74,6 +74,8 @@ struct Habit: Identifiable, Codable, Hashable {
     var HabitDescription: String
     var HabitReward: Int16
     var HabitHasStatus: Bool
+    var HabitHasCheckbox: Bool
+
 } // END struct Task
 
 
