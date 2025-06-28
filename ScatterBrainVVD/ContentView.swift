@@ -37,6 +37,16 @@ struct ContentView: View {
         animation: .default)
     private var items: FetchedResults<Item>
 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     var body: some View {
         
        VStack{
@@ -123,7 +133,7 @@ struct ContentView: View {
                                                             
                                                             TextField("", value: $updateItemStatus, format: .number)
                                                                 .frame(maxWidth: 100, alignment: .center)
-                                                        }.ignoresSafeArea(.keyboard)
+                                                        }
                                                             .padding()
                                                             .foregroundColor(.black)
                                                             .overlay(
@@ -329,6 +339,7 @@ struct ContentView: View {
                                                     }
                                                 }
                                             }
+
                                             
                                         } else {}
                                         
@@ -360,7 +371,7 @@ struct ContentView: View {
                                                             
                                                             TextField("", value: $updateItemStatus, format: .number)
                                                                 .frame(maxWidth: 100, alignment: .center)
-                                                        }.ignoresSafeArea(.keyboard)
+                                                        }
                                                             .padding()
                                                             .foregroundColor(.black)
                                                             .overlay(
@@ -600,7 +611,7 @@ struct ContentView: View {
                                                             
                                                             TextField("", value: $updateItemStatus, format: .number)
                                                                 .frame(maxWidth: 100, alignment: .center)
-                                                        }.ignoresSafeArea(.keyboard)
+                                                        }
                                                             .padding()
                                                             .foregroundColor(.black)
                                                             .overlay(
@@ -812,11 +823,7 @@ struct ContentView: View {
                                     }.onDelete(perform: deleteItems)
 
                                 }
-                                
-                                
-                               
-                                
-                                
+                        
                             }
                             .onAppear{
                                 moveCompleteHabits = UserDefaults.standard.bool(forKey: "displayCompletedHabits")
@@ -832,11 +839,6 @@ struct ContentView: View {
                                 }
                             }
                         }
-                        
-                        
-                        
-                        
-                        
                     }
                 }.onAppear{checkDate()}
             }
@@ -851,11 +853,11 @@ struct ContentView: View {
                    BEGIN PRIVATE FUNCTIONS
      ------------------------------------------------     */
 
-    private func move(from source: IndexSet, to destination: Int) {
-        habitData.move(fromOffsets: source, toOffset: destination)
-        UserDefaults.standard.setEncodable(habitData, forKey: "habitList")
-        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
-    }
+//    private func move(from source: IndexSet, to destination: Int) {
+//        habitData.move(fromOffsets: source, toOffset: destination)
+//        UserDefaults.standard.setEncodable(habitData, forKey: "habitList")
+//        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+//    }
     
     private func celebrationProcedure () {
             print("Goal for the day has been completed!")
@@ -949,8 +951,6 @@ struct ContentView: View {
     /*    ------------------------------------------------
                     SET STATUS
      ------------------------------------------------     */
-    
-    
     
     private func setStatus(refItem: Item) {
         refItem.status = updateItemStatus
