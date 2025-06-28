@@ -86,7 +86,6 @@ struct HabitBuilderView: View {
                                                     Text("Item Description: \n\n \(habitNdx.HabitDescription)" )
                                                 }
                                                 
-                                                
                                                 Button{
                                                     rmHabit(id: habitNdx.id)
 //                                                    selectedTab = .HUB
@@ -304,6 +303,6 @@ struct HabitBuilderView: View {
 
 }
 
-#Preview {
-    HabitBuilderView()
-}
+//#Preview {
+//    HabitBuilderView()
+//}

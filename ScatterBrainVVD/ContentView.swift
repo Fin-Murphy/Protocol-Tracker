@@ -12,7 +12,7 @@ struct ContentView: View {
     
     @State var selectedTab: Tabs = .HUB
     
-    @State var DisplayHabitMaker: Bool = false
+    
     @State var DisplayTaskMaker: Bool = false
 
     @State var Today = Date()
@@ -43,9 +43,7 @@ struct ContentView: View {
     //----------------------------------------------------------
     
     
-    
-    
-    @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.managedObjectContext) public var viewContext
 
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
@@ -115,14 +113,14 @@ struct ContentView: View {
             else if selectedTab == .Protocols {
                 
                     
-                   HabitBuilderView()
+                HabitBuilderView()
                     
                 
 /* *******************************************************
             GOALS TAB
 ****************************************************** */
             } else if selectedTab == .Goals {
-                
+                /*
                 ZStack{
                     
                     VStack{
@@ -288,6 +286,9 @@ struct ContentView: View {
                     
                     
                 }.onAppear{indexProtocols()}
+                */
+                
+                TaskBuilderView(context: _viewContext)
                 
 /* *******************************************************
             MAIN TASK TAB
@@ -1336,16 +1337,6 @@ struct ContentView: View {
         return "No description"
     }
 
-    
-    /*    ------------------------------------------------
-                   OPEN HABIT BUILDER
-     ------------------------------------------------     */
-    
-    
-    
-        private func openHabitBuilder() {
-            DisplayHabitMaker = true
-        }
     
     
     /*    ------------------------------------------------
