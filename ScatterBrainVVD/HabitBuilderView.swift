@@ -9,6 +9,10 @@ import SwiftUI
 
 struct HabitBuilderView: View {
     
+    @State var DisplayHabitMaker: Bool = false
+
+    @State var Today = Date()
+    
     @State var HabitNameSet: String = ""
     @State var HabitGoalSet: Int16 = 1
     @State var HabitProtocolSet: String = "Daily"
@@ -21,18 +25,283 @@ struct HabitBuilderView: View {
     @State var HabitIsSubtaskSet: Bool = false
     @State var HabitHasCheckboxSet: Bool = true
     
+    @State var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
     
-    
-    
-    
-    
-    
-    
-    
+//    @Binding var selectedTab: Tabs
+
+    // -----------------------------------------------
+    //                  END VAR DECLARATIONS
+    // ----------------------------------------------
+   
     
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        
+        ZStack{
+            
+            VStack{
+                
+                HStack{
+                    Text("Habits")
+                        .fontWeight(.bold)
+                        .font(.title)
+                        .padding(.bottom)
+                    
+                    Button {
+                        DisplayHabitMaker = true
+                    } label: {
+                        Text("+")
+                            .foregroundColor(.blue)
+                            .font(.title)
+                            .padding(.bottom)
+                        
+                    }
+                }
+                
+                if let listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") {
+                    if habitData.isEmpty != true {
+                        NavigationView {
+                            List {
+                                ForEach(listOfProtocols) { index in
+                                    
+                                    
+                                    Text(index.ProtocolName)
+                                        .font(.title2)
+                                        .fontWeight(.bold)
+                                        .padding(.top)
+                                    
+                                    ForEach(habitData) { habitNdx in
+                                        
+                                        if habitNdx.HabitProtocol == index.ProtocolName {
+                                            
+                                            NavigationLink{
+                                                
+                                                List{
+                                                    Text(habitNdx.HabitName)
+                                                        .font(.title)
+                                                        .padding()
+                                                    Text("Item is part of protocol \(habitNdx.HabitProtocol).")
+                                                    Text("Item start date: \(habitNdx.HabitStartDate, formatter: itemFormatter)" )
+                                                    Text("Item goal value: \(habitNdx.HabitGoal) \(habitNdx.HabitUnit)" )
+                                                    Text("Item repeats every \(habitNdx.HabitRepeatValue) days." )
+                                                    Text("Item Description: \n\n \(habitNdx.HabitDescription)" )
+                                                }
+                                                
+                                                
+                                                Button{
+                                                    rmHabit(id: habitNdx.id)
+//                                                    selectedTab = .HUB
+                                                } label: {
+                                                    Text("Remove this habit")
+                                                }
+                                            } label: {
+                                                
+                                                HStack {
+                                                    Text(habitNdx.HabitName)
+                                                    
+                                                    Spacer()
+                                                    
+                                                    
+                                                    Text("\(habitNdx.HabitGoal) \(habitNdx.HabitUnit)")
+                                                }
+                                            }
+                                            
+                                        } else {}
+                                    }.onMove(perform: move)
+                                }
+                            }
+                            .toolbar {
+                                EditButton()
+                            }
+                        }
+                    } else {Text("No Habits yet")}
+                }
+            }
+            
+            
+            if DisplayHabitMaker == true {
+                
+                VStack{
+                    Button {
+                        DisplayHabitMaker = false
+                    } label: {
+                        Image(systemName: "x.circle")
+                            .resizable()
+                            .foregroundColor(.white)
+                            .scaledToFit()
+                            .frame(width: 100,height: 24)
+                            .bold()
+                    }.padding()
+                    
+                    
+                    
+                    Form {
+                        
+                        Section(header: Text("Habit Name:")) {
+                            TextField("", text: $HabitNameSet)
+                        }
+                        Toggle("Use checkbox instead of units",isOn: $HabitHasCheckboxSet)
+                        if HabitHasCheckboxSet == false {
+                            Section(header: Text("Habit Goal:")) {
+                                TextField("", value: $HabitGoalSet, format: .number)
+                            }
+                            Section(header: Text("Habit Unit:")) {
+                                TextField("", text: $HabitUnitSet)
+                            }
+                        }
+                        Section(header: Text("Habit Protocol:")) {
+                            TextField("", text: $HabitProtocolSet)
+                        }
+                        Section(header: Text("Habit Interval (1 = Daily, 7 = Weekly, etc):")) {
+                            TextField("", value: $HabitRepetitionSet, format: .number)
+                        }
+                        Section(header: Text("Habit Details")) {
+                            TextEditor(text: $HabitDescriptionSet)
+                                .frame(minHeight: 100)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                )
+                        }
+                        Section("Habit Start Date") {
+                            DatePicker("Select Date",
+                                       selection: $HabitStartDateSet,
+                                       displayedComponents: .date)
+                            .datePickerStyle(.compact)
+                        }
+                        Section(header: Text("Habit Reward (Points for completion)")) {
+                            TextField("", value: $HabitRewardSet, format: .number)
+                        }
+                        Toggle("Include status update", isOn: $HabitHasStatusSet)
+                        Toggle("Make this habit a subtask of another habit?", isOn: $HabitIsSubtaskSet)
+                        
+                        
+                        Section {
+                            Button {addItem()} label: {Text("Save Habit")}
+                            
+                            
+                        }
+                        
+                    }.ignoresSafeArea(.keyboard)
+                    
+                } // VSTACK
+                .frame(width:300,height:700)
+                .cornerRadius(10)
+                .background(Rectangle()
+                    .foregroundColor(.black))
+                .cornerRadius(20)
+                .shadow(radius: 20)
+                
+            } else {}
+            
+            
+        }.onAppear{indexProtocols()}
     }
+        
+        
+    
+    
+    private func indexProtocols () {
+            
+            if var protocolArray: [HabitProtocol] = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") {
+            
+                    for ndx in habitData {
+                        var inArray = false
+                        print("Executing for item ", ndx.HabitName)
+                        for ndx2 in protocolArray {
+                            if ndx.HabitProtocol == ndx2.ProtocolName {
+                                inArray = true
+                            }
+                        }
+                        if inArray == false {
+                            protocolArray.append(HabitProtocol(ProtocolName: ndx.HabitProtocol))
+                        }
+                    }
+                
+                
+                UserDefaults.standard.setEncodable(protocolArray, forKey: "protocol")
+                
+            } else {
+                let pArray: [HabitProtocol] = [/*TaskProtocol(ProtocolName: "Daily")*/]
+                UserDefaults.standard.setEncodable(pArray, forKey: "protocol")
+            }
+        }
+
+    private func openHabitBuilder() {
+        DisplayHabitMaker = true
+    }
+        
+    private func rmHabit(id: UUID) {
+        if var outHabitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") {
+            var iterator = 0
+            for index in outHabitData {
+                if index.id == id {
+                    outHabitData.remove(at: iterator)
+                }
+                iterator += 1
+            }
+            UserDefaults.standard.setEncodable(outHabitData, forKey: "habitList")
+        }
+        
+        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+    }
+
+    private func addItem() {
+        
+        if HabitHasCheckboxSet == true {
+            HabitGoalSet = 1
+        }
+        
+        let inputHabit:Habit = Habit(HabitName: HabitNameSet,
+                                  HabitGoal: HabitGoalSet,
+                                  HabitUnit: HabitUnitSet,
+                                  HabitProtocol: HabitProtocolSet,
+                                  HabitStartDate: HabitStartDateSet,
+                                  HabitRepeatValue: HabitRepetitionSet,
+                                  HabitDescription: HabitDescriptionSet,
+                                  HabitReward: Int16(HabitRewardSet),
+                                  HabitHasStatus: HabitHasStatusSet,
+                                  HabitHasCheckbox: HabitHasCheckboxSet)
+        
+        
+        if var outData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") {
+
+            outData.append(inputHabit)
+            UserDefaults.standard.setEncodable(outData, forKey: "habitList")
+            
+        } else {
+
+            let initHabitList:[Habit] = [inputHabit]
+            UserDefaults.standard.setEncodable(initHabitList, forKey: "habitList")
+        }
+        
+        
+        
+        DisplayHabitMaker = false
+        HabitNameSet = ""
+        HabitGoalSet = 1
+        HabitUnitSet = "units"
+        HabitProtocolSet = "Daily"
+        HabitDescriptionSet = "This is a Habit"
+        HabitHasStatusSet = false
+        HabitRewardSet = 1
+        HabitStartDateSet = Date()
+        HabitHasCheckboxSet = true
+        
+        
+        
+        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+        
+        indexProtocols()
+
+        
+    }
+
+    private func move(from source: IndexSet, to destination: Int) {
+        habitData.move(fromOffsets: source, toOffset: destination)
+        UserDefaults.standard.setEncodable(habitData, forKey: "habitList")
+        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+    }
+
 }
 
 #Preview {
