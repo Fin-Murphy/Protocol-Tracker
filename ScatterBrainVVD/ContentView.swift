@@ -12,25 +12,12 @@ struct ContentView: View {
     
     @State var selectedTab: Tabs = .HUB
     
-    
-    @State var DisplayTaskMaker: Bool = false
-
-    @State var Today = Date()
     @State var SelectedDate: Date = Date()
     
     let valueRange = 1 ... 10
     let calendar = Calendar(identifier: .gregorian)
     
     @State var moveCompleteHabits: Bool = false
-    
-    @State var TaskNameSet: String = "Task"
-    @State var TaskDescriptionSet: String = "This is a Task"
-    @State var TaskRewardSet: Int16 = 1
-    @State var TaskDueDateSet: Date = Date()
-    @State var TaskUnitSet: String = "units"
-    @State var TaskGoalSet: Int16 = 1
-    @State var TaskHasCheckboxSet: Bool = true
-
     
     @State var Celebrate: Int16 = 0
     
@@ -95,36 +82,9 @@ struct ContentView: View {
                 
                 
                 // TOP DATE BAR ---------------------------------------------------------------------
-                HStack{
-                    
-                    Button {
-                        SelectedDate = calendar.date(byAdding: .day, value: -1, to: SelectedDate)!
-                    } label: {
-                        Text("<<")
-                            .fontWeight(.bold)
-                            .font(.title2)
-                    }
-                                        
-                    Text("\(SelectedDate, formatter: itemFormatter)")
-                        .fontWeight(.bold)
-                        .font(.title2)
-                    
-                    Text("(\(Celebrate)/\(UserDefaults.standard.integer(forKey: "dailyGoal")) Points)")
-                        .fontWeight(.bold)
-                        .font(.title2)
-                    
-                    Button {
-                        SelectedDate = calendar.date(byAdding: .day, value: 1, to: SelectedDate)!
-                        
-                    } label: {
-                        Text(">>")
-                            .fontWeight(.bold)
-                            .font(.title2)
-                                            }
-                }
-                .colorScheme(.light)
-                .background(Rectangle()
-                        .foregroundColor(.white))
+           
+                DateBarView(SelectedDate: $SelectedDate, Celebrate: $Celebrate)
+                
                 // TOP DATE BAR ---------------------------------------------------------------------
 
                 
@@ -986,11 +946,6 @@ struct ContentView: View {
         }
     } //END FUNC DELETE ENTITY
     
-    
-    
-    
-    
-    
     /*    ------------------------------------------------
                     SET STATUS
      ------------------------------------------------     */
@@ -1202,44 +1157,7 @@ struct ContentView: View {
         }
     }
     
-    
-    
-    /*    ------------------------------------------------
-                  ADD TASK
-     ------------------------------------------------     */
-    
-        
-        private func addTask() {
-            
-            let inputTask:Task = Task(TaskName: TaskNameSet,
-                                      TaskDescription: TaskDescriptionSet,
-                                      TaskReward: TaskRewardSet,
-                                      TaskDueDate: TaskDueDateSet,
-                                      TaskUnit: TaskUnitSet,
-                                      TaskGoal: TaskGoalSet,
-                                      TaskHasCheckbox: TaskHasCheckboxSet)
-            
-            if var outTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") {
 
-                outTaskData.append(inputTask)
-                UserDefaults.standard.setEncodable(outTaskData, forKey: "taskList")
-                
-            } else {
-
-                let initTaskList:[Task] = [inputTask]
-                UserDefaults.standard.setEncodable(initTaskList, forKey: "taskList")
-            }
-            
-            DisplayTaskMaker = false
-            TaskNameSet = "Task"
-            TaskDescriptionSet = "This is a Task"
-            TaskRewardSet = 1
-            TaskDueDateSet = Date()
-            TaskUnitSet = "units"
-            TaskGoalSet = 1
-            TaskHasCheckboxSet = false
-        }
-    
     
     /*    ------------------------------------------------
                     RESET USER DEFAULTS
