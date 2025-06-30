@@ -959,22 +959,15 @@ struct ContentView: View {
                 populateTasks()
                 UserDefaults.standard.set(Date(), forKey: "DailyTaskPopulate?")
                 Celebrate = 0
-            }
+                SelectedDate = Date()
+            } else {}
             
         } else {
             UserDefaults.standard.set(Date(), forKey: "DailyTaskPopulate?")
             populateTasks()
         }
     }
-    
-    
-    /*    ------------------------------------------------
-                    ADD ONE
-     ------------------------------------------------     */
-    
-   
-    
-    
+
 
 
 
