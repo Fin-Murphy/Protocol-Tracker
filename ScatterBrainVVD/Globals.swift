@@ -37,7 +37,7 @@ extension View {
 
 
 
-let valueRange = 1 ... 100
+let valueRange = 1 ... 1000
 let Today: Date = Date()
 let calendar: Calendar = .current
 

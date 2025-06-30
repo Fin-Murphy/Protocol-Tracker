@@ -53,27 +53,7 @@ struct TabBar: View {
             //Spacer()
             //-----------------------------------------------
             
-                
-            //-----------------------------------------------
-
-            if selectedTab == .HUB {
-                
-                    Button {
-                        selectedTab = .HUB
-                    } label: {
-                        SymbolButton(bIcon: "h.square.fill", bTxt: "Hub")
-                    }.foregroundColor(.black)
-                
-            } else {
-                
-                Button {
-                    selectedTab = .HUB
-                } label: {
-                    SymbolButton(bIcon: "h.square", bTxt: "")
-                }.foregroundColor(.black)
-                
-            }
-
+        
             //-----------------------------------------------
             
             if selectedTab == .Protocols {
@@ -92,6 +72,28 @@ struct TabBar: View {
                         SymbolButton(bIcon: "arrowtriangle.down.square", bTxt: "")
                     }.foregroundColor(.black)
             
+            }
+            
+            
+            //-----------------------------------------------
+
+            
+            if selectedTab == .HUB {
+                
+                    Button {
+                        selectedTab = .HUB
+                    } label: {
+                        SymbolButton(bIcon: "h.square.fill", bTxt: "Hub")
+                    }.foregroundColor(.black)
+                
+            } else {
+                
+                Button {
+                    selectedTab = .HUB
+                } label: {
+                    SymbolButton(bIcon: "h.square", bTxt: "")
+                }.foregroundColor(.black)
+                
             }
                 
             //-----------------------------------------------

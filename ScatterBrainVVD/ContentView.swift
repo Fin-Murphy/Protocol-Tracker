@@ -14,7 +14,6 @@ struct ContentView: View {
     
     @State var SelectedDate: Date = Date()
     
-    let valueRange = 1 ... 10
     let calendar = Calendar(identifier: .gregorian)
     
     @State var moveCompleteHabits: Bool = false
@@ -38,15 +37,7 @@ struct ContentView: View {
     private var items: FetchedResults<Item>
 
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
+   
     var body: some View {
         
        VStack{
@@ -1001,7 +992,7 @@ struct ContentView: View {
     
     public func checkDate() {
         if let savedDate = UserDefaults.standard.object(forKey: "DailyTaskPopulate?") as? Date {
-            if Calendar.current.isDate(savedDate, equalTo: Date(), toGranularity: .day) != true {
+            if Date() > savedDate {
                 populateTasks()
                 UserDefaults.standard.set(Date(), forKey: "DailyTaskPopulate?")
                 Celebrate = 0
