@@ -88,6 +88,12 @@ var backward_Calendar = valueRange.map {
 }
 
 
+let itemFormatter: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.dateStyle = .short
+    formatter.timeStyle = .none
+    return formatter
+}()
 
 
 
@@ -96,6 +102,8 @@ var backward_Calendar = valueRange.map {
 //                    FUNCTIONS
 
 //------------------------------------------------------
+
+
 
 func shuntTask (taskToShunt: Task, viewContext: NSManagedObjectContext) {
     
@@ -123,12 +131,38 @@ func shuntTask (taskToShunt: Task, viewContext: NSManagedObjectContext) {
 }
 
 
-let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .none
-    return formatter
-}()
+func checkTaskDueDates (viewContext: NSManagedObjectContext) {
+    
+    if let outTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") {
+        for index in outTaskData {
+            if Calendar.current.isDate((index.TaskDueDate), equalTo: Date(), toGranularity: .day) == true {
+                shuntTask(taskToShunt: index, viewContext: viewContext)
+            }
+        }
+    } else {
+        print("Failure for task due date checker")
+    }
+    
+}
+
+
+func displayHabitDescription (identifier: String) -> String {
+
+    for index in UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? [] {
+        if index.HabitName == identifier {
+            return index.HabitDescription
+        }
+    }
+    return "No description"
+}
+
+func resetUserDefaults () {
+    UserDefaults.standard.removeObject(forKey: "DailyTaskPopulate?")
+    
+//        UserDefaults.standard.removeObject(forKey: "habitList")
+//        UserDefaults.standard.removeObject(forKey: "protocol")
+//
+}
 
 
 func daysBetween(start: Date, end: Date) -> Int {
@@ -136,7 +170,6 @@ func daysBetween(start: Date, end: Date) -> Int {
     let components = calendar.dateComponents([.day], from: start, to: end)
     return components.day ?? 0
 }
-
 
 
 extension UserDefaults {
@@ -162,8 +195,6 @@ extension UserDefaults {
 
 
 
-
-
 func rmTask(id: UUID) {
     if var outTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") {
         var iterator = 0
@@ -178,4 +209,68 @@ func rmTask(id: UUID) {
 }
 
 
+func addOne(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout Int16) {
+    
+    if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true {
 
+        item.value = item.value + 1
+        
+        if item.value >= item.goal {
+            if item.complete == false {
+                Celebrate += item.reward
+            }
+            item.complete = true
+        }
+        
+        if Celebrate >= UserDefaults.standard.integer(forKey: "dailyGoal") {
+            celebrationProcedure()
+        }
+    }
+        
+
+ 
+    do {
+        try viewContext.save()
+    } catch {
+        let nsError = error as NSError
+        fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+    }
+}
+
+
+
+/*    ------------------------------------------------
+                SUB ONE
+ ------------------------------------------------     */
+
+
+
+func subOne(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout Int16) {
+    
+    if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true {
+        
+        if item.value > 0 {
+            item.value = item.value - 1
+        }
+        
+        if item.value < item.goal {
+            if item.complete == true {
+                Celebrate -= item.reward
+            }
+            item.complete = false
+        }
+    }
+    
+    do {
+        try viewContext.save()
+    } catch {
+        let nsError = error as NSError
+        fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+    }
+}
+
+
+
+func celebrationProcedure () {
+        print("Goal for the day has been completed!")
+}

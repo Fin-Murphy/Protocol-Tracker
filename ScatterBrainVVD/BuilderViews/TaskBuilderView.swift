@@ -228,40 +228,10 @@ struct TaskBuilderView: View {
         TaskUnitSet = "units"
         TaskGoalSet = 1
         TaskHasCheckboxSet = false
+        
+        checkTaskDueDates(viewContext: context)
     }
     
-    /*    ------------------------------------------------
-                  INDEX PROTOCOLS
-     ------------------------------------------------     */
-    /*
-    private func indexProtocols () {
-            
-            if var protocolArray: [HabitProtocol] = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") {
-            
-                    for ndx in habitData {
-                        var inArray = false
-                        print("Executing for item ", ndx.HabitName)
-                        for ndx2 in protocolArray {
-                            if ndx.HabitProtocol == ndx2.ProtocolName {
-                                inArray = true
-                            }
-                        }
-                        if inArray == false {
-                            protocolArray.append(HabitProtocol(ProtocolName: ndx.HabitProtocol))
-                        }
-                    }
-                
-                
-                UserDefaults.standard.setEncodable(protocolArray, forKey: "protocol")
-                
-            } else {
-                let pArray: [HabitProtocol] = [/*TaskProtocol(ProtocolName: "Daily")*/]
-                UserDefaults.standard.setEncodable(pArray, forKey: "protocol")
-            }
-        }
-     */
-}
 
-//#Preview {
-//    TaskBuilderView(context: <#Binding<NSManagedObjectContext>#>)
-//}
+
+}

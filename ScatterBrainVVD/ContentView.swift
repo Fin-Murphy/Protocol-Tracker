@@ -221,7 +221,7 @@ struct ContentView: View {
                                                     HStack{
                                                         
                                                         Button {
-                                                            addOne(item: item)
+                                                            addOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
                                                             if item.value == item.goal {
                                                                 
                                                             }
@@ -237,7 +237,7 @@ struct ContentView: View {
                                                                 .cornerRadius(10)
                                                         }
                                                         Button {
-                                                            subOne(item: item)
+                                                            subOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
                                                             if item.value == item.goal {
                                                                 
                                                             }
@@ -259,7 +259,7 @@ struct ContentView: View {
                                                     
                                                     if item.complete == true {
                                                         Button{
-                                                            subOne(item: item)
+                                                            subOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
                                                         } label: {
                                                             Text("☑")
                                                                 .font(.title)
@@ -274,7 +274,7 @@ struct ContentView: View {
                                                         
                                                     } else {
                                                         Button{
-                                                            addOne(item: item)
+                                                            addOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
                                                         } label: {
                                                             Text("☐")
                                                                 .font(.title)
@@ -459,7 +459,7 @@ struct ContentView: View {
                                                     HStack{
                                                         
                                                         Button {
-                                                            addOne(item: item)
+                                                            addOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
                                                             if item.value == item.goal {
                                                                 
                                                             }
@@ -475,7 +475,7 @@ struct ContentView: View {
                                                                 .cornerRadius(10)
                                                         }
                                                         Button {
-                                                            subOne(item: item)
+                                                            subOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
                                                             if item.value == item.goal {
                                                                 
                                                             }
@@ -497,7 +497,7 @@ struct ContentView: View {
                                                     
                                                     if item.complete == true {
                                                         Button{
-                                                            subOne(item: item)
+                                                            subOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
                                                         } label: {
                                                             Text("☑")
                                                                 .font(.title)
@@ -512,7 +512,7 @@ struct ContentView: View {
                                                         
                                                     } else {
                                                         Button{
-                                                            addOne(item: item)
+                                                            addOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
                                                         } label: {
                                                             Text("☐")
                                                                 .font(.title)
@@ -699,7 +699,7 @@ struct ContentView: View {
                                                     HStack{
                                                         
                                                         Button {
-                                                            addOne(item: item)
+                                                            addOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
                                                             if item.value == item.goal {
                                                                 
                                                             }
@@ -715,7 +715,7 @@ struct ContentView: View {
                                                                 .cornerRadius(10)
                                                         }
                                                         Button {
-                                                            subOne(item: item)
+                                                            subOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
                                                             if item.value == item.goal {
                                                                 
                                                             }
@@ -737,7 +737,7 @@ struct ContentView: View {
                                                     
                                                     if item.complete == true {
                                                         Button{
-                                                            subOne(item: item)
+                                                            subOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
                                                         } label: {
                                                             Text("☑")
                                                                 .font(.title)
@@ -752,7 +752,7 @@ struct ContentView: View {
                                                         
                                                     } else {
                                                         Button{
-                                                            addOne(item: item)
+                                                            addOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
                                                         } label: {
                                                             Text("☐")
                                                                 .font(.title)
@@ -823,11 +823,11 @@ struct ContentView: View {
                                 ToolbarItem(placement: .navigationBarTrailing) {
                                     EditButton()
                                 }
-                                ToolbarItem {
-                                    Button(action: resetUserDefaults) {
-                                        Label("Add Item", systemImage: "trash")
-                                    }
-                                }
+//                                ToolbarItem {
+//                                    Button(action: resetUserDefaults) {
+//                                        Label("Add Item", systemImage: "trash")
+//                                    }
+//                                }
                             }
                         }
                     }
@@ -844,22 +844,6 @@ struct ContentView: View {
                    BEGIN PRIVATE FUNCTIONS
      ------------------------------------------------     */
 
-//    private func move(from source: IndexSet, to destination: Int) {
-//        habitData.move(fromOffsets: source, toOffset: destination)
-//        UserDefaults.standard.setEncodable(habitData, forKey: "habitList")
-//        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
-//    }
-    
-    private func celebrationProcedure () {
-            print("Goal for the day has been completed!")
-    }
-    
-    
-    /*    ------------------------------------------------
-                    SHUNT TASKS
-     ------------------------------------------------     */
-    
-    
 
     
     /*    ------------------------------------------------
@@ -968,11 +952,15 @@ struct ContentView: View {
     
     public func checkDate() {
         if let savedDate = UserDefaults.standard.object(forKey: "DailyTaskPopulate?") as? Date {
-            if Date() > savedDate {
+            
+            let comparison = calendar.compare(Date(), to: savedDate, toGranularity: .day)
+
+            if comparison == .orderedDescending {
                 populateTasks()
                 UserDefaults.standard.set(Date(), forKey: "DailyTaskPopulate?")
                 Celebrate = 0
             }
+            
         } else {
             UserDefaults.standard.set(Date(), forKey: "DailyTaskPopulate?")
             populateTasks()
@@ -984,102 +972,12 @@ struct ContentView: View {
                     ADD ONE
      ------------------------------------------------     */
     
-    private func addOne(item: Item) {
-        
-        if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true {
+   
+    
+    
 
-            item.value = item.value + 1
-            
-            if item.value >= item.goal {
-                if item.complete == false {
-                    Celebrate += item.reward
-                }
-                item.complete = true
-            }
-            
-            if Celebrate >= UserDefaults.standard.integer(forKey: "dailyGoal") {
-                celebrationProcedure()
-            }
-        }
-            
 
-     
-        do {
-            try viewContext.save()
-        } catch {
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-        }
-    }
-    
-    
-    
-    /*    ------------------------------------------------
-                    SUB ONE
-     ------------------------------------------------     */
-    
-    
-    
-    private func subOne(item: Item) {
-        
-        if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true {
-            
-            if item.value > 0 {
-                item.value = item.value - 1
-            }
-            
-            if item.value < item.goal {
-                if item.complete == true {
-                    Celebrate -= item.reward
-                }
-                item.complete = false
-            }
-        }
-        
-        do {
-            try viewContext.save()
-        } catch {
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-        }
-    }
-    
-    
-    /*    ------------------------------------------------
-                    DISPLAY HABIT DESCRIPTION
-     ------------------------------------------------     */
-    
-    private func displayHabitDescription (identifier: String) -> String {
-        
-        for index in habitData {
-            if index.HabitName == identifier {
-                return index.HabitDescription
-            }
-        }
-        return "No description"
-    }
 
-    
-    /*    ------------------------------------------------
-                   CHECK DUE DATES
-     ------------------------------------------------     */
-    
-    private func checkTaskDueDates () {
-        
-        if let outTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") {
-            for index in outTaskData {
-                if Calendar.current.isDate((index.TaskDueDate), equalTo: Date(), toGranularity: .day) == true {
-                    shuntTask(taskToShunt: index, viewContext: viewContext)
-                }
-            }
-        } else {
-            print("Failure for task due date checker")
-        }
-        
-    }
-    
-    
-    
     /*    ------------------------------------------------
                    POPULATE TASKS
      ------------------------------------------------     */
@@ -1098,10 +996,7 @@ struct ContentView: View {
             } else {}
         }
         
-        
-//          ADD LOOP TO CHECK TASKS IN TASKLIST
-        //Does this intefere with shunt/deshunt??
-        
+        checkTaskDueDates(viewContext: viewContext)
 
         for index in habitData {
             
@@ -1133,19 +1028,7 @@ struct ContentView: View {
         }
     }
     
-
     
-    /*    ------------------------------------------------
-                    RESET USER DEFAULTS
-     ------------------------------------------------     */
-    
-    private func resetUserDefaults () {
-        UserDefaults.standard.removeObject(forKey: "DailyTaskPopulate?")
-        
-//        UserDefaults.standard.removeObject(forKey: "habitList")
-//        UserDefaults.standard.removeObject(forKey: "protocol")
-//
-    }
     
 
     /*    ------------------------------------------------
@@ -1167,6 +1050,9 @@ struct ContentView: View {
             }
         }
     }
+    
+    
+    
 }
 
 #Preview {
