@@ -12,6 +12,7 @@ struct TaskBuilderView: View {
     
     @Environment(\.managedObjectContext) var context: NSManagedObjectContext
 
+    @Binding var selectedTab: Tabs
     
     @State var DisplayTaskMaker: Bool = false
     
@@ -191,36 +192,7 @@ struct TaskBuilderView: View {
         
         
     }
-    
-    /*    ------------------------------------------------
-     SHUNT TASKS
-     ------------------------------------------------     */
-    
-    private func shuntTask (taskToShunt: Task, viewContext: NSManagedObjectContext) {
-        
-        let newItem = Item(context: viewContext)
-        newItem.timestamp = Date()
-        newItem.name = taskToShunt.TaskName
-        newItem.goal = taskToShunt.TaskGoal
-        newItem.unit = taskToShunt.TaskUnit
-        newItem.complete = false
-        newItem.reward = taskToShunt.TaskReward
-        newItem.isTask = true
-        newItem.id = UUID()
-        newItem.descriptor = taskToShunt.TaskDescription
-        newItem.hasCheckbox = taskToShunt.TaskHasCheckbox
-        rmTask(id: taskToShunt.id)
-        //        selectedTab = .HUB
-        
-        do {
-            try viewContext.save()
-        } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-        }
-    }
+
     
     /*    ------------------------------------------------
                   ADD TASK
