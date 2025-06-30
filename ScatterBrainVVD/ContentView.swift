@@ -823,11 +823,11 @@ struct ContentView: View {
                                 ToolbarItem(placement: .navigationBarTrailing) {
                                     EditButton()
                                 }
-//                                ToolbarItem {
-//                                    Button(action: resetUserDefaults) {
-//                                        Label("Add Item", systemImage: "trash")
-//                                    }
-//                                }
+                                ToolbarItem {
+                                    Button(action: resetUserDefaults) {
+                                        Label("Add Item", systemImage: "trash")
+                                    }
+                                }
                             }
                         }
                     }
