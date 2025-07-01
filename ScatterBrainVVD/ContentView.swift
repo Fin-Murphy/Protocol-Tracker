@@ -330,6 +330,21 @@ struct ContentView: View {
                                                     }
                                                 }
                                             }
+                                            .swipeActions(edge: .trailing) {
+                                                Button("Complete") {
+                                                    completeHabit(item: item, viewContext: viewContext, Celebrate: &Celebrate)
+                                                    let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                                                    impactFeedback.impactOccurred()
+                                                }
+                                                .tint(.blue)
+                                          
+                                            }
+                                            .swipeActions(edge: .leading) {
+                                                Button("Delete") {
+                                                    deleteEntity(withUUID: item.id ?? UUID())
+                                                }
+                                                .tint(.red)
+                                            }
 
                                             
                                         } else {}
@@ -568,7 +583,21 @@ struct ContentView: View {
                                                     }
                                                 }
                                             }
-                                            
+                                            .swipeActions(edge: .trailing) {
+                                                Button("Complete") {
+                                                    completeHabit(item: item, viewContext: viewContext, Celebrate: &Celebrate)
+                                                    let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                                                    impactFeedback.impactOccurred()
+                                                }
+                                                .tint(.blue)
+                                          
+                                            }
+                                            .swipeActions(edge: .leading) {
+                                                Button("Delete") {
+                                                    deleteEntity(withUUID: item.id ?? UUID())
+                                                }
+                                                .tint(.red)
+                                            }
                                         } else {}
                                         
                                     }.onDelete(perform: deleteItems)
@@ -808,6 +837,22 @@ struct ContentView: View {
                                                     }
                                                 }
                                             }
+                                            .swipeActions(edge: .trailing) {
+                                                Button("Complete") {
+                                                    completeHabit(item: item, viewContext: viewContext, Celebrate: &Celebrate)
+                                                    let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                                                    impactFeedback.impactOccurred()
+                                                }
+                                                .tint(.blue)
+                                          
+                                            }
+                                            .swipeActions(edge: .leading) {
+                                                Button("Delete") {
+                                                    deleteEntity(withUUID: item.id ?? UUID())
+                                                }
+                                                .tint(.red)
+                                            }
+                                            
                                             
                                         } else {}
                                         
@@ -849,7 +894,6 @@ struct ContentView: View {
     /*    ------------------------------------------------
                     DESHUNT TASKS
      ------------------------------------------------     */
-    
     
     private func deshuntTask(item: Item) {
         print("Running deshunt for item \(item.name ?? "")")

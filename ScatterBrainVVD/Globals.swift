@@ -237,12 +237,28 @@ func addOne(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout In
     }
 }
 
+func completeHabit(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout Int16) {
+    
+    if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true {
 
-
-/*    ------------------------------------------------
-                SUB ONE
- ------------------------------------------------     */
-
+        item.value = item.goal
+        item.complete = true
+        Celebrate += item.reward
+        
+        if Celebrate >= UserDefaults.standard.integer(forKey: "dailyGoal") {
+            celebrationProcedure()
+        }
+    }
+      
+    do {
+        try viewContext.save()
+    } catch {
+        let nsError = error as NSError
+        fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+    }
+    
+    
+}
 
 
 func subOne(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout Int16) {
