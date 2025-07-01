@@ -118,6 +118,21 @@ struct ContentView: View {
                                                 if item.hasStatus == true {
                                                     
                                                     
+                                                    
+                                                    
+                                                    
+                                                    // ADD SEPERATE LABEL VIEW !!!!!!!!!!!!!!!!!!
+                                                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                                                    //! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                                                    
+                                                    
+                                                    
+                                                    
+                                                    
+                                                    
+                                                    
+                                                    
+                                                    
                                                     VStack {
                                                         HStack {
                                                             Text("Habit status:")
@@ -349,7 +364,7 @@ struct ContentView: View {
                                             
                                         } else {}
                                         
-                                    }.onDelete(perform: deleteItems)
+                                    }
                                     
                                     ForEach(items) { item in
                                         
@@ -600,7 +615,7 @@ struct ContentView: View {
                                             }
                                         } else {}
                                         
-                                    }.onDelete(perform: deleteItems)
+                                    }
                                     
                                     
                                 } else {
@@ -856,7 +871,7 @@ struct ContentView: View {
                                             
                                         } else {}
                                         
-                                    }.onDelete(perform: deleteItems)
+                                    }
 
                                 }
                         
@@ -865,9 +880,6 @@ struct ContentView: View {
                                 moveCompleteHabits = UserDefaults.standard.bool(forKey: "displayCompletedHabits")
                             }
                             .toolbar {
-                                ToolbarItem(placement: .navigationBarTrailing) {
-                                    EditButton()
-                                }
                                 ToolbarItem {
                                     Button(action: resetUserDefaults) {
                                         Label("Add Item", systemImage: "trash")
