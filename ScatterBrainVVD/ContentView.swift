@@ -116,22 +116,7 @@ struct ContentView: View {
                                                 }
                                                 
                                                 if item.hasStatus == true {
-                                                    
-                                                    
-                                                    
-                                                    
-                                                    
-                                                    // ADD SEPERATE LABEL VIEW !!!!!!!!!!!!!!!!!!
-                                                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                                                    //! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                                                    
-                                                    
-                                                    
-                                                    
-                                                    
-                                                    
-                                                    
-                                                    
+                                           
                                                     
                                                     VStack {
                                                         HStack {
@@ -140,34 +125,21 @@ struct ContentView: View {
                                                             TextField("", value: $updateItemStatus, format: .number)
                                                                 .frame(maxWidth: 100, alignment: .center)
                                                         }
-                                                            .padding()
-                                                            .foregroundColor(.black)
-                                                            .overlay(
-                                                                RoundedRectangle(cornerRadius: 10)
-                                                                    .stroke(Color.black, lineWidth: 3)
-                                                            )
-                                                            .cornerRadius(10)
+                                                        .bckMod()
+
                                                         
                                                         Button {setStatus(refItem: item)} label: {
                                                             Text("Save Habit Status")
                                                             
                                                         }
                                                         .foregroundColor(.blue)
-                                                        .padding()
-                                                        .overlay(
-                                                            RoundedRectangle(cornerRadius: 10)
-                                                                .stroke(Color.black, lineWidth: 3)
-                                                        )
-                                                        .cornerRadius(10)
+                                                        .bckMod()
+
                                                         
                                                     }
                                                     .onAppear{updateItemStatus = item.status}
-                                                    .padding()
-                                                    .overlay(
-                                                        RoundedRectangle(cornerRadius: 10)
-                                                            .stroke(Color.black, lineWidth: 3)
-                                                    )
-                                                    .cornerRadius(10)
+                                                    .bckMod()
+
                                                     
                                                 } else {}
                                                 
@@ -179,24 +151,16 @@ struct ContentView: View {
                                                         Text(displayHabitDescription(identifier: item.name ?? ""))
                                                             .frame(maxWidth: .infinity, alignment: .leading)
                                                             .padding()
-                                                            .padding()
-                                                            .overlay(
-                                                                RoundedRectangle(cornerRadius: 10)
-                                                                    .stroke(Color.black, lineWidth: 3)
-                                                            )
-                                                            .cornerRadius(10)
+                                                            .bckMod()
+
                                                         
                                                     } else {
                                                         
                                                         Text(item.descriptor ?? "")
                                                             .frame(maxWidth: .infinity, alignment: .leading)
                                                             .padding()
-                                                            .padding()
-                                                            .overlay(
-                                                                RoundedRectangle(cornerRadius: 10)
-                                                                    .stroke(Color.black, lineWidth: 3)
-                                                            )
-                                                            .cornerRadius(10)
+                                                            .bckMod()
+
                                                     }
                                                     
                                                     
@@ -212,24 +176,14 @@ struct ContentView: View {
                                                         Text("☑ \(item.value)/\(item.goal) \(item.unit ?? "")")
                                                             .font(.title)
                                                             .padding()
-                                                            .padding()
-                                                        //.background(Color.gray.opacity(0.2))
-                                                            .overlay(
-                                                                RoundedRectangle(cornerRadius: 10)
-                                                                    .stroke(Color.black, lineWidth: 3)
-                                                            )
-                                                            .cornerRadius(10)
+                                                            .bckMod()
+
                                                     } else {
                                                         Text("☐ \(item.value)/\(item.goal) \(item.unit ?? "")")
                                                             .font(.title)
                                                             .padding()
-                                                            .padding()
-                                                        //.background(Color.gray.opacity(0.2))
-                                                            .overlay(
-                                                                RoundedRectangle(cornerRadius: 10)
-                                                                    .stroke(Color.black, lineWidth: 3)
-                                                            )
-                                                            .cornerRadius(10)
+                                                            .bckMod()
+
                                                         
                                                     }
                                                     
@@ -243,13 +197,8 @@ struct ContentView: View {
                                                         }
                                                         label: {
                                                             Text("+ 1")
-                                                                .shadow(radius: 5)
-                                                                .padding()
-                                                                .overlay(
-                                                                    RoundedRectangle(cornerRadius: 10)
-                                                                        .stroke(Color.black, lineWidth: 3)
-                                                                )
-                                                                .cornerRadius(10)
+                                                                .bckMod()
+
                                                         }
                                                         Button {
                                                             subOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
@@ -259,13 +208,8 @@ struct ContentView: View {
                                                         }
                                                         label: {
                                                             Text("- 1")
-                                                                .shadow(radius: 5)
-                                                                .padding()
-                                                                .overlay(
-                                                                    RoundedRectangle(cornerRadius: 10)
-                                                                        .stroke(Color.black, lineWidth: 3)
-                                                                )
-                                                                .cornerRadius(10)
+                                                                .bckMod()
+
                                                         }
                                                     }
                                                     
@@ -279,12 +223,8 @@ struct ContentView: View {
                                                             Text("☑")
                                                                 .font(.title)
                                                                 .padding()
-                                                                .padding()
-                                                                .overlay(
-                                                                    RoundedRectangle(cornerRadius: 10)
-                                                                        .stroke(Color.black, lineWidth: 3)
-                                                                )
-                                                                .cornerRadius(10)
+                                                                .bckMod()
+
                                                         }
                                                         
                                                     } else {
@@ -294,12 +234,8 @@ struct ContentView: View {
                                                             Text("☐")
                                                                 .font(.title)
                                                                 .padding()
-                                                                .padding()
-                                                                .overlay(
-                                                                    RoundedRectangle(cornerRadius: 10)
-                                                                        .stroke(Color.black, lineWidth: 3)
-                                                                )
-                                                                .cornerRadius(10)
+                                                                .bckMod()
+
                                                         }
                                                     }
                                                 }
@@ -309,8 +245,6 @@ struct ContentView: View {
                                                 Spacer()
                                                 
                                             } label: {
-                                                
-                                                
                                                 HStack{
                                                     
                                                     if item.isTask == true {
@@ -393,34 +327,21 @@ struct ContentView: View {
                                                             TextField("", value: $updateItemStatus, format: .number)
                                                                 .frame(maxWidth: 100, alignment: .center)
                                                         }
-                                                            .padding()
-                                                            .foregroundColor(.black)
-                                                            .overlay(
-                                                                RoundedRectangle(cornerRadius: 10)
-                                                                    .stroke(Color.black, lineWidth: 3)
-                                                            )
-                                                            .cornerRadius(10)
+                                                        .bckMod()
+
                                                         
                                                         Button {setStatus(refItem: item)} label: {
                                                             Text("Save Habit Status")
                                                             
                                                         }
                                                         .foregroundColor(.blue)
-                                                        .padding()
-                                                        .overlay(
-                                                            RoundedRectangle(cornerRadius: 10)
-                                                                .stroke(Color.black, lineWidth: 3)
-                                                        )
-                                                        .cornerRadius(10)
+                                                        .bckMod()
+
                                                         
                                                     }
                                                     .onAppear{updateItemStatus = item.status}
-                                                    .padding()
-                                                    .overlay(
-                                                        RoundedRectangle(cornerRadius: 10)
-                                                            .stroke(Color.black, lineWidth: 3)
-                                                    )
-                                                    .cornerRadius(10)
+                                                    .bckMod()
+
                                                     
                                                 } else {}
                                                 
@@ -432,24 +353,16 @@ struct ContentView: View {
                                                         Text(displayHabitDescription(identifier: item.name ?? ""))
                                                             .frame(maxWidth: .infinity, alignment: .leading)
                                                             .padding()
-                                                            .padding()
-                                                            .overlay(
-                                                                RoundedRectangle(cornerRadius: 10)
-                                                                    .stroke(Color.black, lineWidth: 3)
-                                                            )
-                                                            .cornerRadius(10)
+                                                            .bckMod()
+
                                                         
                                                     } else {
                                                         
                                                         Text(item.descriptor ?? "")
                                                             .frame(maxWidth: .infinity, alignment: .leading)
                                                             .padding()
-                                                            .padding()
-                                                            .overlay(
-                                                                RoundedRectangle(cornerRadius: 10)
-                                                                    .stroke(Color.black, lineWidth: 3)
-                                                            )
-                                                            .cornerRadius(10)
+                                                            .bckMod()
+
                                                     }
                                                     
                                                     
@@ -465,25 +378,14 @@ struct ContentView: View {
                                                         Text("☑ \(item.value)/\(item.goal) \(item.unit ?? "")")
                                                             .font(.title)
                                                             .padding()
-                                                            .padding()
-                                                        //.background(Color.gray.opacity(0.2))
-                                                            .overlay(
-                                                                RoundedRectangle(cornerRadius: 10)
-                                                                    .stroke(Color.black, lineWidth: 3)
-                                                            )
-                                                            .cornerRadius(10)
+                                                            .bckMod()
+
                                                     } else {
                                                         Text("☐ \(item.value)/\(item.goal) \(item.unit ?? "")")
                                                             .font(.title)
                                                             .padding()
-                                                            .padding()
-                                                        //.background(Color.gray.opacity(0.2))
-                                                            .overlay(
-                                                                RoundedRectangle(cornerRadius: 10)
-                                                                    .stroke(Color.black, lineWidth: 3)
-                                                            )
-                                                            .cornerRadius(10)
-                                                        
+                                                            .bckMod()
+
                                                     }
                                                     
                                                     HStack{
@@ -497,12 +399,8 @@ struct ContentView: View {
                                                         label: {
                                                             Text("+ 1")
                                                                 .shadow(radius: 5)
-                                                                .padding()
-                                                                .overlay(
-                                                                    RoundedRectangle(cornerRadius: 10)
-                                                                        .stroke(Color.black, lineWidth: 3)
-                                                                )
-                                                                .cornerRadius(10)
+                                                                .bckMod()
+
                                                         }
                                                         Button {
                                                             subOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
@@ -512,13 +410,8 @@ struct ContentView: View {
                                                         }
                                                         label: {
                                                             Text("- 1")
-                                                                .shadow(radius: 5)
-                                                                .padding()
-                                                                .overlay(
-                                                                    RoundedRectangle(cornerRadius: 10)
-                                                                        .stroke(Color.black, lineWidth: 3)
-                                                                )
-                                                                .cornerRadius(10)
+                                                                .bckMod()
+
                                                         }
                                                     }
                                                     
@@ -532,12 +425,8 @@ struct ContentView: View {
                                                             Text("☑")
                                                                 .font(.title)
                                                                 .padding()
-                                                                .padding()
-                                                                .overlay(
-                                                                    RoundedRectangle(cornerRadius: 10)
-                                                                        .stroke(Color.black, lineWidth: 3)
-                                                                )
-                                                                .cornerRadius(10)
+                                                                .bckMod()
+
                                                         }
                                                         
                                                     } else {
@@ -547,12 +436,8 @@ struct ContentView: View {
                                                             Text("☐")
                                                                 .font(.title)
                                                                 .padding()
-                                                                .padding()
-                                                                .overlay(
-                                                                    RoundedRectangle(cornerRadius: 10)
-                                                                        .stroke(Color.black, lineWidth: 3)
-                                                                )
-                                                                .cornerRadius(10)
+                                                                .bckMod()
+
                                                         }
                                                     }
                                                 }
@@ -646,35 +531,19 @@ struct ContentView: View {
                                                             
                                                             TextField("", value: $updateItemStatus, format: .number)
                                                                 .frame(maxWidth: 100, alignment: .center)
-                                                        }
-                                                            .padding()
-                                                            .foregroundColor(.black)
-                                                            .overlay(
-                                                                RoundedRectangle(cornerRadius: 10)
-                                                                    .stroke(Color.black, lineWidth: 3)
-                                                            )
-                                                            .cornerRadius(10)
+                                                        }.bckMod()
                                                         
                                                         Button {setStatus(refItem: item)} label: {
                                                             Text("Save Habit Status")
                                                             
                                                         }
                                                         .foregroundColor(.blue)
-                                                        .padding()
-                                                        .overlay(
-                                                            RoundedRectangle(cornerRadius: 10)
-                                                                .stroke(Color.black, lineWidth: 3)
-                                                        )
-                                                        .cornerRadius(10)
+                                                        .bckMod()
                                                         
                                                     }
                                                     .onAppear{updateItemStatus = item.status}
-                                                    .padding()
-                                                    .overlay(
-                                                        RoundedRectangle(cornerRadius: 10)
-                                                            .stroke(Color.black, lineWidth: 3)
-                                                    )
-                                                    .cornerRadius(10)
+                                                    .bckMod()
+
                                                     
                                                 } else {}
                                                 
@@ -686,24 +555,16 @@ struct ContentView: View {
                                                         Text(displayHabitDescription(identifier: item.name ?? ""))
                                                             .frame(maxWidth: .infinity, alignment: .leading)
                                                             .padding()
-                                                            .padding()
-                                                            .overlay(
-                                                                RoundedRectangle(cornerRadius: 10)
-                                                                    .stroke(Color.black, lineWidth: 3)
-                                                            )
-                                                            .cornerRadius(10)
+                                                            .bckMod()
+
                                                         
                                                     } else {
                                                         
                                                         Text(item.descriptor ?? "")
                                                             .frame(maxWidth: .infinity, alignment: .leading)
                                                             .padding()
-                                                            .padding()
-                                                            .overlay(
-                                                                RoundedRectangle(cornerRadius: 10)
-                                                                    .stroke(Color.black, lineWidth: 3)
-                                                            )
-                                                            .cornerRadius(10)
+                                                            .bckMod()
+
                                                     }
                                                     
                                                     
@@ -719,24 +580,14 @@ struct ContentView: View {
                                                         Text("☑ \(item.value)/\(item.goal) \(item.unit ?? "")")
                                                             .font(.title)
                                                             .padding()
-                                                            .padding()
-                                                        //.background(Color.gray.opacity(0.2))
-                                                            .overlay(
-                                                                RoundedRectangle(cornerRadius: 10)
-                                                                    .stroke(Color.black, lineWidth: 3)
-                                                            )
-                                                            .cornerRadius(10)
+                                                            .bckMod()
+
                                                     } else {
                                                         Text("☐ \(item.value)/\(item.goal) \(item.unit ?? "")")
                                                             .font(.title)
                                                             .padding()
-                                                            .padding()
-                                                        //.background(Color.gray.opacity(0.2))
-                                                            .overlay(
-                                                                RoundedRectangle(cornerRadius: 10)
-                                                                    .stroke(Color.black, lineWidth: 3)
-                                                            )
-                                                            .cornerRadius(10)
+                                                            .bckMod()
+
                                                         
                                                     }
                                                     
@@ -751,12 +602,8 @@ struct ContentView: View {
                                                         label: {
                                                             Text("+ 1")
                                                                 .shadow(radius: 5)
-                                                                .padding()
-                                                                .overlay(
-                                                                    RoundedRectangle(cornerRadius: 10)
-                                                                        .stroke(Color.black, lineWidth: 3)
-                                                                )
-                                                                .cornerRadius(10)
+                                                                .bckMod()
+
                                                         }
                                                         Button {
                                                             subOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
@@ -767,12 +614,8 @@ struct ContentView: View {
                                                         label: {
                                                             Text("- 1")
                                                                 .shadow(radius: 5)
-                                                                .padding()
-                                                                .overlay(
-                                                                    RoundedRectangle(cornerRadius: 10)
-                                                                        .stroke(Color.black, lineWidth: 3)
-                                                                )
-                                                                .cornerRadius(10)
+                                                                .bckMod()
+
                                                         }
                                                     }
                                                     
@@ -786,12 +629,8 @@ struct ContentView: View {
                                                             Text("☑")
                                                                 .font(.title)
                                                                 .padding()
-                                                                .padding()
-                                                                .overlay(
-                                                                    RoundedRectangle(cornerRadius: 10)
-                                                                        .stroke(Color.black, lineWidth: 3)
-                                                                )
-                                                                .cornerRadius(10)
+                                                                .bckMod()
+
                                                         }
                                                         
                                                     } else {
@@ -801,12 +640,8 @@ struct ContentView: View {
                                                             Text("☐")
                                                                 .font(.title)
                                                                 .padding()
-                                                                .padding()
-                                                                .overlay(
-                                                                    RoundedRectangle(cornerRadius: 10)
-                                                                        .stroke(Color.black, lineWidth: 3)
-                                                                )
-                                                                .cornerRadius(10)
+                                                                .bckMod()
+
                                                         }
                                                     }
                                                 }

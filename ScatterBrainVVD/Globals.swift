@@ -96,6 +96,26 @@ let itemFormatter: DateFormatter = {
 }()
 
 
+struct backgroundMod: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .padding()
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color.black, lineWidth: 3)
+            )
+            .cornerRadius(10)
+    }
+}
+
+extension View {
+    func bckMod() -> some View {
+        modifier(backgroundMod())
+    }
+}
+
+
+
 
 //------------------------------------------------------
 
