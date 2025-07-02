@@ -28,8 +28,17 @@ struct HabitBuilderView: View {
     
     @State var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
     
-//    @Binding var selectedTab: Tabs
 
+    private var closeButton: some View {
+        Image(systemName: "x.circle")
+            .resizable()
+            .foregroundColor(.white)
+            .scaledToFit()
+            .frame(width: 100,height: 24)
+            .bold()
+    }
+    
+    
     // -----------------------------------------------
     //                  END VAR DECLARATIONS
     // ----------------------------------------------
@@ -76,16 +85,7 @@ struct HabitBuilderView: View {
                                                 
                                                 ZStack{
                                                   
-                                                    List{
-                                                        Text(habitNdx.HabitName)
-                                                            .font(.title)
-                                                            .padding()
-                                                        Text("Item is part of protocol \(habitNdx.HabitProtocol).")
-                                                        Text("Item start date: \(habitNdx.HabitStartDate, formatter: itemFormatter)" )
-                                                        Text("Item goal value: \(habitNdx.HabitGoal) \(habitNdx.HabitUnit)" )
-                                                        Text("Item repeats every \(habitNdx.HabitRepeatValue) days." )
-                                                        Text("Item Description: \n\n \(habitNdx.HabitDescription)" )
-                                                    }
+                                                    HabitDetailView(habitNdx: habitNdx)
                                                     
                                                     Button {DisplayHabitEditor = true} label: {
                                                         Text("Edit habit")
@@ -101,7 +101,7 @@ struct HabitBuilderView: View {
                                                     
                                                     if DisplayHabitEditor == true {
                                                         
-                                                        HabitEditView(habit: index)
+                                                        HabitEditView(habit: habitNdx)
                                                         
                                                     } else {}
                                                     
@@ -139,12 +139,7 @@ struct HabitBuilderView: View {
                     Button {
                         DisplayHabitMaker = false
                     } label: {
-                        Image(systemName: "x.circle")
-                            .resizable()
-                            .foregroundColor(.white)
-                            .scaledToFit()
-                            .frame(width: 100,height: 24)
-                            .bold()
+                        closeButton
                     }.padding()
                     
                     
@@ -207,11 +202,6 @@ struct HabitBuilderView: View {
                 .shadow(radius: 20)
                 
             } else {}
-            
-     
-            
-            
-            
             
         }.onAppear{indexProtocols()}
     }
