@@ -358,7 +358,7 @@ struct HabitBuilderView: View {
                                   HabitGoal: HabitGoalSet,
                                   HabitUnit: HabitUnitSet,
                                   HabitProtocol: HabitProtocolSet,
-                                  HabitStartDate: HabitStartDateSet,
+                                  HabitStartDate: Calendar.current.startOfDay(for: HabitStartDateSet),
                                   HabitRepeatValue: HabitRepetitionSet,
                                   HabitDescription: HabitDescriptionSet,
                                   HabitReward: Int16(HabitRewardSet),

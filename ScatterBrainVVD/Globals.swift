@@ -188,7 +188,7 @@ func resetUserDefaults () {
 func daysBetween(start: Date, end: Date) -> Int {
     let calendar = Calendar.current
     let components = calendar.dateComponents([.day], from: start, to: end)
-    return components.day ?? 0
+    return components.day ?? 1
 }
 
 

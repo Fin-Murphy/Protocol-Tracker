@@ -734,9 +734,9 @@ struct ContentView: View {
      ------------------------------------------------     */
     
     private func deshuntTask(item: Item) {
-        print("Running deshunt for item \(item.name ?? "")")
+//        print("Running deshunt for item \(item.name ?? "")")
         if item.isTask == true {
-            print("Successful!")
+//            print("Successful!")
             let returnedTask = Task(id: UUID(),
                                     TaskName: item.name ?? "",
                                     TaskDescription: item.descriptor ?? "",
@@ -856,14 +856,12 @@ struct ContentView: View {
     /*    ------------------------------------------------
                    POPULATE TASKS
      ------------------------------------------------     */
-    
-    
+
     private func populateTasks() {
         
         habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
         
         for taskFinder in items {
-            print("PopulateTasks checking item \(taskFinder.name ?? "")")
             if Calendar.current.isDate((taskFinder.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) != true {
                 if taskFinder.complete == false {
                     deshuntTask(item: taskFinder)
@@ -874,12 +872,13 @@ struct ContentView: View {
         checkTaskDueDates(viewContext: viewContext)
         
         for index in habitData {
-            print("\(index.HabitName) has had \(daysBetween(start: index.HabitStartDate,end: Date()) % index.HabitRepeatValue + 1) days since inception")
+            print("\(index.HabitName) - \(daysBetween(start: index.HabitStartDate,end: Calendar.current.startOfDay(for: Date())))")
         }
 
         for index in habitData {
             
-            if (daysBetween(start: index.HabitStartDate,end: Date()) % index.HabitRepeatValue) == 0 {
+            
+            if (daysBetween(start: Calendar.current.startOfDay(for: index.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) >= 0) && (daysBetween(start:  Calendar.current.startOfDay(for: index.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) % index.HabitRepeatValue == 0) {
                                         
                 let newItem = Item(context: viewContext)
                 newItem.timestamp = Date()
@@ -892,7 +891,7 @@ struct ContentView: View {
                 newItem.id = UUID()
                 newItem.hasStatus = index.HabitHasStatus
                 newItem.hasCheckbox = index.HabitHasCheckbox
-             
+    
             }
         }
 
