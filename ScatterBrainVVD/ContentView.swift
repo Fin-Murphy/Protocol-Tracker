@@ -152,7 +152,6 @@ struct ContentView: View {
                                                             .frame(maxWidth: .infinity, alignment: .leading)
                                                             .padding()
                                                             .bckMod()
-
                                                         
                                                     } else {
                                                         
@@ -160,7 +159,6 @@ struct ContentView: View {
                                                             .frame(maxWidth: .infinity, alignment: .leading)
                                                             .padding()
                                                             .bckMod()
-
                                                     }
                                                     
                                                     
@@ -184,7 +182,6 @@ struct ContentView: View {
                                                             .padding()
                                                             .bckMod()
 
-                                                        
                                                     }
                                                     
                                                     HStack{
@@ -198,7 +195,6 @@ struct ContentView: View {
                                                         label: {
                                                             Text("+ 1")
                                                                 .bckMod()
-
                                                         }
                                                         Button {
                                                             subOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
@@ -209,7 +205,6 @@ struct ContentView: View {
                                                         label: {
                                                             Text("- 1")
                                                                 .bckMod()
-
                                                         }
                                                     }
                                                     
@@ -224,7 +219,6 @@ struct ContentView: View {
                                                                 .font(.title)
                                                                 .padding()
                                                                 .bckMod()
-
                                                         }
                                                         
                                                     } else {
@@ -235,7 +229,6 @@ struct ContentView: View {
                                                                 .font(.title)
                                                                 .padding()
                                                                 .bckMod()
-
                                                         }
                                                     }
                                                 }

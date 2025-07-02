@@ -10,6 +10,7 @@ import SwiftUI
 struct HabitBuilderView: View {
     
     @State var DisplayHabitMaker: Bool = false
+    @State var DisplayHabitEditor: Bool = false
 
     @State var Today = Date()
     
@@ -53,7 +54,6 @@ struct HabitBuilderView: View {
                             .foregroundColor(.blue)
                             .font(.title)
                             .padding(.bottom)
-                        
                     }
                 }
                 
@@ -62,7 +62,6 @@ struct HabitBuilderView: View {
                         NavigationView {
                             List {
                                 ForEach(listOfProtocols) { index in
-                                    
                                     
                                     Text(index.ProtocolName)
                                         .font(.title2)
@@ -75,23 +74,40 @@ struct HabitBuilderView: View {
                                             
                                             NavigationLink{
                                                 
-                                                List{
-                                                    Text(habitNdx.HabitName)
-                                                        .font(.title)
-                                                        .padding()
-                                                    Text("Item is part of protocol \(habitNdx.HabitProtocol).")
-                                                    Text("Item start date: \(habitNdx.HabitStartDate, formatter: itemFormatter)" )
-                                                    Text("Item goal value: \(habitNdx.HabitGoal) \(habitNdx.HabitUnit)" )
-                                                    Text("Item repeats every \(habitNdx.HabitRepeatValue) days." )
-                                                    Text("Item Description: \n\n \(habitNdx.HabitDescription)" )
+                                                ZStack{
+                                                  
+                                                    List{
+                                                        Text(habitNdx.HabitName)
+                                                            .font(.title)
+                                                            .padding()
+                                                        Text("Item is part of protocol \(habitNdx.HabitProtocol).")
+                                                        Text("Item start date: \(habitNdx.HabitStartDate, formatter: itemFormatter)" )
+                                                        Text("Item goal value: \(habitNdx.HabitGoal) \(habitNdx.HabitUnit)" )
+                                                        Text("Item repeats every \(habitNdx.HabitRepeatValue) days." )
+                                                        Text("Item Description: \n\n \(habitNdx.HabitDescription)" )
+                                                    }
+                                                    
+                                                    Button {DisplayHabitEditor = true} label: {
+                                                        Text("Edit habit")
+                                                    }
+                                                    
+                                                    Button{
+                                                        rmHabit(id: habitNdx.id)
+
+                                                    } label: {
+                                                        Text("Remove this habit")
+                                                    }
+                                                    
+                                                    
+                                                    if DisplayHabitEditor == true {
+                                                        
+                                                        HabitEditView(habit: index)
+                                                        
+                                                    } else {}
+                                                    
                                                 }
                                                 
-                                                Button{
-                                                    rmHabit(id: habitNdx.id)
-//                                                    selectedTab = .HUB
-                                                } label: {
-                                                    Text("Remove this habit")
-                                                }
+                                                
                                             } label: {
                                                 
                                                 HStack {
@@ -180,7 +196,7 @@ struct HabitBuilderView: View {
                             
                         }
                         
-                    }.ignoresSafeArea(.keyboard)
+                    }
                     
                 } // VSTACK
                 .frame(width:300,height:700)
@@ -191,6 +207,10 @@ struct HabitBuilderView: View {
                 .shadow(radius: 20)
                 
             } else {}
+            
+     
+            
+            
             
             
         }.onAppear{indexProtocols()}
