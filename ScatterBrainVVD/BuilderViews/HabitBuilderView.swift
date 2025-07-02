@@ -21,7 +21,7 @@ struct HabitBuilderView: View {
     @State var HabitRepetitionSet: Int = 1
     @State var HabitDescriptionSet: String = "This is a Habit"
     @State var HabitHasStatusSet: Bool = false
-    @State var HabitRewardSet: Int = 1
+    @State var HabitRewardSet: Int16 = 1
     @State var HabitStartDateSet: Date = Date()
     @State var HabitIsSubtaskSet: Bool = false
     @State var HabitHasCheckboxSet: Bool = true
@@ -66,7 +66,7 @@ struct HabitBuilderView: View {
                     }
                 }
                 
-//                if let listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") {
+                if let listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") {
 
                 
                 if habitData.isEmpty != true {
@@ -74,16 +74,16 @@ struct HabitBuilderView: View {
                             
                             
                             List {
-//                                ForEach(listOfProtocols) { index in
+                                ForEach(listOfProtocols) { index in
                                     
-//                                    Text(index.ProtocolName)
-//                                        .font(.title2)
-//                                        .fontWeight(.bold)
-//                                        .padding(.top)
+                                    Text(index.ProtocolName)
+                                        .font(.title2)
+                                        .fontWeight(.bold)
+                                        .padding(.top)
                                     
                                     ForEach(habitData) { habitNdx in
                                         
-//                                        if habitNdx.HabitProtocol == index.ProtocolName {
+                                        if habitNdx.HabitProtocol == index.ProtocolName {
                                             
                                             NavigationLink{
                                                 
@@ -105,89 +105,73 @@ struct HabitBuilderView: View {
                                                     
                                                     if DisplayHabitEditor == true {
                                                         
-                                                        
-//                                                        HabitEditView(habitIdentifier: habitNdx.id)
-                                                        
-//                                                        Form {
-//                                                            
-//                                                            Section(header: Text("Habit Name:")) {
-//                                                                TextField("", text: $HabitNameSet)
-//                                                            }
-//                                                            Toggle("Use checkbox instead of units",isOn: $HabitHasCheckboxSet)
-//                                                            if HabitHasCheckboxSet == false {
-//                                                                Section(header: Text("Habit Goal:")) {
-//                                                                    TextField("", value: $HabitGoalSet, format: .number)
-//                                                                }
-//                                                                Section(header: Text("Habit Unit:")) {
-//                                                                    TextField("", text: $HabitUnitSet)
-//                                                                }
-//                                                            }
-//                                                            Section(header: Text("Habit Protocol:")) {
-//                                                                TextField("", text: $HabitProtocolSet)
-//                                                            }
-//                                                            Section(header: Text("Habit Interval (1 = Daily, 7 = Weekly, etc):")) {
-//                                                                TextField("", value: $HabitRepetitionSet, format: .number)
-//                                                            }
-//                                                            Section(header: Text("Habit Details")) {
-//                                                                TextEditor(text: $HabitDescriptionSet)
-//                                                                    .frame(minHeight: 100)
-//                                                                    .overlay(
-//                                                                        RoundedRectangle(cornerRadius: 8)
-//                                                                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-//                                                                    )
-//                                                            }
-//                                                            Section("Habit Start Date") {
-//                                                                DatePicker("Select Date",
-//                                                                           selection: $HabitStartDateSet,
-//                                                                           displayedComponents: .date)
-//                                                                .datePickerStyle(.compact)
-//                                                            }
-//                                                            Section(header: Text("Habit Reward (Points for completion)")) {
-//                                                                TextField("", value: $HabitRewardSet, format: .number)
-//                                                            }
-//                                                            Toggle("Include status update", isOn: $HabitHasStatusSet)
-//                                                            Toggle("Make this habit a subtask of another habit?", isOn: $HabitIsSubtaskSet)
-//                                                            
-//                                                            
-//                                                            Section {
-//                                                                Button {
-//                                                                    
-//                                                                    habitNdx.HabitName = HabitNameSet
-//                                                                    habitNdx.HabitGoal = HabitGoalSet
-//                                                                    habitNdx.HabitUnit = HabitUnitSet
-//                                                                    habitNdx.HabitProtocol = HabitProtocolSet
-//                                                                    habitNdx.HabitRepeatValue = HabitRepetitionSet
-//                                                                    habitNdx.HabitDescription = HabitDescriptionSet
-//                                                                    habitNdx.HabitStartDate = HabitStartDateSet
-//                                                                    habitNdx.HabitReward = HabitRewardSet
-//                                                                    habitNdx.HabitHasStatus = HabitHasStatusSet
-//                                                                    habitNdx.HabitHasCheckbox = HabitHasCheckboxSet
-//                                                                    
-//                                                                } label: {Text("Save Habit")}
-//                                                                
-//                                                                
-//                                                            }
-//                                                            
-//                                                        }
-//                                                        .onAppear{
-//                                                            
-//                                                            HabitNameSet = habitNdx.HabitName
-//                                                            HabitGoalSet = habitNdx.HabitGoal
-//                                                            HabitUnitSet = habitNdx.HabitUnit
-//                                                            HabitProtocolSet = habitNdx.HabitProtocol
-//                                                            HabitRepetitionSet = habitNdx.HabitRepeatValue
-//                                                            HabitDescriptionSet = habitNdx.HabitDescription
-//                                                            HabitStartDateSet = habitNdx.HabitStartDate
-//                                                            HabitRewardSet = habitNdx.HabitReward
-//                                                            HabitHasCheckboxSet = habitNdx.HabitHasCheckbox
-//                                                            HabitHasStatusSet = habitNdx.HabitHasStatus
-//                                                            
-//                                                        }
-                                                        
-                                                        
-                                                        
-                                                        
-                                                        
+                                                                                                                
+                                                        Form {
+
+                                                            Section(header: Text("Habit Name:")) {
+                                                                TextField("", text: $HabitNameSet)
+                                                            }
+                                                            Toggle("Use checkbox instead of units",isOn: $HabitHasCheckboxSet)
+                                                            if HabitHasCheckboxSet == false {
+                                                                Section(header: Text("Habit Goal:")) {
+                                                                    TextField("", value: $HabitGoalSet, format: .number)
+                                                                }
+                                                                Section(header: Text("Habit Unit:")) {
+                                                                    TextField("", text: $HabitUnitSet)
+                                                                }
+                                                            }
+                                                            Section(header: Text("Habit Protocol:")) {
+                                                                TextField("", text: $HabitProtocolSet)
+                                                            }
+                                                            Section(header: Text("Habit Interval (1 = Daily, 7 = Weekly, etc):")) {
+                                                                TextField("", value: $HabitRepetitionSet, format: .number)
+                                                            }
+                                                            Section(header: Text("Habit Details")) {
+                                                                TextEditor(text: $HabitDescriptionSet)
+                                                                    .frame(minHeight: 100)
+                                                                    .overlay(
+                                                                        RoundedRectangle(cornerRadius: 8)
+                                                                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                                                    )
+                                                            }
+                                                            Section("Habit Start Date") {
+                                                                DatePicker("Select Date",
+                                                                           selection: $HabitStartDateSet,
+                                                                           displayedComponents: .date)
+                                                                .datePickerStyle(.compact)
+                                                            }
+                                                            Section(header: Text("Habit Reward (Points for completion)")) {
+                                                                TextField("", value: $HabitRewardSet, format: .number)
+                                                            }
+                                                            Toggle("Include status update", isOn: $HabitHasStatusSet)
+                                                            Toggle("Make this habit a subtask of another habit?", isOn: $HabitIsSubtaskSet)
+
+
+                                                            Section {
+                                                                Button {
+
+                                                                    updateHabit(habitToEdit: habitNdx.id)
+                                                                                                                                        
+                                                                } label: {Text("Save Habit")}
+
+                                                                
+                                                            }
+                                                       
+
+                                                            
+                                                        }
+                                                        .onAppear{  // < ------------ /THIS IS WHATS CAUSING THE ISSUE
+                                                            HabitNameSet = habitNdx.HabitName
+                                                            HabitGoalSet = habitNdx.HabitGoal
+                                                            HabitUnitSet = habitNdx.HabitUnit
+                                                            HabitProtocolSet = habitNdx.HabitProtocol
+                                                            HabitRepetitionSet = habitNdx.HabitRepeatValue
+                                                            HabitDescriptionSet = habitNdx.HabitDescription
+                                                            HabitStartDateSet = habitNdx.HabitStartDate
+                                                            HabitRewardSet = habitNdx.HabitReward
+                                                            HabitHasCheckboxSet = habitNdx.HabitHasCheckbox
+                                                            HabitHasStatusSet = habitNdx.HabitHasStatus
+                                                        }
                                                         
                                                         
                                                         
@@ -207,9 +191,9 @@ struct HabitBuilderView: View {
                                                 }
                                             }
                                             
-                                        //} else {}
+                                        } else {}
                                     }.onMove(perform: move)
-                                //}
+                                }
                             }
                             .toolbar {
                                 EditButton()
@@ -220,7 +204,7 @@ struct HabitBuilderView: View {
                 
                 
                 
-                //}
+                }
             }
             
             
@@ -297,7 +281,36 @@ struct HabitBuilderView: View {
         }.onAppear{indexProtocols()}
     }
         
+    private func updateHabit(habitToEdit: UUID) {
         
+        var habitDataIteratorList: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+        
+        for ndx in 0..<habitDataIteratorList.count {
+            if habitDataIteratorList[ndx].id == habitToEdit {
+                habitDataIteratorList[ndx].HabitName = HabitNameSet
+                habitDataIteratorList[ndx].HabitGoal = HabitGoalSet
+                habitDataIteratorList[ndx].HabitUnit = HabitUnitSet
+                habitDataIteratorList[ndx].HabitProtocol = HabitProtocolSet
+                habitDataIteratorList[ndx].HabitRepeatValue = HabitRepetitionSet
+                habitDataIteratorList[ndx].HabitDescription = HabitDescriptionSet
+                habitDataIteratorList[ndx].HabitStartDate = HabitStartDateSet
+                habitDataIteratorList[ndx].HabitReward = HabitRewardSet
+                habitDataIteratorList[ndx].HabitHasStatus = HabitHasStatusSet
+                habitDataIteratorList[ndx].HabitHasCheckbox = HabitHasCheckboxSet
+                
+                if habitDataIteratorList[ndx].HabitHasCheckbox == true {
+                    habitDataIteratorList[ndx].HabitGoal = 1
+                    habitDataIteratorList[ndx].HabitUnit = "units"
+                }
+         
+            }
+        }
+        
+        UserDefaults.standard.setEncodable(habitDataIteratorList, forKey: "habitList")
+        
+        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+       
+    }
     
     
     private func indexProtocols () {
@@ -317,7 +330,6 @@ struct HabitBuilderView: View {
                         }
                     }
                 
-                
                 UserDefaults.standard.setEncodable(protocolArray, forKey: "protocol")
                 
             } else {
@@ -326,7 +338,6 @@ struct HabitBuilderView: View {
             }
         
             habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
-        
         }
 
     private func openHabitBuilder() {
@@ -352,6 +363,7 @@ struct HabitBuilderView: View {
         
         if HabitHasCheckboxSet == true {
             HabitGoalSet = 1
+            HabitUnitSet = "units"
         }
         
         let inputHabit:Habit = Habit(HabitName: HabitNameSet,
@@ -378,7 +390,6 @@ struct HabitBuilderView: View {
         }
         
         
-        
         DisplayHabitMaker = false
         HabitNameSet = ""
         HabitGoalSet = 1
@@ -389,8 +400,6 @@ struct HabitBuilderView: View {
         HabitRewardSet = 1
         HabitStartDateSet = Date()
         HabitHasCheckboxSet = true
-        
-        
         
         habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
         
@@ -407,6 +416,6 @@ struct HabitBuilderView: View {
 
 }
 
-//#Preview {
-//    HabitBuilderView()
-//}
+#Preview {
+    HabitBuilderView()
+}

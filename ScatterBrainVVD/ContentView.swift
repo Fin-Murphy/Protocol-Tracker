@@ -818,7 +818,6 @@ struct ContentView: View {
                     }
                 }
             
-            
             UserDefaults.standard.setEncodable(protocolArray, forKey: "protocol")
             
         } else {
