@@ -66,36 +66,41 @@ struct HabitBuilderView: View {
                     }
                 }
                 
-                if let listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") {
-                    if habitData.isEmpty != true {
+//                if let listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") {
+
+                
+                if habitData.isEmpty != true {
                         NavigationView {
+                            
+                            
                             List {
-                                ForEach(listOfProtocols) { index in
+//                                ForEach(listOfProtocols) { index in
                                     
-                                    Text(index.ProtocolName)
-                                        .font(.title2)
-                                        .fontWeight(.bold)
-                                        .padding(.top)
+//                                    Text(index.ProtocolName)
+//                                        .font(.title2)
+//                                        .fontWeight(.bold)
+//                                        .padding(.top)
                                     
                                     ForEach(habitData) { habitNdx in
                                         
-                                        if habitNdx.HabitProtocol == index.ProtocolName {
+//                                        if habitNdx.HabitProtocol == index.ProtocolName {
                                             
                                             NavigationLink{
                                                 
                                                 ZStack{
-                                                  
-                                                    HabitDetailView(habitNdx: habitNdx)
                                                     
-                                                    Button {DisplayHabitEditor = true} label: {
-                                                        Text("Edit habit")
-                                                    }
-                                                    
-                                                    Button{
-                                                        rmHabit(id: habitNdx.id)
-
-                                                    } label: {
-                                                        Text("Remove this habit")
+                                                    VStack {
+                                               
+                                                        HabitDetailView(habitIdentifier: habitNdx.id)
+                                                        
+                                                        Button{DisplayHabitEditor = true} label: {
+                                                            Text("Edit habit")
+                                                        }
+                                                        
+                                                        Button{rmHabit(id: habitNdx.id)} label: {
+                                                            Text("Remove this habit")
+                                                        }
+                                                        
                                                     }
                                                     
                                                     if DisplayHabitEditor == true {
@@ -118,16 +123,20 @@ struct HabitBuilderView: View {
                                                 }
                                             }
                                             
-                                        } else {}
+                                        //} else {}
                                     }.onMove(perform: move)
-                                }
+                                //}
                             }
                             .toolbar {
                                 EditButton()
                             }
                         }
                     } else {Text("No Habits yet")}
-                }
+               
+                
+                
+                
+                //}
             }
             
             
@@ -228,9 +237,12 @@ struct HabitBuilderView: View {
                 UserDefaults.standard.setEncodable(protocolArray, forKey: "protocol")
                 
             } else {
-                let pArray: [HabitProtocol] = [/*TaskProtocol(ProtocolName: "Daily")*/]
+                let pArray: [HabitProtocol] = []
                 UserDefaults.standard.setEncodable(pArray, forKey: "protocol")
             }
+        
+            habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+        
         }
 
     private func openHabitBuilder() {

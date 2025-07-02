@@ -9,9 +9,10 @@ import SwiftUI
 
 struct HabitEditView: View {
     
-    @Binding var habit: Habit
-    @Binding var lister: [Habit]
+    @State var habitIdentifier: UUID?
     
+    @State var habit: Habit
+
     @State var HabitNameSet: String = ""
     @State var HabitGoalSet: Int16 = 1
     @State var HabitProtocolSet: String = "Daily"
@@ -26,6 +27,7 @@ struct HabitEditView: View {
     @State var HabitIsSubtaskSet: Bool = false
     @State var HabitHasCheckboxSet: Bool = true
     
+    @State var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
     
     var body: some View {
         
@@ -92,6 +94,13 @@ struct HabitEditView: View {
             
         }
         .onAppear{
+            
+            for i in habitData {
+                if i.id == habitIdentifier {
+                    habit = i
+                }
+            }
+            
             
             HabitNameSet = habit.HabitName
             HabitGoalSet = habit.HabitGoal

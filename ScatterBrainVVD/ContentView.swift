@@ -700,8 +700,7 @@ struct ContentView: View {
                                         } else {}
                                         
                                     }
-
-                                }
+\                                }
                         
                             }
                             .onAppear{
