@@ -98,7 +98,6 @@ struct HabitBuilderView: View {
                                                         Text("Remove this habit")
                                                     }
                                                     
-                                                    
                                                     if DisplayHabitEditor == true {
                                                         
                                                         HabitEditView(habit: habitNdx)
@@ -114,8 +113,7 @@ struct HabitBuilderView: View {
                                                     Text(habitNdx.HabitName)
                                                     
                                                     Spacer()
-                                                    
-                                                    
+                                                                                                        
                                                     Text("\(habitNdx.HabitGoal) \(habitNdx.HabitUnit)")
                                                 }
                                             }
