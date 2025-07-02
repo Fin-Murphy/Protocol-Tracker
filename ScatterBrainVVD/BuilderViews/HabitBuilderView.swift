@@ -91,7 +91,7 @@ struct HabitBuilderView: View {
                                                     
                                                     VStack {
                                                
-                                                        HabitDetailView(habitIdentifier: habitNdx.id)
+                                                        HabitDetailView(habitNdx: habitNdx)
                                                         
                                                         Button{DisplayHabitEditor = true} label: {
                                                             Text("Edit habit")
@@ -105,7 +105,91 @@ struct HabitBuilderView: View {
                                                     
                                                     if DisplayHabitEditor == true {
                                                         
-                                                        HabitEditView(habit: habitNdx)
+                                                        
+//                                                        HabitEditView(habitIdentifier: habitNdx.id)
+                                                        
+//                                                        Form {
+//                                                            
+//                                                            Section(header: Text("Habit Name:")) {
+//                                                                TextField("", text: $HabitNameSet)
+//                                                            }
+//                                                            Toggle("Use checkbox instead of units",isOn: $HabitHasCheckboxSet)
+//                                                            if HabitHasCheckboxSet == false {
+//                                                                Section(header: Text("Habit Goal:")) {
+//                                                                    TextField("", value: $HabitGoalSet, format: .number)
+//                                                                }
+//                                                                Section(header: Text("Habit Unit:")) {
+//                                                                    TextField("", text: $HabitUnitSet)
+//                                                                }
+//                                                            }
+//                                                            Section(header: Text("Habit Protocol:")) {
+//                                                                TextField("", text: $HabitProtocolSet)
+//                                                            }
+//                                                            Section(header: Text("Habit Interval (1 = Daily, 7 = Weekly, etc):")) {
+//                                                                TextField("", value: $HabitRepetitionSet, format: .number)
+//                                                            }
+//                                                            Section(header: Text("Habit Details")) {
+//                                                                TextEditor(text: $HabitDescriptionSet)
+//                                                                    .frame(minHeight: 100)
+//                                                                    .overlay(
+//                                                                        RoundedRectangle(cornerRadius: 8)
+//                                                                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+//                                                                    )
+//                                                            }
+//                                                            Section("Habit Start Date") {
+//                                                                DatePicker("Select Date",
+//                                                                           selection: $HabitStartDateSet,
+//                                                                           displayedComponents: .date)
+//                                                                .datePickerStyle(.compact)
+//                                                            }
+//                                                            Section(header: Text("Habit Reward (Points for completion)")) {
+//                                                                TextField("", value: $HabitRewardSet, format: .number)
+//                                                            }
+//                                                            Toggle("Include status update", isOn: $HabitHasStatusSet)
+//                                                            Toggle("Make this habit a subtask of another habit?", isOn: $HabitIsSubtaskSet)
+//                                                            
+//                                                            
+//                                                            Section {
+//                                                                Button {
+//                                                                    
+//                                                                    habitNdx.HabitName = HabitNameSet
+//                                                                    habitNdx.HabitGoal = HabitGoalSet
+//                                                                    habitNdx.HabitUnit = HabitUnitSet
+//                                                                    habitNdx.HabitProtocol = HabitProtocolSet
+//                                                                    habitNdx.HabitRepeatValue = HabitRepetitionSet
+//                                                                    habitNdx.HabitDescription = HabitDescriptionSet
+//                                                                    habitNdx.HabitStartDate = HabitStartDateSet
+//                                                                    habitNdx.HabitReward = HabitRewardSet
+//                                                                    habitNdx.HabitHasStatus = HabitHasStatusSet
+//                                                                    habitNdx.HabitHasCheckbox = HabitHasCheckboxSet
+//                                                                    
+//                                                                } label: {Text("Save Habit")}
+//                                                                
+//                                                                
+//                                                            }
+//                                                            
+//                                                        }
+//                                                        .onAppear{
+//                                                            
+//                                                            HabitNameSet = habitNdx.HabitName
+//                                                            HabitGoalSet = habitNdx.HabitGoal
+//                                                            HabitUnitSet = habitNdx.HabitUnit
+//                                                            HabitProtocolSet = habitNdx.HabitProtocol
+//                                                            HabitRepetitionSet = habitNdx.HabitRepeatValue
+//                                                            HabitDescriptionSet = habitNdx.HabitDescription
+//                                                            HabitStartDateSet = habitNdx.HabitStartDate
+//                                                            HabitRewardSet = habitNdx.HabitReward
+//                                                            HabitHasCheckboxSet = habitNdx.HabitHasCheckbox
+//                                                            HabitHasStatusSet = habitNdx.HabitHasStatus
+//                                                            
+//                                                        }
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
                                                         
                                                     } else {}
                                                     

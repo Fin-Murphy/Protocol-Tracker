@@ -127,7 +127,6 @@ struct ContentView: View {
                                                         }
                                                         .bckMod()
 
-                                                        
                                                         Button {setStatus(refItem: item)} label: {
                                                             Text("Save Habit Status")
                                                             
@@ -700,7 +699,7 @@ struct ContentView: View {
                                         } else {}
                                         
                                     }
-\                                }
+                                }
                         
                             }
                             .onAppear{
@@ -873,6 +872,10 @@ struct ContentView: View {
         }
         
         checkTaskDueDates(viewContext: viewContext)
+        
+        for index in habitData {
+            print("\(index.HabitName) has had \(daysBetween(start: index.HabitStartDate,end: Date()) % index.HabitRepeatValue + 1) days since inception")
+        }
 
         for index in habitData {
             
@@ -891,7 +894,6 @@ struct ContentView: View {
                 newItem.hasCheckbox = index.HabitHasCheckbox
              
             }
-            
         }
 
         do {

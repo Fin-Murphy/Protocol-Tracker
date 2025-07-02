@@ -9,7 +9,7 @@ import SwiftUI
 
 struct HabitDetailView: View {
     
-    @Binding var habitNdx: Habit
+    @State var habitNdx: Habit
     
     var body: some View {
        
