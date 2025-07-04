@@ -9,6 +9,8 @@ import SwiftUI
 
 struct HabitBuilderView: View {
     
+    @Binding var selectedTab: Tabs
+    
     @State var DisplayHabitMaker: Bool = false
     @State var DisplayHabitEditor: Bool = false
 
@@ -25,6 +27,7 @@ struct HabitBuilderView: View {
     @State var HabitStartDateSet: Date = Date()
     @State var HabitIsSubtaskSet: Bool = false
     @State var HabitHasCheckboxSet: Bool = true
+    @State var HabitSuperTaskSet: UUID?
     
     @State var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
     
@@ -257,7 +260,30 @@ struct HabitBuilderView: View {
                             TextField("", value: $HabitRewardSet, format: .number)
                         }
                         Toggle("Include status update", isOn: $HabitHasStatusSet)
+                        
+                        
+                        
                         Toggle("Make this habit a subtask of another habit?", isOn: $HabitIsSubtaskSet)
+                        if HabitIsSubtaskSet == true {
+                            habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+                            ForEach(habitData){superTaskHabit in
+                                
+                                Button{
+                                    
+                                    
+                                    
+                                } label: {Text(superTaskHabit.habitName)}
+                                
+                                
+                                
+                                
+                                
+                                
+                            }
+                            
+                            
+                            
+                        }
                         
                         
                         Section {
@@ -297,6 +323,8 @@ struct HabitBuilderView: View {
                 habitDataIteratorList[ndx].HabitReward = HabitRewardSet
                 habitDataIteratorList[ndx].HabitHasStatus = HabitHasStatusSet
                 habitDataIteratorList[ndx].HabitHasCheckbox = HabitHasCheckboxSet
+                habitDataIteratorList[ndx].HabitIsSubtask = HabitIsSubtaskSet
+                habitDataIteratorList[ndx].HabitSuperTask = HabitSuperTaskSet
                 
                 if habitDataIteratorList[ndx].HabitHasCheckbox == true {
                     habitDataIteratorList[ndx].HabitGoal = 1
@@ -367,15 +395,17 @@ struct HabitBuilderView: View {
         }
         
         let inputHabit:Habit = Habit(HabitName: HabitNameSet,
-                                  HabitGoal: HabitGoalSet,
-                                  HabitUnit: HabitUnitSet,
-                                  HabitProtocol: HabitProtocolSet,
-                                  HabitStartDate: Calendar.current.startOfDay(for: HabitStartDateSet),
-                                  HabitRepeatValue: HabitRepetitionSet,
-                                  HabitDescription: HabitDescriptionSet,
-                                  HabitReward: Int16(HabitRewardSet),
-                                  HabitHasStatus: HabitHasStatusSet,
-                                  HabitHasCheckbox: HabitHasCheckboxSet)
+                                HabitGoal: HabitGoalSet,
+                                HabitUnit: HabitUnitSet,
+                                HabitProtocol: HabitProtocolSet,
+                                HabitStartDate: Calendar.current.startOfDay(for: HabitStartDateSet),
+                                HabitRepeatValue: HabitRepetitionSet,
+                                HabitDescription: HabitDescriptionSet,
+                                HabitReward: Int16(HabitRewardSet),
+                                HabitHasStatus: HabitHasStatusSet,
+                                HabitHasCheckbox: HabitHasCheckboxSet,
+                                HabitSuperTask: HabitSuperTaskSet,
+                                HabitIsSubtask: HabitIsSubtaskSet)
         
         
         if var outData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") {
@@ -400,6 +430,7 @@ struct HabitBuilderView: View {
         HabitRewardSet = 1
         HabitStartDateSet = Date()
         HabitHasCheckboxSet = true
+        HabitIsSubtaskSet = false
         
         habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
         
@@ -416,6 +447,6 @@ struct HabitBuilderView: View {
 
 }
 
-#Preview {
-    HabitBuilderView()
-}
+//#Preview {
+//    HabitBuilderView(selectedTab: Tabs.HUB)
+//}

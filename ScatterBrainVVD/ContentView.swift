@@ -66,7 +66,7 @@ struct ContentView: View {
          }
             else if selectedTab == .Protocols {
                                     
-                HabitBuilderView()
+                HabitBuilderView(selectedTab: $selectedTab)
                     
                 
 /* *******************************************************
@@ -781,7 +781,7 @@ struct ContentView: View {
         }
     } //END FUNC DELETE ENTITY
     
-    /*    ------------------------------------------------
+    /* ------------------------------------------------
                     SET STATUS
      ------------------------------------------------     */
     

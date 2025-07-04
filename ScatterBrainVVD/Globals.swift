@@ -75,6 +75,8 @@ struct Habit: Identifiable, Codable, Hashable {
     var HabitReward: Int16
     var HabitHasStatus: Bool
     var HabitHasCheckbox: Bool
+    var HabitIsSubtask: Bool = false
+    var HabitSuperTask: UUID?
 
 } // END struct Task
 
