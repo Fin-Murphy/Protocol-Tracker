@@ -264,27 +264,27 @@ struct HabitBuilderView: View {
                         
                         
                         Toggle("Make this habit a subtask of another habit?", isOn: $HabitIsSubtaskSet)
-                        if HabitIsSubtaskSet == true {
-                            habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
-                            ForEach(habitData){superTaskHabit in
-                                
-                                Button{
-                                    
-                                    
-                                    
-                                } label: {Text(superTaskHabit.habitName)}
-                                
-                                
-                                
-                                
-                                
-                                
-                            }
-                            
-                            
-                            
-                        }
-                        
+//                        if HabitIsSubtaskSet == true {
+//                            habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+//                            ForEach(habitData){superTaskHabit in
+//                                
+//                                Button{
+//                                    
+//                                    
+//                                    
+//                                } label: {Text(superTaskHabit.habitName)}
+//                                
+//                                
+//                                
+//                                
+//                                
+//                                
+//                            }
+//                            
+//                            
+//                            
+//                        }
+//                        
                         
                         Section {
                             Button {addItem()} label: {Text("Save Habit")}
@@ -324,7 +324,7 @@ struct HabitBuilderView: View {
                 habitDataIteratorList[ndx].HabitHasStatus = HabitHasStatusSet
                 habitDataIteratorList[ndx].HabitHasCheckbox = HabitHasCheckboxSet
                 habitDataIteratorList[ndx].HabitIsSubtask = HabitIsSubtaskSet
-                habitDataIteratorList[ndx].HabitSuperTask = HabitSuperTaskSet
+//                habitDataIteratorList[ndx].HabitSuperTask = HabitSuperTaskSet
                 
                 if habitDataIteratorList[ndx].HabitHasCheckbox == true {
                     habitDataIteratorList[ndx].HabitGoal = 1
@@ -404,8 +404,8 @@ struct HabitBuilderView: View {
                                 HabitReward: Int16(HabitRewardSet),
                                 HabitHasStatus: HabitHasStatusSet,
                                 HabitHasCheckbox: HabitHasCheckboxSet,
-                                HabitSuperTask: HabitSuperTaskSet,
-                                HabitIsSubtask: HabitIsSubtaskSet)
+                                HabitIsSubtask: HabitIsSubtaskSet,
+                                HabitSuperTask: HabitSuperTaskSet)
         
         
         if var outData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") {
