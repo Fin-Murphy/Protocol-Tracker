@@ -9,6 +9,8 @@ import SwiftUI
 
 struct HabitDetailView: View {
     
+    @State var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+    
     @State var habitNdx: Habit
     
     var body: some View {
@@ -22,6 +24,14 @@ struct HabitDetailView: View {
             Text("Item goal value: \(habitNdx.HabitGoal) \(habitNdx.HabitUnit)" )
             Text("Item repeats every \(habitNdx.HabitRepeatValue) days." )
             Text("Item Description: \n\n \(habitNdx.HabitDescription)" )
+            if habitNdx.HabitHasSubtask == true {
+                Text("Subhabits:")
+                ForEach(habitData){ indexr in
+                    if indexr.HabitSuperTask == habitNdx.id {
+                        Text(indexr.HabitName)
+                    }
+                }
+            }
         }
         
         

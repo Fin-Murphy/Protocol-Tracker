@@ -149,14 +149,14 @@ struct HabitBuilderView: View {
                                     
                                     ForEach(habitData) { habitNdx in
                                         
-                                        if habitNdx.HabitProtocol == index.ProtocolName {
+                                        if habitNdx.HabitProtocol == index.ProtocolName && habitNdx.HabitIsSubtask == false {
                                             
                                             NavigationLink{
                                                 ZStack{
                                                     VStack {
                                                
                                                         HabitDetailView(habitNdx: habitNdx)
-                                                        
+                                                                                                                
                                                         Button{DisplayHabitEditor = true} label: {
                                                             Text("Edit habit")
                                                         }
