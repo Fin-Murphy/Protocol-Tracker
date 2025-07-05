@@ -8,9 +8,7 @@
 import SwiftUI
 
 struct HabitBuilderView: View {
-    
-    @Binding var selectedTab: Tabs
-    
+        
     @State var DisplayHabitMaker: Bool = false
     @State var DisplayHabitEditor: Bool = false
 
@@ -28,10 +26,10 @@ struct HabitBuilderView: View {
     @State var HabitIsSubtaskSet: Bool = false
     @State var HabitHasCheckboxSet: Bool = true
     @State var HabitSuperTaskSet: UUID?
+    @State var HabitHasSubTaskSet: Bool = false
     
     @State var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
     
-
     private var closeButton: some View {
         Image(systemName: "x.circle")
             .resizable()
@@ -41,11 +39,81 @@ struct HabitBuilderView: View {
             .bold()
     }
     
+    private var habLister: some View {
+        ForEach(habitData){ superTaskHabit in
+
+            Button{
+                HabitSuperTaskSet = superTaskHabit.id
+            } label: {
+                Text(superTaskHabit.HabitName)
+            }
+        }
+    }
+    
+    private var habitBuilderForm: some View {
+        
+        Form {
+            
+            Section(header: Text("Habit Name:")) {
+                TextField("", text: $HabitNameSet)
+            }
+            Toggle("Use checkbox instead of units",isOn: $HabitHasCheckboxSet)
+            if HabitHasCheckboxSet == false {
+                Section(header: Text("Habit Goal:")) {
+                    TextField("", value: $HabitGoalSet, format: .number)
+                }
+                Section(header: Text("Habit Unit:")) {
+                    TextField("", text: $HabitUnitSet)
+                }
+            }
+            Section(header: Text("Habit Protocol:")) {
+                TextField("", text: $HabitProtocolSet)
+            }
+            Section(header: Text("Habit Interval (1 = Daily, 7 = Weekly, etc):")) {
+                TextField("", value: $HabitRepetitionSet, format: .number)
+            }
+            Section(header: Text("Habit Details")) {
+                TextEditor(text: $HabitDescriptionSet)
+                    .frame(minHeight: 100)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                    )
+            }
+            Section("Habit Start Date") {
+                DatePicker("Select Date",
+                           selection: $HabitStartDateSet,
+                           displayedComponents: .date)
+                .datePickerStyle(.compact)
+            }
+            Section(header: Text("Habit Reward (Points for completion)")) {
+                TextField("", value: $HabitRewardSet, format: .number)
+            }
+            Toggle("Include status update", isOn: $HabitHasStatusSet)
+            
+            
+            
+            Toggle("Make this habit a subhabit of another habit?", isOn: $HabitIsSubtaskSet)
+            if HabitIsSubtaskSet == true {
+                habLister
+            }
+            
+            Section {
+                Button {addItem()} label: {Text("Save Habit")}
+            }
+        }
+    }
+    
+//    private var habitEditorForm: some View {
+//        
+//        
+//    }
+    
+    
     
     // -----------------------------------------------
     //                  END VAR DECLARATIONS
     // ----------------------------------------------
-   
     
     var body: some View {
         
@@ -71,10 +139,8 @@ struct HabitBuilderView: View {
                 
                 if let listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") {
 
-                
                 if habitData.isEmpty != true {
                         NavigationView {
-                            
                             
                             List {
                                 ForEach(listOfProtocols) { index in
@@ -89,9 +155,7 @@ struct HabitBuilderView: View {
                                         if habitNdx.HabitProtocol == index.ProtocolName {
                                             
                                             NavigationLink{
-                                                
                                                 ZStack{
-                                                    
                                                     VStack {
                                                
                                                         HabitDetailView(habitNdx: habitNdx)
@@ -99,16 +163,13 @@ struct HabitBuilderView: View {
                                                         Button{DisplayHabitEditor = true} label: {
                                                             Text("Edit habit")
                                                         }
-                                                        
                                                         Button{rmHabit(id: habitNdx.id)} label: {
                                                             Text("Remove this habit")
                                                         }
-                                                        
                                                     }
                                                     
                                                     if DisplayHabitEditor == true {
                                                         
-                                                                                                                
                                                         Form {
 
                                                             Section(header: Text("Habit Name:")) {
@@ -147,23 +208,15 @@ struct HabitBuilderView: View {
                                                                 TextField("", value: $HabitRewardSet, format: .number)
                                                             }
                                                             Toggle("Include status update", isOn: $HabitHasStatusSet)
-                                                            Toggle("Make this habit a subtask of another habit?", isOn: $HabitIsSubtaskSet)
-
-
                                                             Section {
                                                                 Button {
 
                                                                     updateHabit(habitToEdit: habitNdx.id)
                                                                                                                                         
                                                                 } label: {Text("Save Habit")}
-
-                                                                
                                                             }
-                                                       
-
-                                                            
                                                         }
-                                                        .onAppear{  // < ------------ /THIS IS WHATS CAUSING THE ISSUE
+                                                        .onAppear{
                                                             HabitNameSet = habitNdx.HabitName
                                                             HabitGoalSet = habitNdx.HabitGoal
                                                             HabitUnitSet = habitNdx.HabitUnit
@@ -175,25 +228,20 @@ struct HabitBuilderView: View {
                                                             HabitHasCheckboxSet = habitNdx.HabitHasCheckbox
                                                             HabitHasStatusSet = habitNdx.HabitHasStatus
                                                         }
-                                                        
-                                                        
-                                                        
                                                     } else {}
-                                                    
                                                 }
-                                                
-                                                
                                             } label: {
                                                 
                                                 HStack {
+                                                    //-----------------------------------------------------
                                                     Text(habitNdx.HabitName)
                                                     
                                                     Spacer()
-                                                                                                        
+                                                    
                                                     Text("\(habitNdx.HabitGoal) \(habitNdx.HabitUnit)")
+                                                    //-----------------------------------------------------
                                                 }
                                             }
-                                            
                                         } else {}
                                     }.onMove(perform: move)
                                 }
@@ -203,13 +251,8 @@ struct HabitBuilderView: View {
                             }
                         }
                     } else {Text("No Habits yet")}
-               
-                
-                
-                
                 }
             }
-            
             
             if DisplayHabitMaker == true {
                 
@@ -219,80 +262,8 @@ struct HabitBuilderView: View {
                     } label: {
                         closeButton
                     }.padding()
-                    
-                    
-                    
-                    Form {
-                        
-                        Section(header: Text("Habit Name:")) {
-                            TextField("", text: $HabitNameSet)
-                        }
-                        Toggle("Use checkbox instead of units",isOn: $HabitHasCheckboxSet)
-                        if HabitHasCheckboxSet == false {
-                            Section(header: Text("Habit Goal:")) {
-                                TextField("", value: $HabitGoalSet, format: .number)
-                            }
-                            Section(header: Text("Habit Unit:")) {
-                                TextField("", text: $HabitUnitSet)
-                            }
-                        }
-                        Section(header: Text("Habit Protocol:")) {
-                            TextField("", text: $HabitProtocolSet)
-                        }
-                        Section(header: Text("Habit Interval (1 = Daily, 7 = Weekly, etc):")) {
-                            TextField("", value: $HabitRepetitionSet, format: .number)
-                        }
-                        Section(header: Text("Habit Details")) {
-                            TextEditor(text: $HabitDescriptionSet)
-                                .frame(minHeight: 100)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                )
-                        }
-                        Section("Habit Start Date") {
-                            DatePicker("Select Date",
-                                       selection: $HabitStartDateSet,
-                                       displayedComponents: .date)
-                            .datePickerStyle(.compact)
-                        }
-                        Section(header: Text("Habit Reward (Points for completion)")) {
-                            TextField("", value: $HabitRewardSet, format: .number)
-                        }
-                        Toggle("Include status update", isOn: $HabitHasStatusSet)
-                        
-                        
-                        
-                        Toggle("Make this habit a subtask of another habit?", isOn: $HabitIsSubtaskSet)
-//                        if HabitIsSubtaskSet == true {
-//                            habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
-//                            ForEach(habitData){superTaskHabit in
-//                                
-//                                Button{
-//                                    
-//                                    
-//                                    
-//                                } label: {Text(superTaskHabit.habitName)}
-//                                
-//                                
-//                                
-//                                
-//                                
-//                                
-//                            }
-//                            
-//                            
-//                            
-//                        }
-//                        
-                        
-                        Section {
-                            Button {addItem()} label: {Text("Save Habit")}
-                            
-                            
-                        }
-                        
-                    }
+
+                    habitBuilderForm
                     
                 } // VSTACK
                 .frame(width:300,height:700)
@@ -306,6 +277,16 @@ struct HabitBuilderView: View {
             
         }.onAppear{indexProtocols()}
     }
+    
+    
+    
+    
+    
+    // ------------------------------------ Spacer
+    
+    
+
+
         
     private func updateHabit(habitToEdit: UUID) {
         
@@ -323,8 +304,6 @@ struct HabitBuilderView: View {
                 habitDataIteratorList[ndx].HabitReward = HabitRewardSet
                 habitDataIteratorList[ndx].HabitHasStatus = HabitHasStatusSet
                 habitDataIteratorList[ndx].HabitHasCheckbox = HabitHasCheckboxSet
-                habitDataIteratorList[ndx].HabitIsSubtask = HabitIsSubtaskSet
-//                habitDataIteratorList[ndx].HabitSuperTask = HabitSuperTaskSet
                 
                 if habitDataIteratorList[ndx].HabitHasCheckbox == true {
                     habitDataIteratorList[ndx].HabitGoal = 1
@@ -337,9 +316,7 @@ struct HabitBuilderView: View {
         UserDefaults.standard.setEncodable(habitDataIteratorList, forKey: "habitList")
         
         habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
-       
     }
-    
     
     private func indexProtocols () {
             
@@ -394,6 +371,14 @@ struct HabitBuilderView: View {
             HabitUnitSet = "units"
         }
         
+        if HabitIsSubtaskSet == true {
+            for index in habitData {
+                if index.id == HabitSuperTaskSet {
+//                    index.HabitHasSubtask = true
+                }
+            }
+        }
+        
         let inputHabit:Habit = Habit(HabitName: HabitNameSet,
                                 HabitGoal: HabitGoalSet,
                                 HabitUnit: HabitUnitSet,
@@ -407,7 +392,6 @@ struct HabitBuilderView: View {
                                 HabitIsSubtask: HabitIsSubtaskSet,
                                 HabitSuperTask: HabitSuperTaskSet)
         
-        
         if var outData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") {
 
             outData.append(inputHabit)
@@ -418,7 +402,6 @@ struct HabitBuilderView: View {
             let initHabitList:[Habit] = [inputHabit]
             UserDefaults.standard.setEncodable(initHabitList, forKey: "habitList")
         }
-        
         
         DisplayHabitMaker = false
         HabitNameSet = ""
@@ -436,7 +419,6 @@ struct HabitBuilderView: View {
         
         indexProtocols()
 
-        
     }
 
     private func move(from source: IndexSet, to destination: Int) {
@@ -447,6 +429,6 @@ struct HabitBuilderView: View {
 
 }
 
-//#Preview {
-//    HabitBuilderView(selectedTab: Tabs.HUB)
-//}
+#Preview {
+    HabitBuilderView()
+}

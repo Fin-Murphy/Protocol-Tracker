@@ -66,7 +66,7 @@ struct ContentView: View {
          }
             else if selectedTab == .Protocols {
                                     
-                HabitBuilderView(selectedTab: $selectedTab)
+                HabitBuilderView(/*selectedTab: $selectedTab*/)
                     
                 
 /* *******************************************************
@@ -855,7 +855,6 @@ struct ContentView: View {
     /*    ------------------------------------------------
                    POPULATE TASKS
      ------------------------------------------------     */
-
     private func populateTasks() {
         
         habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
