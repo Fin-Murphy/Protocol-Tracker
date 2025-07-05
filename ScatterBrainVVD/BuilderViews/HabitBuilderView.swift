@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct HabitBuilderView: View {
+    
+    @State var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
         
     @State var DisplayHabitMaker: Bool = false
     @State var DisplayHabitEditor: Bool = false
-
-    @State var Today = Date()
     
     @State var HabitNameSet: String = ""
     @State var HabitGoalSet: Int16 = 1
@@ -28,8 +28,6 @@ struct HabitBuilderView: View {
     @State var HabitSuperTaskSet: UUID?
     @State var HabitHasSubTaskSet: Bool = false
     
-    @State var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
-    
     private var closeButton: some View {
         Image(systemName: "x.circle")
             .resizable()
@@ -41,7 +39,6 @@ struct HabitBuilderView: View {
     
     private var habLister: some View {
         ForEach(habitData){ superTaskHabit in
-
             Button{
                 HabitSuperTaskSet = superTaskHabit.id
             } label: {
@@ -51,9 +48,7 @@ struct HabitBuilderView: View {
     }
     
     private var habitBuilderForm: some View {
-        
         Form {
-            
             Section(header: Text("Habit Name:")) {
                 TextField("", text: $HabitNameSet)
             }
@@ -90,14 +85,10 @@ struct HabitBuilderView: View {
                 TextField("", value: $HabitRewardSet, format: .number)
             }
             Toggle("Include status update", isOn: $HabitHasStatusSet)
-            
-            
-            
             Toggle("Make this habit a subhabit of another habit?", isOn: $HabitIsSubtaskSet)
             if HabitIsSubtaskSet == true {
                 habLister
             }
-            
             Section {
                 Button {addItem()} label: {Text("Save Habit")}
             }
@@ -108,7 +99,6 @@ struct HabitBuilderView: View {
 //        
 //        
 //    }
-    
     
     
     // -----------------------------------------------
@@ -126,7 +116,6 @@ struct HabitBuilderView: View {
                         .fontWeight(.bold)
                         .font(.title)
                         .padding(.bottom)
-                    
                     Button {
                         DisplayHabitMaker = true
                     } label: {
