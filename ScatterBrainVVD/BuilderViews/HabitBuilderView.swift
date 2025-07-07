@@ -382,7 +382,7 @@ struct HabitBuilderView: View {
             UserDefaults.standard.setEncodable(habitData, forKey: "habitList")
         } else {}
         
-        
+            
         let inputHabit:Habit = Habit(HabitName: HabitNameSet,
                                 HabitGoal: HabitGoalSet,
                                 HabitUnit: HabitUnitSet,

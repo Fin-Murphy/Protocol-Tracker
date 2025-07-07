@@ -85,6 +85,7 @@ struct ContentView: View {
 /* *******************************************************
             MAIN TASK TAB
 ****************************************************** */
+                
             } else if selectedTab == .HUB {
                 
                 
@@ -140,7 +141,6 @@ struct ContentView: View {
                                                         .foregroundColor(.blue)
                                                         .bckMod()
 
-                                                        
                                                     }
                                                     .onAppear{updateItemStatus = item.status}
                                                     .bckMod()
