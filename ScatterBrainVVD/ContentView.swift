@@ -76,7 +76,7 @@ struct ContentView: View {
          }
             else if selectedTab == .Protocols {
                                     
-                HabitBuilderView()
+                HabitBuilderView(viewContext: _viewContext)
                     
                 
 /* *******************************************************
@@ -732,11 +732,12 @@ struct ContentView: View {
                          Text("Welcome to Scatterbrain!")
                          Text("")
                          Text("This app is still under heavy development.")
-                         Text("If you have any issues or encounter any bugs or errors,")
-                         Text("please let me know.")
+                         Text("If you have any issues or encounter any bugs or errors, please let me know!")
 
                          
                          Text("")
+                         Text("The 5 tabs along the bottom of the screen are, in this order, the Calendar tab, the Habit Tab, the Main tab, the Task tab, and the Settings tab.")
+                         Text("The final version of this app aims to replicate all the functionalities of Org mode in a user-friendly format. If you have suggestions, again please let me know!")
                          
                          Button{
                              UserDefaults.standard.set(true, forKey: "seenWelcome")
@@ -799,7 +800,7 @@ struct ContentView: View {
         
     }
     
-    /*    ------------------------------------------------
+    /* ------------------------------------------------
                     DELETE ENTITY
      ------------------------------------------------     */
     

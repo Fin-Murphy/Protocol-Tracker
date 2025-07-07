@@ -6,8 +6,12 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct HabitBuilderView: View {
+    
+    @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
+
     
     @State var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
     
@@ -407,6 +411,25 @@ struct HabitBuilderView: View {
             let initHabitList:[Habit] = [inputHabit]
             UserDefaults.standard.setEncodable(initHabitList, forKey: "habitList")
         }
+        
+            
+            
+        if (daysBetween(start: Calendar.current.startOfDay(for: inputHabit.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) >= 0) && (daysBetween(start:  Calendar.current.startOfDay(for: inputHabit.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) % inputHabit.HabitRepeatValue == 0) {
+                                    
+            let newItem = Item(context: viewContext)
+            newItem.timestamp = Date()
+            newItem.name = inputHabit.HabitName
+            newItem.goal = inputHabit.HabitGoal
+            newItem.unit = inputHabit.HabitUnit
+            newItem.whichProtocol = inputHabit.HabitProtocol
+            newItem.complete = false
+            newItem.reward = inputHabit.HabitReward
+            newItem.id = UUID()
+            newItem.hasStatus = inputHabit.HabitHasStatus
+            newItem.hasCheckbox = inputHabit.HabitHasCheckbox
+
+        }
+            
         
         DisplayHabitMaker = false
         HabitNameSet = ""
