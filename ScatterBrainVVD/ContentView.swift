@@ -23,29 +23,35 @@ struct ContentView: View {
     @State var updateItemStatus: Int16 = 0
     
     @State var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
-
+    
     //-------------------------------------------
     @State var range:Int = 4
     //----------------------------------------------------------
     
-    
     @Environment(\.managedObjectContext) public var viewContext
-
+    
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
         animation: .default)
     private var items: FetchedResults<Item>
-
     
-   
+
+//    private var NavViewContent: some View {
+//
+//        
+//        
+//    }
+//    
+//    
+    
     var body: some View {
-        
+    
        VStack{
-           
+    
 /* *******************************************************
                 Calendar TAB
  ****************************************************** */
-            
+    
            if selectedTab == .Calendar {
                
                
@@ -66,7 +72,7 @@ struct ContentView: View {
          }
             else if selectedTab == .Protocols {
                                     
-                HabitBuilderView(/*selectedTab: $selectedTab*/)
+                HabitBuilderView()
                     
                 
 /* *******************************************************
@@ -89,7 +95,7 @@ struct ContentView: View {
                 // TOP DATE BAR ---------------------------------------------------------------------
 
                 
-                ZStack{
+                ZStack{ 
                     
                     NavigationView {
                         
@@ -99,7 +105,7 @@ struct ContentView: View {
                                 
                                 if moveCompleteHabits == true {
                                     ForEach(items) { item in
-                                        
+                                        // How in the hell do I refactor this
                                         if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true && item.complete == false {
                                             
                                             NavigationLink {
@@ -438,7 +444,8 @@ struct ContentView: View {
                                                 
                                                 Spacer()
                                                 
-                                            } label: {
+                                            } // End of navigation link
+                                            label: {
                                                 
                                                 
                                                 HStack{

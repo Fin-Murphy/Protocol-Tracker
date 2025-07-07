@@ -29,9 +29,9 @@ struct DateBarView: View {
                 .fontWeight(.bold)
                 .font(.title2)
             
-            Text("(\(Celebrate)/\(UserDefaults.standard.integer(forKey: "dailyGoal")) Points)")
-                .fontWeight(.bold)
-                .font(.title2)
+//            Text("(\(Celebrate)/\(UserDefaults.standard.integer(forKey: "dailyGoal")) Points)")
+//                .fontWeight(.bold)
+//                .font(.title2)
             
             Button {
                 SelectedDate = calendar.date(byAdding: .day, value: 1, to: SelectedDate)!

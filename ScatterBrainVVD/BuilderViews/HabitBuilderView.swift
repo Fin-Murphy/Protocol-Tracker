@@ -10,7 +10,7 @@ import SwiftUI
 struct HabitBuilderView: View {
     
     @State var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
-        
+    
     @State var DisplayHabitMaker: Bool = false
     @State var DisplayHabitEditor: Bool = false
     
@@ -39,10 +39,13 @@ struct HabitBuilderView: View {
     
     private var habLister: some View {
         ForEach(habitData){ superTaskHabit in
-            Button{
-                HabitSuperTaskSet = superTaskHabit.id
-            } label: {
-                Text(superTaskHabit.HabitName)
+            
+            if superTaskHabit.HabitIsSubtask == false {
+                Button{
+                    HabitSuperTaskSet = superTaskHabit.id
+                } label: {
+                    Text(superTaskHabit.HabitName)
+                }
             }
         }
     }
@@ -63,40 +66,41 @@ struct HabitBuilderView: View {
                 }
             }
             
-            Toggle("Make this habit a subhabit of another habit?", isOn: $HabitIsSubtaskSet)
-            if HabitIsSubtaskSet == true {
+//            Toggle("Make this habit a subhabit of another habit?", isOn: $HabitIsSubtaskSet)
+//            if HabitIsSubtaskSet == true {
+//                
+//                Text("Superhabit: \(displayNameByUUID(id: HabitSuperTaskSet ?? UUID()))")
+//                
+//                    habLister
+//          
+//            } else {
                 
-                Text("Superhabit: \(displayNameByUUID(id: HabitSuperTaskSet ?? UUID()))")
-                
-                    habLister
-          
-            } else {
-                
-                    Section(header: Text("Habit Protocol:")) {
-                        TextField("", text: $HabitProtocolSet)
-                    }
-                    Section(header: Text("Habit Interval (1 = Daily, 7 = Weekly, etc):")) {
-                        TextField("", value: $HabitRepetitionSet, format: .number)
-                    }
-                    Section(header: Text("Habit Details")) {
-                        TextEditor(text: $HabitDescriptionSet)
-                            .frame(minHeight: 100)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                            )
-                    }
-                    Section("Habit Start Date") {
-                        DatePicker("Select Date",
-                                   selection: $HabitStartDateSet,
-                                   displayedComponents: .date)
-                        .datePickerStyle(.compact)
-                    }
-                    Section(header: Text("Habit Reward (Points for completion)")) {
-                        TextField("", value: $HabitRewardSet, format: .number)
-                    }
-                    Toggle("Include status update", isOn: $HabitHasStatusSet)
-            }
+                Section(header: Text("Habit Protocol:")) {
+                    TextField("", text: $HabitProtocolSet)
+                }
+                Section(header: Text("Habit Interval (1 = Daily, 7 = Weekly, etc):")) {
+                    TextField("", value: $HabitRepetitionSet, format: .number)
+                }
+                Section(header: Text("Habit Details")) {
+                    TextEditor(text: $HabitDescriptionSet)
+                        .frame(minHeight: 100)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                        )
+                }
+                Section("Habit Start Date") {
+                    DatePicker("Select Date",
+                               selection: $HabitStartDateSet,
+                               displayedComponents: .date)
+                    .datePickerStyle(.compact)
+                }
+                Section(header: Text("Habit Reward (Points for completion)")) {
+                    TextField("", value: $HabitRewardSet, format: .number)
+                }
+                Toggle("Include status update", isOn: $HabitHasStatusSet)
+            
+//            }
             Section {
                 Button {addItem()} label: {Text("Save Habit")}
             }
