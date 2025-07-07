@@ -726,27 +726,28 @@ struct ContentView: View {
                         }
                     }
                     
-//                 if seenWelcome {
-//                    
-//                     VStack{
-//                         Text("Welcome to Scatterbrain!")
-//                         
-//                         
-//                         
-//                         Button{
-//                             
-//                             
-//                             
-//                         } label: {
-//                             
-//                         }
-//                     }
-//                    
-//                    
-//                    
-//                    
-//                    
-//                }
+                 if seenWelcome {
+                    
+                     VStack{
+                         Text("Welcome to Scatterbrain!")
+                         Text("")
+                         Text("This app is still under heavy development.")
+                         Text("If you have any issues or encounter any bugs or errors,")
+                         Text("please let me know.")
+
+                         
+                         Text("")
+                         
+                         Button{
+                             UserDefaults.standard.set(true, forKey: "seenWelcome")
+                             seenWelcome = false
+                         } label: {
+                             Text("Get Started")
+                         }
+                     }.bckMod()
+                    
+                    
+                }
                     
                     
                 }.onAppear{checkDate()} // END ZSTACK
