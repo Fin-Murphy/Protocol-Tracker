@@ -19,27 +19,17 @@ struct GoalSetView: View {
                 
                 TextField("", value: $dailyGoalSet, format: .number)
                     .frame(maxWidth: 100, alignment: .center)
-            }.ignoresSafeArea(.keyboard)
-                .padding()
-                .foregroundColor(.black)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.black, lineWidth: 3)
-                )
-                .cornerRadius(10)
+            }
+            .foregroundColor(ForeColor)
+            .bckMod()
             
             Button {
                 UserDefaults.standard.set(dailyGoalSet, forKey: "dailyGoal")
             } label: {
                 Text("Save Daily Goal")
             }
-            .foregroundColor(.blue)
-            .padding()
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.black, lineWidth: 3)
-            )
-            .cornerRadius(10)
+            .foregroundColor(ForeColor)
+            .bckMod()
             
             Toggle("Move complete habits to bottom of list",isOn: $displayCompletedHabits)
                 .onAppear{displayCompletedHabits = UserDefaults.standard.bool(forKey: "displayCompletedHabits")}
@@ -49,22 +39,9 @@ struct GoalSetView: View {
             
         }
         .onAppear{dailyGoalSet = UserDefaults.standard.integer(forKey: "dailyGoal")}
-        .padding()
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(Color.black, lineWidth: 3)
-        )
-        .cornerRadius(10)
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+        .foregroundColor(ForeColor)
+        .bckMod()
+  
     }
 }
 

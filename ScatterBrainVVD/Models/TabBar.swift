@@ -36,7 +36,7 @@ struct TabBar: View {
                     }
                     label: {
                         SymbolButton(bIcon: "calendar.badge.plus", bTxt: "Calendar")
-                    }.foregroundColor(.black)
+                    }.foregroundColor(ForeColor)
 
             } else {
 
@@ -45,7 +45,7 @@ struct TabBar: View {
                     }
                     label: {
                         SymbolButton(bIcon: "calendar", bTxt: "")
-                    }.foregroundColor(.black)
+                    }.foregroundColor(ForeColor)
 
             }
             
@@ -62,7 +62,7 @@ struct TabBar: View {
                         selectedTab = .Protocols
                     } label: {
                         SymbolButton(bIcon: "arrowtriangle.down.square.fill", bTxt: "Habits")
-                    }.foregroundColor(.black)
+                    }.foregroundColor(ForeColor)
                 
             } else {
                     
@@ -70,7 +70,7 @@ struct TabBar: View {
                         selectedTab = .Protocols
                     } label: {
                         SymbolButton(bIcon: "arrowtriangle.down.square", bTxt: "")
-                    }.foregroundColor(.black)
+                    }.foregroundColor(ForeColor)
             
             }
             
@@ -84,7 +84,7 @@ struct TabBar: View {
                         selectedTab = .HUB
                     } label: {
                         SymbolButton(bIcon: "h.square.fill", bTxt: "Hub")
-                    }.foregroundColor(.black)
+                    }.foregroundColor(ForeColor)
                 
             } else {
                 
@@ -92,7 +92,7 @@ struct TabBar: View {
                     selectedTab = .HUB
                 } label: {
                     SymbolButton(bIcon: "h.square", bTxt: "")
-                }.foregroundColor(.black)
+                }.foregroundColor(ForeColor)
                 
             }
                 
@@ -106,7 +106,7 @@ struct TabBar: View {
                         selectedTab = .Goals
                     } label: {
                         SymbolButton(bIcon: "checklist.checked", bTxt: "Tasks")
-                    }.foregroundColor(.black)
+                    }.foregroundColor(ForeColor)
                 
             } else {
                     
@@ -114,7 +114,7 @@ struct TabBar: View {
                         selectedTab = .Goals
                     } label: {
                         SymbolButton(bIcon: "checklist.unchecked", bTxt: "")
-                    }.foregroundColor(.black)
+                    }.foregroundColor(ForeColor)
             
             }
             
@@ -130,7 +130,7 @@ struct TabBar: View {
                         selectedTab = .Settings
                     } label: {
                         SymbolButton(bIcon: "gearshape.fill", bTxt: "Settings")
-                    }.foregroundColor(.black)
+                    }.foregroundColor(ForeColor)
 
             } else {
 
@@ -138,7 +138,7 @@ struct TabBar: View {
                         selectedTab = .Settings
                     } label: {
                         SymbolButton(bIcon: "gearshape", bTxt: "")
-                    }.foregroundColor(.black)
+                    }.foregroundColor(ForeColor)
 
             }
             
@@ -150,8 +150,9 @@ struct TabBar: View {
             
         }
         .colorScheme(.light)
-        .background(Rectangle()
-            .foregroundColor(.white))
+        .foregroundColor(ForeColor)
+//        .background(Rectangle()
+//            .foregroundColor(BackColor))
         
         
         

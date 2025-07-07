@@ -42,14 +42,13 @@ struct TaskBuilderView: View {
                         DisplayTaskMaker = true
                     } label: {
                         Text("+")
-                            .foregroundColor(.blue)
                             .font(.title)
                             .padding(.bottom)
                         
                     }
                     
                     
-                }
+                }.foregroundColor(ForeColor)
                 
                 if let ProtocolTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") {
                     NavigationView {
@@ -120,7 +119,10 @@ struct TaskBuilderView: View {
                             }
                         }
                     }
-                } else {Text("No Tasks yet")}
+                } else {
+                    Text("No Tasks yet")
+                        .foregroundColor(ForeColor)
+                }
                 
             }
             

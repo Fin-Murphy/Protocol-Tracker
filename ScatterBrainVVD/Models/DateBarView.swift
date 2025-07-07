@@ -43,8 +43,9 @@ struct DateBarView: View {
                                     }
         }
         .colorScheme(.light)
-        .background(Rectangle()
-                .foregroundColor(.white))
+        .foregroundColor(ForeColor)
+//        .background(Rectangle()
+//                .foregroundColor(BackColor))
         
         
         

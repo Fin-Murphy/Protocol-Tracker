@@ -12,6 +12,8 @@ struct CalendarView: View {
     @Binding var SelectedDate: Date
     @Binding var selectedTab: Tabs
     
+    
+    
     var body: some View {
         
     
@@ -51,7 +53,9 @@ struct CalendarView: View {
                 }
                 
                 
-            } // END LAZY HSTACK
+            }
+            .foregroundColor(ForeColor)
+            // END LAZY HSTACK
         }
         
         

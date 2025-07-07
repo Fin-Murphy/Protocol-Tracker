@@ -16,6 +16,21 @@ import SwiftUI
 
 //------------------------------------------------------
 
+func refreshVisualData(ForeColor:  inout Color) {
+    currentScheme = getCurrentColorScheme()
+    ForeColor = currentScheme == .dark ? .white : .black
+}
+
+func getCurrentColorScheme() -> ColorScheme {
+    let traitCollection = UITraitCollection.current
+    return traitCollection.userInterfaceStyle == .dark ? .dark : .light
+}
+
+var currentScheme = getCurrentColorScheme()
+var ForeColor: Color = currentScheme == .dark ? .white : .black
+
+//let ForeColor: Color = Color.black
+
 
 class GlobalVars {
     static let shared = GlobalVars()
@@ -105,7 +120,7 @@ struct backgroundMod: ViewModifier {
             .padding()
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.black, lineWidth: 3)
+                    .stroke(ForeColor, lineWidth: 3)
             )
             .cornerRadius(10)
     }

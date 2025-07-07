@@ -125,6 +125,7 @@ struct HabitBuilderView: View {
                 
                 HStack{
                     Text("Habits")
+                        
                         .fontWeight(.bold)
                         .font(.title)
                         .padding(.bottom)
@@ -132,11 +133,11 @@ struct HabitBuilderView: View {
                         DisplayHabitMaker = true
                     } label: {
                         Text("+")
-                            .foregroundColor(.blue)
                             .font(.title)
                             .padding(.bottom)
                     }
-                }
+                }.foregroundColor(ForeColor)
+                
                 
                 if let listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") {
 

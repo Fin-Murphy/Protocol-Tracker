@@ -10,6 +10,8 @@ import CoreData
 
 struct ContentView: View {
     
+    @Environment(\.scenePhase) private var scenePhase
+    
     @State var selectedTab: Tabs = .HUB
     
     @State var SelectedDate: Date = Date()
@@ -23,6 +25,8 @@ struct ContentView: View {
     @State var updateItemStatus: Int16 = 0
     
     @State var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+    
+    @State var seenWelcome: Bool = !UserDefaults.standard.bool(forKey: "seenWelcome")
     
     //-------------------------------------------
     @State var range:Int = 4
@@ -712,22 +716,50 @@ struct ContentView: View {
                             .onAppear{
                                 moveCompleteHabits = UserDefaults.standard.bool(forKey: "displayCompletedHabits")
                             }
-                            .toolbar {
-                                ToolbarItem {
-                                    Button(action: resetUserDefaults) {
-                                        Label("Add Item", systemImage: "trash")
-                                    }
-                                }
-                            }
+//                            .toolbar {
+//                                ToolbarItem {
+//                                    Button(action: resetUserDefaults) {
+//                                        Label("Add Item", systemImage: "trash")
+//                                    }
+//                                }
+//                            }
                         }
                     }
-                }.onAppear{checkDate()}
+                    
+//                 if seenWelcome {
+//                    
+//                     VStack{
+//                         Text("Welcome to Scatterbrain!")
+//                         
+//                         
+//                         
+//                         Button{
+//                             
+//                             
+//                             
+//                         } label: {
+//                             
+//                         }
+//                     }
+//                    
+//                    
+//                    
+//                    
+//                    
+//                }
+                    
+                    
+                }.onAppear{checkDate()} // END ZSTACK
             }
             
             Spacer()
                         
             TabBar(selectedTab: $selectedTab)
-        }.colorScheme(.light)
+       }
+       .onAppear{refreshVisualData(ForeColor: &ForeColor)}
+       .onChange(of: scenePhase) {newval in
+               refreshVisualData(ForeColor: &ForeColor)
+       }
     }
 
 /*    ------------------------------------------------
