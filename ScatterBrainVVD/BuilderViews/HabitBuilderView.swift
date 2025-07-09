@@ -219,6 +219,9 @@ struct HabitBuilderView: View {
                                                                     //------------------------------------
                                                                     updateHabit(habitToEdit: habitNdx.id)
                                                                     //------------------------------------
+                                                                    DisplayHabitEditor = false
+                                                                    indexProtocols()
+                                                                    
                                                                 } label: {Text("Save Habit")}
                                                             }
                                                         }
