@@ -32,6 +32,8 @@ struct HabitBuilderView: View {
     @State var HabitHasSubTaskSet: Bool = false
     @State var HabitSuperTaskSet: UUID? = nil
     
+    @State var displayByProtocol: Bool = false
+    
     private var closeButton: some View {
         Image(systemName: "x.circle")
             .resizable()
@@ -141,24 +143,127 @@ struct HabitBuilderView: View {
                             .padding(.bottom)
                     }
                 }.foregroundColor(ForeColor)
+                Toggle("", isOn: $displayByProtocol)
+
                 
                 
                 if let listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") {
 
                 if habitData.isEmpty != true {
+                    
                         NavigationView {
                             
                             List {
-                                ForEach(listOfProtocols) { index in
-                                    
-                                    Text(index.ProtocolName)
-                                        .font(.title2)
-                                        .fontWeight(.bold)
-                                        .padding(.top)
+                                if displayByProtocol == true {
+                                    ForEach(listOfProtocols) { index in
+                                        
+                                        Text(index.ProtocolName)
+                                            .font(.title2)
+                                            .fontWeight(.bold)
+                                            .padding(.top)
+                                        
+                                        ForEach(habitData) { habitNdx in
+                                            
+                                            if habitNdx.HabitProtocol == index.ProtocolName && habitNdx.HabitIsSubtask == false {
+                                                
+                                                NavigationLink{
+                                                    ZStack{
+                                                        VStack {
+                                                   
+                                                            HabitDetailView(habitNdx: habitNdx)
+                                                                                                                    
+                                                            Button{DisplayHabitEditor = true} label: {
+                                                                Text("Edit habit")
+                                                            }
+                                                            Button{rmHabit(id: habitNdx.id)} label: {
+                                                                Text("Remove this habit")
+                                                            }
+                                                        }
+                                                        
+                                                        if DisplayHabitEditor == true {
+                                                            
+                                                            Form {
+
+                                                                Section(header: Text("Habit Name:")) {
+                                                                    TextField("", text: $HabitNameSet)
+                                                                }
+                                                                Toggle("Use checkbox instead of units",isOn: $HabitHasCheckboxSet)
+                                                                if HabitHasCheckboxSet == false {
+                                                                    Section(header: Text("Habit Goal:")) {
+                                                                        TextField("", value: $HabitGoalSet, format: .number)
+                                                                    }
+                                                                    Section(header: Text("Habit Unit:")) {
+                                                                        TextField("", text: $HabitUnitSet)
+                                                                    }
+                                                                }
+                                                                Section(header: Text("Habit Protocol:")) {
+                                                                    TextField("", text: $HabitProtocolSet)
+                                                                }
+                                                                Section(header: Text("Habit Interval (1 = Daily, 7 = Weekly, etc):")) {
+                                                                    TextField("", value: $HabitRepetitionSet, format: .number)
+                                                                }
+                                                                Section(header: Text("Habit Details")) {
+                                                                    TextEditor(text: $HabitDescriptionSet)
+                                                                        .frame(minHeight: 100)
+                                                                        .overlay(
+                                                                            RoundedRectangle(cornerRadius: 8)
+                                                                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                                                        )
+                                                                }
+                                                                Section("Habit Start Date") {
+                                                                    DatePicker("Select Date",
+                                                                               selection: $HabitStartDateSet,
+                                                                               displayedComponents: .date)
+                                                                    .datePickerStyle(.compact)
+                                                                }
+                                                                Section(header: Text("Habit Reward (Points for completion)")) {
+                                                                    TextField("", value: $HabitRewardSet, format: .number)
+                                                                }
+                                                                Toggle("Include status update", isOn: $HabitHasStatusSet)
+                                                                Section {
+                                                                    Button {
+                                                                        //------------------------------------
+                                                                        updateHabit(habitToEdit: habitNdx.id)
+                                                                        //------------------------------------
+                                                                        DisplayHabitEditor = false
+                                                                        indexProtocols()
+                                                                        //crap commit
+                                                                    } label: {Text("Save Habit")}
+                                                                }
+                                                            }
+                                                            .onAppear{
+                                                                HabitNameSet = habitNdx.HabitName
+                                                                HabitGoalSet = habitNdx.HabitGoal
+                                                                HabitUnitSet = habitNdx.HabitUnit
+                                                                HabitProtocolSet = habitNdx.HabitProtocol
+                                                                HabitRepetitionSet = habitNdx.HabitRepeatValue
+                                                                HabitDescriptionSet = habitNdx.HabitDescription
+                                                                HabitStartDateSet = habitNdx.HabitStartDate
+                                                                HabitRewardSet = habitNdx.HabitReward
+                                                                HabitHasCheckboxSet = habitNdx.HabitHasCheckbox
+                                                                HabitHasStatusSet = habitNdx.HabitHasStatus
+                                                            }
+                                                        } else {}
+                                                    }
+                                                } label: {
+                                                    HStack {
+                                                        //-----------------------------------------------------
+                                                        Text(habitNdx.HabitName)
+                                                        
+                                                        Spacer()
+                                                        
+                                                        Text("\(habitNdx.HabitGoal) \(habitNdx.HabitUnit)")
+                                                        //-----------------------------------------------------
+                                                    }
+                                                }
+                                            } else {}
+                                        }.onMove(perform: move)
+                                    }
+                                } else {
                                     
                                     ForEach(habitData) { habitNdx in
                                         
-                                        if habitNdx.HabitProtocol == index.ProtocolName && habitNdx.HabitIsSubtask == false {
+                                        if habitNdx.HabitIsSubtask == false {
                                             
                                             NavigationLink{
                                                 ZStack{
@@ -252,12 +357,19 @@ struct HabitBuilderView: View {
                                             }
                                         } else {}
                                     }.onMove(perform: move)
+                                    
+                                    
+                                    
+                                    
                                 }
+                        
                             }
                             .toolbar {
                                 EditButton()
                             }
                         }
+                    
+                    
                     } else {Text("No Habits yet")}
                 }
             }
