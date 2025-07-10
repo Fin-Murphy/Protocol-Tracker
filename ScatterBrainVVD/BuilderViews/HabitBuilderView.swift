@@ -12,6 +12,7 @@ struct HabitBuilderView: View {
     
     @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
 
+//    @Binding var displayByProtocol: Bool
     
     @State var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
     
@@ -143,8 +144,7 @@ struct HabitBuilderView: View {
                             .padding(.bottom)
                     }
                 }.foregroundColor(ForeColor)
-                Toggle("", isOn: $displayByProtocol)
-
+                    Toggle("Display by Protocol", isOn: $displayByProtocol).frame(maxWidth: 210)
                 
                 
                 if let listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") {
