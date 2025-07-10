@@ -729,7 +729,7 @@ struct ContentView: View {
                  if seenWelcome {
                     
                      VStack{
-                         Text("Welcome to Scatterbrain!")
+                         Text("Welcome to Protocol Tracker!")
                          Text("")
                          Text("This app is still under heavy development.")
                          Text("If you have any issues or encounter any bugs or errors, please let me know!")
