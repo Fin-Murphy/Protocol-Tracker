@@ -6,31 +6,28 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct MainListTab: View {
     
-    @State var selectedTab: Tabs = .HUB // MAKE BINDING
+    @Binding var selectedTab: Tabs
     
-    @State var Celebrate: Int16 = 0  // MAKE BINDING
+    @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
     
+    @Binding var Celebrate: Int16
+    
+    @Binding var SelectedDate: Date
+
+    @Binding var moveCompleteHabits: Bool
+
     @State var habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []  // MAKE BINDING
 
     @State var updateItemStatus: Int16 = 0
 
     @State var seenWelcome: Bool = !UserDefaults.standard.bool(forKey: "seenWelcome")  // MAKE BINDING
     
-    @Environment(\.managedObjectContext) public var viewContext  // MAKE BINDING
-    
-    
-    // MAKE BINDING
-    // ----------------------------------------------------------------------------------// MAKE BINDING
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
-        animation: .default)
-    private var items: FetchedResults<Item>
-    // ----------------------------------------------------------------------------------// MAKE BINDING
-    // MAKE BINDING
-    
+    @Binding var items: [Item]
+
     
     
     var body: some View {
@@ -686,14 +683,44 @@ struct MainListTab: View {
         }
             
             
-        }.onAppear{checkDate()} // END ZSTACK
+        }.onAppear{
+            
+            checkDate()
+        
+            
+            
+        } // END ZSTACK
 
         
         
         
         
         
+    } // END VIEWABLE CONTENT
+    
+    
+    
+    // START PRIVATE FUNCITONS
+    
+    
+    public func checkDate() {
+        if let savedDate = UserDefaults.standard.object(forKey: "DailyTaskPopulate?") as? Date {
+            
+            let comparison = calendar.compare(Date(), to: savedDate, toGranularity: .day)
+
+            if comparison == .orderedDescending {
+                populateTasks()
+                UserDefaults.standard.set(Date(), forKey: "DailyTaskPopulate?")
+                Celebrate = 0
+                SelectedDate = Date()
+            } else {}
+            
+        } else {
+            UserDefaults.standard.set(Date(), forKey: "DailyTaskPopulate?")
+            populateTasks()
+        }
     }
+    
     
     private func setStatus(refItem: Item) {
         refItem.status = updateItemStatus
@@ -707,6 +734,23 @@ struct MainListTab: View {
     }
     
     
+    
+    private func deleteEntity(withUUID uuid: UUID) {
+        // Create a fetch request for your entity
+        let request: NSFetchRequest<Item> = Item.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", uuid as CVarArg)
+        request.fetchLimit = 1
+        
+        do {
+            let results = try viewContext.fetch(request)
+            if let entityToDelete = results.first {
+                viewContext.delete(entityToDelete)
+                try viewContext.save()
+            }
+        } catch {
+            print("Error deleting entity: \(error)")
+        }
+    } //END FUNC DELETE ENTITY
     
     
     
@@ -809,6 +853,6 @@ struct MainListTab: View {
     
 }
 
-#Preview {
-    MainListTab()
-}
+//#Preview {
+//    MainListTab()
+//}

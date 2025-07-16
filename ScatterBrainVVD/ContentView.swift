@@ -90,7 +90,7 @@ struct ContentView: View {
                 // TOP DATE BAR ---------------------------------------------------------------------
                 
                 
-                ZStack{
+        /*        ZStack{
                     
                     NavigationView {
                         
@@ -741,7 +741,18 @@ struct ContentView: View {
                 }
                     
                     
-                }.onAppear{checkDate()} // END ZSTACK
+                }.onAppear{checkDate()}*/ // END ZSTACK
+                
+                
+                MainListTab(
+                    selectedTab: $selectedTab,
+                    viewContext: _viewContext,
+                    Celebrate: $Celebrate,
+                    SelectedDate: $SelectedDate,
+                    moveCompleteHabits: $moveCompleteHabits,
+                    items: $items
+                )
+                
                 
                 
             }// END HUB TAB
