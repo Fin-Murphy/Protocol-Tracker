@@ -40,14 +40,6 @@ struct ContentView: View {
     private var items: FetchedResults<Item>
     
 
-//    private var NavViewContent: some View {
-//
-//        
-//        
-//    }
-//    
-//    
-    
     var body: some View {
     
        VStack{
@@ -752,7 +744,9 @@ struct ContentView: View {
                     
                     
                 }.onAppear{checkDate()} // END ZSTACK
-            }
+                
+                
+            }// END HUB TAB
             
             Spacer()
                         
@@ -837,35 +831,7 @@ struct ContentView: View {
         print(refItem.status)
     }
     
-    /*    ------------------------------------------------
-                    INDEX PROTOCOLS
-     ------------------------------------------------     */
-    
-    
-    private func indexProtocols () {
-        
-        if var protocolArray: [HabitProtocol] = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") {
-        
-                for ndx in habitData {
-                    var inArray = false
-                    print("Executing for item ", ndx.HabitName)
-                    for ndx2 in protocolArray {
-                        if ndx.HabitProtocol == ndx2.ProtocolName {
-                            inArray = true
-                        }
-                    }
-                    if inArray == false {
-                        protocolArray.append(HabitProtocol(ProtocolName: ndx.HabitProtocol))
-                    }
-                }
-            
-            UserDefaults.standard.setEncodable(protocolArray, forKey: "protocol")
-            
-        } else {
-            let pArray: [HabitProtocol] = [/*TaskProtocol(ProtocolName: "Daily")*/]
-            UserDefaults.standard.setEncodable(pArray, forKey: "protocol")
-        }
-    }
+
     
     
     /*    ------------------------------------------------
