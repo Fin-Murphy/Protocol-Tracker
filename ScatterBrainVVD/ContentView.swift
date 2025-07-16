@@ -81,18 +81,16 @@ struct ContentView: View {
 /* *******************************************************
             MAIN TASK TAB
 ****************************************************** */
+            
                 
             } else if selectedTab == .HUB {
                 
-                
                 // TOP DATE BAR ---------------------------------------------------------------------
-           
                 DateBarView(SelectedDate: $SelectedDate, Celebrate: $Celebrate)
-                
                 // TOP DATE BAR ---------------------------------------------------------------------
-
                 
-                ZStack{ 
+                
+                ZStack{
                     
                     NavigationView {
                         
