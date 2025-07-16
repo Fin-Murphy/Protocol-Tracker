@@ -72,8 +72,7 @@ struct Task: Identifiable, Codable {
     var TaskDueDate: Date = Date()
     var TaskUnit: String
     var TaskGoal: Int16
-    var TaskHasCheckbox: Bool
-    
+    var TaskHasCheckbox: Bool    
 }
 
 

@@ -23,6 +23,7 @@ struct TaskBuilderView: View {
     @State var TaskUnitSet: String = "units"
     @State var TaskGoalSet: Int16 = 1
     @State var TaskHasCheckboxSet: Bool = true
+    @State var TaskIsntFloatingSet: Bool = true
     
     
     var body: some View {
@@ -155,12 +156,17 @@ struct TaskBuilderView: View {
                             }
                         }
                         
-                        Section("Task Due Date") {
-                            DatePicker("Select Date",
-                                       selection: $TaskDueDateSet,
-                                       displayedComponents: .date)
-                            .datePickerStyle(.compact)
+                        
+                        Toggle("Schedule task", isOn: $TaskIsntFloatingSet)
+                        if TaskIsntFloatingSet == true {
+                            Section("Task Date") {
+                                DatePicker("Select Date",
+                                           selection: $TaskDueDateSet,
+                                           displayedComponents: .date)
+                                .datePickerStyle(.compact)
+                            }
                         }
+                        
                         
                         Section(header: Text("Task Details")) {
                             TextEditor(text: $TaskDescriptionSet)
