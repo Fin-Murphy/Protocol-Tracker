@@ -200,6 +200,35 @@ struct TaskBuilderView: View {
                   ADD TASK
      ------------------------------------------------     */
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    // FINISH ADDING FUNCTIONALITIES TO MAKE FLOATING TASKS THAT DO NOT ADHERE TO A SPECIFIC DAY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
         
     private func addTask() {
         

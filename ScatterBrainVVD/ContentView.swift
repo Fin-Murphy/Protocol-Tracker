@@ -111,7 +111,7 @@ struct ContentView: View {
                                 if moveCompleteHabits == true {
                                     ForEach(items) { item in
                                         // How in the hell do I refactor this
-                                        if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true && item.complete == false {
+                                        if (Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true && item.complete == false) || (item.floater == true && item.complete == false) {
                                             
                                             NavigationLink {
                                                 
@@ -304,7 +304,7 @@ struct ContentView: View {
                                     
                                     ForEach(items) { item in
                                         
-                                        if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true && item.complete == true {
+                                        if (Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true && item.complete == true)  || (item.floater == true && item.complete == true) {
                                             
                                             NavigationLink {
                                                 
@@ -510,7 +510,7 @@ struct ContentView: View {
 
                                     ForEach(items) { item in
                                         
-                                        if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true {
+                                        if (Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true) || (item.floater == true) {
                                             
                                             NavigationLink {
                                                 
@@ -782,7 +782,7 @@ struct ContentView: View {
                                     TaskName: item.name ?? "",
                                     TaskDescription: item.descriptor ?? "",
                                     TaskReward: item.reward,
-                                    TaskDueDate: (item.timestamp ?? Date()),
+                                    TaskDueDate: (calendar.date(byAdding: .day, value: 1, to: Date())!),
                                     TaskUnit: item.unit ?? "",
                                     TaskGoal: item.goal,
                                     TaskHasCheckbox: item.hasCheckbox)
