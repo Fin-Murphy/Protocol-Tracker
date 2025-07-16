@@ -9,15 +9,27 @@ import SwiftUI
 
 struct MainListTab: View {
     
-    @State var selectedTab: Tabs = .HUB
+    @State var selectedTab: Tabs = .HUB // MAKE BINDING
+    
+    @State var Celebrate: Int16 = 0  // MAKE BINDING
+    
+    @State var habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []  // MAKE BINDING
+
+    @State var updateItemStatus: Int16 = 0
+
+    @State var seenWelcome: Bool = !UserDefaults.standard.bool(forKey: "seenWelcome")  // MAKE BINDING
+    
+    @Environment(\.managedObjectContext) public var viewContext  // MAKE BINDING
     
     
-    @Environment(\.managedObjectContext) public var viewContext
-    
+    // MAKE BINDING
+    // ----------------------------------------------------------------------------------// MAKE BINDING
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
         animation: .default)
     private var items: FetchedResults<Item>
+    // ----------------------------------------------------------------------------------// MAKE BINDING
+    // MAKE BINDING
     
     
     

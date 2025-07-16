@@ -19,8 +19,6 @@ struct HabitItemComponent: View {
     @State var updateItemStatus: Int16 = 0
     
     @State var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
-
-    
     
     
     var body: some View {

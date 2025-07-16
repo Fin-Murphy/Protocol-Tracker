@@ -11,7 +11,7 @@ import CoreData
 struct ContentView: View {
     
     @Environment(\.scenePhase) private var scenePhase
-    
+        
     @State var selectedTab: Tabs = .HUB
     
     @State var SelectedDate: Date = Date()
