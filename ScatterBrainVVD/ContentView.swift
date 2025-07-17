@@ -154,7 +154,7 @@ struct ContentView: View {
     
     
     private func deleteEntity(withUUID uuid: UUID) {
-        // Create a fetch request for your entity
+
         let request: NSFetchRequest<Item> = Item.fetchRequest()
         request.predicate = NSPredicate(format: "id == %@", uuid as CVarArg)
         request.fetchLimit = 1
@@ -168,12 +168,12 @@ struct ContentView: View {
         } catch {
             print("Error deleting entity: \(error)")
         }
-    } //END FUNC DELETE ENTITY
+    }
     
     /* ------------------------------------------------
                     SET STATUS
      ------------------------------------------------     */
-    
+
     private func setStatus(refItem: Item) {
         refItem.status = updateItemStatus
         do {
@@ -232,7 +232,6 @@ struct ContentView: View {
             print("\(index.HabitName) - \(daysBetween(start: index.HabitStartDate,end: Calendar.current.startOfDay(for: Date())))")
         }
 
-        
         for index in habitData {
             
             
@@ -264,29 +263,6 @@ struct ContentView: View {
         }
     }
 
-    
-    
-
-    /*    ------------------------------------------------
-                   DELETE ITEM
-     ------------------------------------------------     */
-    
-    
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            offsets.map { items[$0] }.forEach(viewContext.delete)
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
-        }
-    }
-    
     
     
 }
