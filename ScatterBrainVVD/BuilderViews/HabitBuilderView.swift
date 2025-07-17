@@ -542,6 +542,7 @@ struct HabitBuilderView: View {
             newItem.id = UUID()
             newItem.hasStatus = inputHabit.HabitHasStatus
             newItem.hasCheckbox = inputHabit.HabitHasCheckbox
+            newItem.notFloater = true
 
         }
             

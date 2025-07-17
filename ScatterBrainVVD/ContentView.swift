@@ -9,7 +9,7 @@ import SwiftUI
 import CoreData
 
 struct ContentView: View {
-    
+
     @Environment(\.scenePhase) private var scenePhase
         
     @State var selectedTab: Tabs = .HUB
@@ -88,7 +88,7 @@ struct ContentView: View {
             } else if selectedTab == .HUB {
                 
                 // TOP DATE BAR ---------------------------------------------------------------------
-                DateBarView(SelectedDate: $SelectedDate, Celebrate: $Celebrate)
+                
                 // TOP DATE BAR ---------------------------------------------------------------------
     
                 
@@ -132,7 +132,8 @@ struct ContentView: View {
                                     TaskDueDate: (calendar.date(byAdding: .day, value: 1, to: Date())!),
                                     TaskUnit: item.unit ?? "",
                                     TaskGoal: item.goal,
-                                    TaskHasCheckbox: item.hasCheckbox)
+                                    TaskHasCheckbox: item.hasCheckbox,
+                                    TaskNotFloater: item.notFloater)
             
             if var outTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") {
                 outTaskData.append(returnedTask)

@@ -244,7 +244,8 @@ struct TaskBuilderView: View {
                                     TaskDueDate: TaskDueDateSet,
                                     TaskUnit: TaskUnitSet,
                                     TaskGoal: TaskGoalSet,
-                                    TaskHasCheckbox: TaskHasCheckboxSet)
+                                    TaskHasCheckbox: TaskHasCheckboxSet,
+                                    TaskNotFloater: TaskIsntFloatingSet)
         
         if var outTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") {
 
