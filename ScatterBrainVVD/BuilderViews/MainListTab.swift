@@ -10,15 +10,26 @@ import CoreData
 
 struct MainListTab: View {
     
+    
+    // ---------------------------------------------------------------------------------------------------------------------
+    // BINDINGS
+    // ---------------------------------------------------------------------------------------------------------------------
+
+    
+    
     @Binding var selectedTab: Tabs
-    
-//    @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
-    
+        
     @Binding var Celebrate: Int16
     
     @Binding var SelectedDate: Date
 
     @Binding var moveCompleteHabits: Bool
+    
+    // ---------------------------------------------------------------------------------------------------------------------
+    // STATES
+    // ---------------------------------------------------------------------------------------------------------------------
+
+    
 
     @State var habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []  // MAKE BINDING
 
@@ -26,26 +37,61 @@ struct MainListTab: View {
 
     @State var seenWelcome: Bool = !UserDefaults.standard.bool(forKey: "seenWelcome")  // MAKE BINDING
     
-//    @Binding var items: [Item]
+    
+    // ---------------------------------------------------------------------------------------------------------------------
+    // COREDATA
+    // ---------------------------------------------------------------------------------------------------------------------
+
+    
     
     @Environment(\.managedObjectContext) public var viewContext
     
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
         animation: .default)
-    
-//    private var welcomeMessageView: some View {
-//        
-//        
-//        
-//    }
-    
-    
-    
-    
     private var items: FetchedResults<Item>
 
+    
+    
+    // ---------------------------------------------------------------------------------------------------------------------
+    // WELCOME MESSAGE
+    // ---------------------------------------------------------------------------------------------------------------------
 
+    
+    
+    
+    private var welcomeMessageView: some View {
+    
+        VStack{
+            Text("Welcome to Protocol Tracker!")
+            Text("")
+            Text("This app is still under heavy development.")
+            Text("If you have any issues or encounter any bugs or errors, please let me know!")
+            
+            
+            Text("")
+            Text("The 5 tabs along the bottom of the screen are, in this order, the Calendar tab, the Habit Tab, the Main tab, the Task tab, and the Settings tab.")
+            Text("The final version of this app aims to replicate all the functionalities of Org mode in a user-friendly format. If you have suggestions, again please let me know!")
+            
+            Button{
+                UserDefaults.standard.set(true, forKey: "seenWelcome")
+                seenWelcome = false
+            } label: {
+                Text("Get Started")
+            }
+            
+        }.bckMod()
+    }//END WELCOMEMESSAGEVIEW
+    
+    
+    
+    
+    // ---------------------------------------------------------------------------------------------------------------------
+    // BODY CONTENT
+    // ---------------------------------------------------------------------------------------------------------------------
+
+    
+    
     
     
     var body: some View {
@@ -665,42 +711,20 @@ struct MainListTab: View {
                                 }
                             }
                             
-                        }
+                        }//END LIST
+                        
                         .onAppear{
                             moveCompleteHabits = UserDefaults.standard.bool(forKey: "displayCompletedHabits")
                         }
-                        //                            .toolbar {
-                        //                                ToolbarItem {
-                        //                                    Button(action: resetUserDefaults) {
-                        //                                        Label("Add Item", systemImage: "trash")
-                        //                                    }
-                        //                                }
-                        //                            }
-                    }
-                }
+       
+                    }//END VSTACK
+                    
+                }//END NAV VIEW
                 
                 if seenWelcome {
                     
-                    VStack{
-                        Text("Welcome to Protocol Tracker!")
-                        Text("")
-                        Text("This app is still under heavy development.")
-                        Text("If you have any issues or encounter any bugs or errors, please let me know!")
-                        
-                        
-                        Text("")
-                        Text("The 5 tabs along the bottom of the screen are, in this order, the Calendar tab, the Habit Tab, the Main tab, the Task tab, and the Settings tab.")
-                        Text("The final version of this app aims to replicate all the functionalities of Org mode in a user-friendly format. If you have suggestions, again please let me know!")
-                        
-                        Button{
-                            UserDefaults.standard.set(true, forKey: "seenWelcome")
-                            seenWelcome = false
-                        } label: {
-                            Text("Get Started")
-                        }
-                    }.bckMod()
-                    
-                    
+                    welcomeMessageView()
+                
                 }
                 
                 
@@ -712,16 +736,26 @@ struct MainListTab: View {
                 
             } // END ZSTACK
             
-        }
-        
-        
-        
+        }//END VSTACK
         
     } // END VIEWABLE CONTENT
     
     
     
+    
+    
+    
+    
+    // ---------------------------------------------------------------------------------------------------------------------
+    
+    
     // START PRIVATE FUNCITONS
+    
+    
+    // ---------------------------------------------------------------------------------------------------------------------
+
+    
+    
     
     
     public func checkDate() {
@@ -742,6 +776,11 @@ struct MainListTab: View {
         }
     }
     
+    // ---------------------------------------------------------------------------------------------------------------------
+    // SET STATUS
+    // ---------------------------------------------------------------------------------------------------------------------
+
+    
     
     private func setStatus(refItem: Item) {
         refItem.status = updateItemStatus
@@ -754,6 +793,12 @@ struct MainListTab: View {
         print(refItem.status)
     }
     
+    
+    
+    // ---------------------------------------------------------------------------------------------------------------------
+    // DELETE ENTITY
+    // ---------------------------------------------------------------------------------------------------------------------
+
     
     
     private func deleteEntity(withUUID uuid: UUID) {
@@ -772,6 +817,14 @@ struct MainListTab: View {
             print("Error deleting entity: \(error)")
         }
     } //END FUNC DELETE ENTITY
+    
+    
+    
+    // ---------------------------------------------------------------------------------------------------------------------
+    // POPULATE TASKS
+    // ---------------------------------------------------------------------------------------------------------------------
+
+    
     
     
     private func populateTasks() {
@@ -824,6 +877,13 @@ struct MainListTab: View {
     
     
     
+    // ---------------------------------------------------------------------------------------------------------------------
+    // DESHUNT TASKS
+    // ---------------------------------------------------------------------------------------------------------------------
+
+    
+    
+    
     
     private func deshuntTask(item: Item) {
 //        print("Running deshunt for item \(item.name ?? "")")
@@ -849,6 +909,3 @@ struct MainListTab: View {
     }
 }
 
-//#Preview {
-//    MainListTab()
-//}
