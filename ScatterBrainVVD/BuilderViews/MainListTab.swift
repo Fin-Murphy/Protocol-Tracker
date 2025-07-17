@@ -723,7 +723,7 @@ struct MainListTab: View {
                 
                 if seenWelcome {
                     
-                    welcomeMessageView()
+                    welcomeMessageView
                 
                 }
                 

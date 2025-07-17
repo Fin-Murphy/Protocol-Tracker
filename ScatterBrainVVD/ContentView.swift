@@ -11,6 +11,7 @@ import CoreData
 struct ContentView: View {
 
     @Environment(\.scenePhase) private var scenePhase
+    
         
     @State var selectedTab: Tabs = .HUB
     
@@ -21,16 +22,12 @@ struct ContentView: View {
     @State var moveCompleteHabits: Bool = false
     
     @State var Celebrate: Int16 = 0
-    
-    @State var updateItemStatus: Int16 = 0
-    
+        
     @State var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
     
     @State var seenWelcome: Bool = !UserDefaults.standard.bool(forKey: "seenWelcome")
     
-    //-------------------------------------------
-    @State var range:Int = 4
-    //----------------------------------------------------------
+
     
     @Environment(\.managedObjectContext) public var viewContext
     
