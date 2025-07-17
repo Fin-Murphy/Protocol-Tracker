@@ -221,10 +221,8 @@ struct ContentView: View {
         habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
         
         for taskFinder in items {
-            if Calendar.current.isDate((taskFinder.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) != true {
-                if taskFinder.complete == false {
+            if (taskFinder.isTask == true) && (Calendar.current.isDate((taskFinder.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) != true) && (taskFinder.complete == false) {
                     deshuntTask(item: taskFinder)
-                }
             } else {}
         }
         
@@ -234,6 +232,7 @@ struct ContentView: View {
             print("\(index.HabitName) - \(daysBetween(start: index.HabitStartDate,end: Calendar.current.startOfDay(for: Date())))")
         }
 
+        
         for index in habitData {
             
             
@@ -250,6 +249,7 @@ struct ContentView: View {
                 newItem.id = UUID()
                 newItem.hasStatus = index.HabitHasStatus
                 newItem.hasCheckbox = index.HabitHasCheckbox
+                newItem.notFloater = true
     
             }
         }
@@ -263,7 +263,7 @@ struct ContentView: View {
             fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
         }
     }
-    
+
     
     
 

@@ -153,6 +153,7 @@ func shuntTask (taskToShunt: Task, viewContext: NSManagedObjectContext) {
     newItem.id = UUID()
     newItem.descriptor = taskToShunt.TaskDescription
     newItem.hasCheckbox = taskToShunt.TaskHasCheckbox
+    newItem.notFloater = taskToShunt.TaskNotFloater
     rmTask(id: taskToShunt.id)
     
     do {

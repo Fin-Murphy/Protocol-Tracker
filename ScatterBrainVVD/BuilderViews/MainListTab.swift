@@ -787,10 +787,8 @@ struct MainListTab: View {
         habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
         
         for taskFinder in items {
-            if Calendar.current.isDate((taskFinder.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) != true {
-                if taskFinder.complete == false {
+            if (taskFinder.isTask == true) && (Calendar.current.isDate((taskFinder.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) != true) && (taskFinder.complete == false) {
                     deshuntTask(item: taskFinder)
-                }
             } else {}
         }
         
@@ -837,7 +835,6 @@ struct MainListTab: View {
     
     private func deshuntTask(item: Item) {
 //        print("Running deshunt for item \(item.name ?? "")")
-        if item.isTask == true {
 //            print("Successful!")
             let returnedTask = Task(id: UUID(),
                                     TaskName: item.name ?? "",
@@ -857,13 +854,7 @@ struct MainListTab: View {
                 UserDefaults.standard.setEncodable(taskDataInitialzier, forKey: "taskList")
             }
             deleteEntity(withUUID: item.id ?? UUID())
-            
-        } else {}
-        
     }
-    
-    
-    
 }
 
 //#Preview {
