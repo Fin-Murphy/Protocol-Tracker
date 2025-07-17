@@ -449,7 +449,6 @@ struct MainListTab: View {
                                     
                                 }
                                 
-                                
                             } else {
                                 
                                 ForEach(items) { item in

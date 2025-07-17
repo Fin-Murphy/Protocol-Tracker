@@ -266,6 +266,7 @@ struct TaskBuilderView: View {
         TaskUnitSet = "units"
         TaskGoalSet = 1
         TaskHasCheckboxSet = false
+        TaskIsntFloatingSet = true
         
         checkTaskDueDates(viewContext: context)
     }
