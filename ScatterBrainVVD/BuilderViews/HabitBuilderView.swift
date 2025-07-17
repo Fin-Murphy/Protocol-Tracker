@@ -12,7 +12,6 @@ struct HabitBuilderView: View {
     
     @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
 
-//    @Binding var displayByProtocol: Bool
     
     @State var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
     
@@ -113,11 +112,6 @@ struct HabitBuilderView: View {
             }
         }
     }
-    
-//    private var habitEditorForm: some View {
-//        
-//        
-//    }
     
     
     // -----------------------------------------------

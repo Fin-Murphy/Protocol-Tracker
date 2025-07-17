@@ -167,7 +167,7 @@ func shuntTask (taskToShunt: Task, viewContext: NSManagedObjectContext) {
 }
 
 
-func checkTaskDueDates (viewContext: NSManagedObjectContext) {
+func shuntTodaysTasks (viewContext: NSManagedObjectContext) {
     
     if let outTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") {
         for index in outTaskData {

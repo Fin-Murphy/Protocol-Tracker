@@ -742,10 +742,6 @@ struct MainListTab: View {
     
     
     
-    
-    
-    
-    
     // ---------------------------------------------------------------------------------------------------------------------
     
     
@@ -754,8 +750,6 @@ struct MainListTab: View {
     
     // ---------------------------------------------------------------------------------------------------------------------
 
-    
-    
     
     
     public func checkDate() {
@@ -832,12 +826,12 @@ struct MainListTab: View {
         habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
         
         for taskFinder in items {
-            if (taskFinder.isTask == true) && (Calendar.current.isDate((taskFinder.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) != true) && (taskFinder.complete == false) {
+            if (taskFinder.isTask == true) && (Calendar.current.isDate((taskFinder.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) != true) && (taskFinder.complete == false) && (taskFinder.notFloater == true){
                     deshuntTask(item: taskFinder)
             } else {}
         }
         
-        checkTaskDueDates(viewContext: viewContext)
+        shuntTodaysTasks(viewContext: viewContext)
         
         for index in habitData {
             print("\(index.HabitName) - \(daysBetween(start: index.HabitStartDate,end: Calendar.current.startOfDay(for: Date())))")

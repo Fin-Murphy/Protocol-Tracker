@@ -12,12 +12,11 @@ struct ContentView: View {
 
     @Environment(\.scenePhase) private var scenePhase
     
+    
         
     @State var selectedTab: Tabs = .HUB
     
     @State var SelectedDate: Date = Date()
-    
-    let calendar = Calendar(identifier: .gregorian)
     
     @State var moveCompleteHabits: Bool = false
     
@@ -98,6 +97,7 @@ struct ContentView: View {
                         
             TabBar(selectedTab: $selectedTab)
        }
+        
        .onAppear{refreshVisualData(ForeColor: &ForeColor)}
        .onChange(of: scenePhase) {newval in
                refreshVisualData(ForeColor: &ForeColor)

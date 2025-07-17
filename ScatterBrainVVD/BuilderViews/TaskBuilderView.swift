@@ -239,7 +239,7 @@ struct TaskBuilderView: View {
         TaskHasCheckboxSet = false
         TaskIsntFloatingSet = true
         
-        checkTaskDueDates(viewContext: context)
+        shuntTodaysTasks(viewContext: context)
     }
     
 
