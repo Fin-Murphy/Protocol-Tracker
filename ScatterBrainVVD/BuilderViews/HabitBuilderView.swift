@@ -364,9 +364,9 @@ struct HabitBuilderView: View {
                                 }
                         
                             }
-                            .toolbar {
-                                EditButton()
-                            }
+//                            .toolbar {
+//                                EditButton()
+//                            }
                         }
                     
                     
@@ -431,6 +431,8 @@ struct HabitBuilderView: View {
         habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
     }
     
+    
+    
     private func displayNameByUUID (id: UUID) -> String {
         for index in habitData {
             if index.id == id {
@@ -439,6 +441,8 @@ struct HabitBuilderView: View {
         }
         return "None"
     }
+    
+    
     
     private func indexProtocols () {
             
@@ -467,6 +471,7 @@ struct HabitBuilderView: View {
             habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
         }
 
+    
     private func openHabitBuilder() {
         DisplayHabitMaker = true
     }
