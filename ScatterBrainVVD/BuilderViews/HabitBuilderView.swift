@@ -140,7 +140,6 @@ struct HabitBuilderView: View {
                 }.foregroundColor(ForeColor)
                     Toggle("Display by Protocol", isOn: $displayByProtocol).frame(maxWidth: 210)
                 
-                
                 if let listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") {
 
                 if habitData.isEmpty != true {

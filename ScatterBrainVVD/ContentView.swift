@@ -98,6 +98,7 @@ struct ContentView: View {
             TabBar(selectedTab: $selectedTab)
        }
         
+    
        .onAppear{refreshVisualData(ForeColor: &ForeColor)}
        .onChange(of: scenePhase) {newval in
                refreshVisualData(ForeColor: &ForeColor)
