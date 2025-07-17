@@ -12,7 +12,7 @@ struct MainListTab: View {
     
     @Binding var selectedTab: Tabs
     
-    @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
+//    @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
     
     @Binding var Celebrate: Int16
     
@@ -26,7 +26,15 @@ struct MainListTab: View {
 
     @State var seenWelcome: Bool = !UserDefaults.standard.bool(forKey: "seenWelcome")  // MAKE BINDING
     
-    @Binding var items: [Item]
+//    @Binding var items: [Item]
+    
+    @Environment(\.managedObjectContext) public var viewContext
+    
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
+        animation: .default)
+    private var items: FetchedResults<Item>
+
 
     
     
