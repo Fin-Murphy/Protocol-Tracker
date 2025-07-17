@@ -86,11 +86,7 @@ struct ContentView: View {
             
                 
             } else if selectedTab == .HUB {
-                
-                // TOP DATE BAR ---------------------------------------------------------------------
-                
-                // TOP DATE BAR ---------------------------------------------------------------------
-    
+            
                 
                 MainListTab(
                     selectedTab: $selectedTab,
@@ -120,146 +116,146 @@ struct ContentView: View {
     /*    ------------------------------------------------
                     DESHUNT TASKS
      ------------------------------------------------     */
-    
-    private func deshuntTask(item: Item) {
-//        print("Running deshunt for item \(item.name ?? "")")
-        if item.isTask == true {
-//            print("Successful!")
-            let returnedTask = Task(id: UUID(),
-                                    TaskName: item.name ?? "",
-                                    TaskDescription: item.descriptor ?? "",
-                                    TaskReward: item.reward,
-                                    TaskDueDate: (calendar.date(byAdding: .day, value: 1, to: Date())!),
-                                    TaskUnit: item.unit ?? "",
-                                    TaskGoal: item.goal,
-                                    TaskHasCheckbox: item.hasCheckbox,
-                                    TaskNotFloater: item.notFloater)
-            
-            if var outTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") {
-                outTaskData.append(returnedTask)
-                UserDefaults.standard.setEncodable(outTaskData, forKey: "taskList")
-            } else {
-                let taskDataInitialzier: [Task] = [returnedTask]
-                UserDefaults.standard.setEncodable(taskDataInitialzier, forKey: "taskList")
-            }
-            deleteEntity(withUUID: item.id ?? UUID())
-            
-        } else {}
-        
-    }
+//    
+//    private func deshuntTask(item: Item) {
+////        print("Running deshunt for item \(item.name ?? "")")
+//        if item.isTask == true {
+////            print("Successful!")
+//            let returnedTask = Task(id: UUID(),
+//                                    TaskName: item.name ?? "",
+//                                    TaskDescription: item.descriptor ?? "",
+//                                    TaskReward: item.reward,
+//                                    TaskDueDate: (calendar.date(byAdding: .day, value: 1, to: Date())!),
+//                                    TaskUnit: item.unit ?? "",
+//                                    TaskGoal: item.goal,
+//                                    TaskHasCheckbox: item.hasCheckbox,
+//                                    TaskNotFloater: item.notFloater)
+//            
+//            if var outTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") {
+//                outTaskData.append(returnedTask)
+//                UserDefaults.standard.setEncodable(outTaskData, forKey: "taskList")
+//            } else {
+//                let taskDataInitialzier: [Task] = [returnedTask]
+//                UserDefaults.standard.setEncodable(taskDataInitialzier, forKey: "taskList")
+//            }
+//            deleteEntity(withUUID: item.id ?? UUID())
+//            
+//        } else {}
+//        
+//    }
     
     /* ------------------------------------------------
                     DELETE ENTITY
      ------------------------------------------------     */
     
     
-    private func deleteEntity(withUUID uuid: UUID) {
-
-        let request: NSFetchRequest<Item> = Item.fetchRequest()
-        request.predicate = NSPredicate(format: "id == %@", uuid as CVarArg)
-        request.fetchLimit = 1
-        
-        do {
-            let results = try viewContext.fetch(request)
-            if let entityToDelete = results.first {
-                viewContext.delete(entityToDelete)
-                try viewContext.save()
-            }
-        } catch {
-            print("Error deleting entity: \(error)")
-        }
-    }
+//    private func deleteEntity(withUUID uuid: UUID) {
+//
+//        let request: NSFetchRequest<Item> = Item.fetchRequest()
+//        request.predicate = NSPredicate(format: "id == %@", uuid as CVarArg)
+//        request.fetchLimit = 1
+//        
+//        do {
+//            let results = try viewContext.fetch(request)
+//            if let entityToDelete = results.first {
+//                viewContext.delete(entityToDelete)
+//                try viewContext.save()
+//            }
+//        } catch {
+//            print("Error deleting entity: \(error)")
+//        }
+//    }
     
     /* ------------------------------------------------
                     SET STATUS
      ------------------------------------------------     */
 
-    private func setStatus(refItem: Item) {
-        refItem.status = updateItemStatus
-        do {
-            try viewContext.save()
-        } catch {
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-        }
-        print(refItem.status)
-    }
-    
+//    private func setStatus(refItem: Item) {
+//        refItem.status = updateItemStatus
+//        do {
+//            try viewContext.save()
+//        } catch {
+//            let nsError = error as NSError
+//            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+//        }
+//        print(refItem.status)
+//    }
+//    
 
     /*    ------------------------------------------------
                     CHECK DATE
      ------------------------------------------------     */
     
-    public func checkDate() {
-        if let savedDate = UserDefaults.standard.object(forKey: "DailyTaskPopulate?") as? Date {
-            
-            let comparison = calendar.compare(Date(), to: savedDate, toGranularity: .day)
-
-            if comparison == .orderedDescending {
-                populateTasks()
-                UserDefaults.standard.set(Date(), forKey: "DailyTaskPopulate?")
-                Celebrate = 0
-                SelectedDate = Date()
-            } else {}
-            
-        } else {
-            UserDefaults.standard.set(Date(), forKey: "DailyTaskPopulate?")
-            populateTasks()
-        }
-    }
-
+//    public func checkDate() {
+//        if let savedDate = UserDefaults.standard.object(forKey: "DailyTaskPopulate?") as? Date {
+//            
+//            let comparison = calendar.compare(Date(), to: savedDate, toGranularity: .day)
+//
+//            if comparison == .orderedDescending {
+//                populateTasks()
+//                UserDefaults.standard.set(Date(), forKey: "DailyTaskPopulate?")
+//                Celebrate = 0
+//                SelectedDate = Date()
+//            } else {}
+//            
+//        } else {
+//            UserDefaults.standard.set(Date(), forKey: "DailyTaskPopulate?")
+//            populateTasks()
+//        }
+//    }
+//
 
 
 
     /*    ------------------------------------------------
                    POPULATE TASKS
      ------------------------------------------------     */
-    private func populateTasks() {
-        
-        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
-        
-        for taskFinder in items {
-            if (taskFinder.isTask == true) && (Calendar.current.isDate((taskFinder.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) != true) && (taskFinder.complete == false) {
-                    deshuntTask(item: taskFinder)
-            } else {}
-        }
-        
-        checkTaskDueDates(viewContext: viewContext)
-        
-        for index in habitData {
-            print("\(index.HabitName) - \(daysBetween(start: index.HabitStartDate,end: Calendar.current.startOfDay(for: Date())))")
-        }
-
-        for index in habitData {
-            
-            
-            if (daysBetween(start: Calendar.current.startOfDay(for: index.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) >= 0) && (daysBetween(start:  Calendar.current.startOfDay(for: index.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) % index.HabitRepeatValue == 0) {
-                                        
-                let newItem = Item(context: viewContext)
-                newItem.timestamp = Date()
-                newItem.name = index.HabitName
-                newItem.goal = index.HabitGoal
-                newItem.unit = index.HabitUnit
-                newItem.whichProtocol = index.HabitProtocol
-                newItem.complete = false
-                newItem.reward = index.HabitReward
-                newItem.id = UUID()
-                newItem.hasStatus = index.HabitHasStatus
-                newItem.hasCheckbox = index.HabitHasCheckbox
-                newItem.notFloater = true
-    
-            }
-        }
-
-        do {
-            try viewContext.save()
-        } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-        }
-    }
+//    private func populateTasks() {
+//        
+//        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+//        
+//        for taskFinder in items {
+//            if (taskFinder.isTask == true) && (Calendar.current.isDate((taskFinder.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) != true) && (taskFinder.complete == false) {
+//                    deshuntTask(item: taskFinder)
+//            } else {}
+//        }
+//        
+//        checkTaskDueDates(viewContext: viewContext)
+//        
+//        for index in habitData {
+//            print("\(index.HabitName) - \(daysBetween(start: index.HabitStartDate,end: Calendar.current.startOfDay(for: Date())))")
+//        }
+//
+//        for index in habitData {
+//            
+//            
+//            if (daysBetween(start: Calendar.current.startOfDay(for: index.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) >= 0) && (daysBetween(start:  Calendar.current.startOfDay(for: index.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) % index.HabitRepeatValue == 0) {
+//                                        
+//                let newItem = Item(context: viewContext)
+//                newItem.timestamp = Date()
+//                newItem.name = index.HabitName
+//                newItem.goal = index.HabitGoal
+//                newItem.unit = index.HabitUnit
+//                newItem.whichProtocol = index.HabitProtocol
+//                newItem.complete = false
+//                newItem.reward = index.HabitReward
+//                newItem.id = UUID()
+//                newItem.hasStatus = index.HabitHasStatus
+//                newItem.hasCheckbox = index.HabitHasCheckbox
+//                newItem.notFloater = true
+//    
+//            }
+//        }
+//
+//        do {
+//            try viewContext.save()
+//        } catch {
+//            // Replace this implementation with code to handle the error appropriately.
+//            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+//            let nsError = error as NSError
+//            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+//        }
+//    }
 
     
     

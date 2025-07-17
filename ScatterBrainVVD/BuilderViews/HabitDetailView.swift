@@ -33,10 +33,6 @@ struct HabitDetailView: View {
                 }
             }
         }
-        
-        
-        
-        
     }
 }
 
