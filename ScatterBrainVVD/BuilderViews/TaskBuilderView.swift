@@ -15,6 +15,7 @@ struct TaskBuilderView: View {
     @Binding var selectedTab: Tabs
     
     @State var DisplayTaskMaker: Bool = false
+    @State var DisplayTaskEditor: Bool = false
     
     @State var TaskNameSet: String = "Task"
     @State var TaskDescriptionSet: String = "This is a Task"
@@ -24,6 +25,10 @@ struct TaskBuilderView: View {
     @State var TaskGoalSet: Int16 = 1
     @State var TaskHasCheckboxSet: Bool = true
     @State var TaskIsntFloatingSet: Bool = true
+    
+    @State var ProtocolTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
+    
+
     
     
     var body: some View {
@@ -51,65 +56,133 @@ struct TaskBuilderView: View {
                     
                 }.foregroundColor(ForeColor)
                 
-                if let ProtocolTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") {
+                if ProtocolTaskData.isEmpty == false {
+                
                     NavigationView {
                         List{
                             ForEach(ProtocolTaskData) { taskNdx in
                                 
                                 NavigationLink{
                                     
-                                    Spacer()
-                                    
-                                    Text(taskNdx.TaskName)
-                                        .font(.title)
-                                        .padding()
-                                    Text("Item goal: \(taskNdx.TaskGoal) \(taskNdx.TaskUnit)" )
-                                        .font(.title)
-                                        .fontWeight(.bold)
-                                        .padding()
-                                    
-                                    Spacer()
-                                    
-                                    Text("Item Description: \n")
-                                        .font(.title2)
-                                    Text("\(taskNdx.TaskDescription)" )
-                                    
-                                    Text("Item due date: \(taskNdx.TaskDueDate)")
-                                    
-                                    
-                                    Spacer()
-                                    
-                                    Button{
-                                        shuntTask(taskToShunt: taskNdx, viewContext: context)
-                                    } label: {
-                                        Text("Shunt Task")
-                                            .padding()
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 10)
-                                                    .stroke(Color.black, lineWidth: 3)
-                                            )
-                                            .cornerRadius(10)
-                                            .padding()
-                                    }
-                                    
-                                    Button{
-                                        rmTask(id: taskNdx.id)
-//                                        selectedTab = .HUB
-                                    } label: {
-                                        Text("Remove this task")
-                                            .padding()
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 10)
-                                                    .stroke(Color.black, lineWidth: 3)
-                                            )
-                                            .cornerRadius(10)
-                                            .padding()
+                                    ZStack {
+                                        
+                                        VStack{
+                                            
+                                            Spacer()
+                                            
+                                            Text(taskNdx.TaskName)
+                                                .font(.title)
+                                                .padding()
+                                            Text("Item goal: \(taskNdx.TaskGoal) \(taskNdx.TaskUnit)" )
+                                                .font(.title)
+                                                .fontWeight(.bold)
+                                                .padding()
+                                            
+                                            Spacer()
+                                            
+                                            Text("Item Description: \n")
+                                                .font(.title2)
+                                            Text("\(taskNdx.TaskDescription)" )
+                                            
+                                            Text("Item due date: \(taskNdx.TaskDueDate)")
+                                            
+                                            
+                                            Spacer()
+                                            
+                                            Button{
+                                                DisplayTaskEditor = true
+                                            } label: {
+                                                Text("Edit Task").bckMod()
+                                            }
+                                            
+                                            Button{
+                                                shuntTask(taskToShunt: taskNdx, viewContext: context)
+                                            } label: {
+                                                Text("Shunt Task").bckMod()
+                                            }
+                                            
+                                            Button{
+                                                rmTask(id: taskNdx.id)
+                                                //                                        selectedTab = .HUB
+                                            } label: {
+                                                Text("Remove this task").bckMod()
+                                            }
+                                            
+                                            Spacer()
+                                            
+                                        }
+                                        
+                                        if DisplayTaskEditor == true {
+                                            
+                                            VStack {
+                                                
+                    
+                                                Form {
+                                                    
+                                                    Section(header: Text("Task Name:")) {
+                                                        TextField("", text: $TaskNameSet).ignoresSafeArea(.keyboard)
+                                                    }
+                                                    Toggle("Use checkbox instead of units", isOn: $TaskHasCheckboxSet)
+                                                    if TaskHasCheckboxSet == false {
+                                                        Section(header: Text("Task Goal:")) {
+                                                            TextField("", value: $TaskGoalSet, format: .number)
+                                                        }
+                                                        Section(header: Text("Task Unit:")) {
+                                                            TextField("", text: $TaskUnitSet)
+                                                        }
+                                                    }
+                                                    
+                                                    Toggle("Schedule task", isOn: $TaskIsntFloatingSet)
+                                                    if TaskIsntFloatingSet == true {
+                                                        Section("Task Date") {
+                                                            DatePicker("Select Date",
+                                                                       selection: $TaskDueDateSet,
+                                                                       displayedComponents: .date)
+                                                            .datePickerStyle(.compact)
+                                                        }
+                                                    }
+                                                    
+                                                    
+                                                    Section(header: Text("Task Details")) {
+                                                        TextEditor(text: $TaskDescriptionSet)
+                                                            .frame(minHeight: 100)
+                                                            .overlay(
+                                                                RoundedRectangle(cornerRadius: 8)
+                                                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                                            )
+                                                    }
+                                                    Section(header: Text("Task Reward (Points for completion)")) {
+                                                        TextField("", value: $TaskRewardSet, format: .number)
+                                                    }
+                                                    
+                                                    
+                                                    Section{
+                                                        Button{
+                                                            DisplayTaskEditor = false
+                                                            updateTask(taskToEdit: taskNdx.id)
+                                                            
+                                                        } label: {
+                                                            Text("Save Habit")
+                                                        }
+                                                    }
+                                                    
+                                                    
+                                                }.onAppear{
+                                                    
+                                                    TaskNameSet = taskNdx.TaskName
+                                                    TaskDescriptionSet = taskNdx.TaskDescription
+                                                    TaskRewardSet = taskNdx.TaskReward
+                                                    TaskDueDateSet = taskNdx.TaskDueDate
+                                                    TaskUnitSet = taskNdx.TaskUnit
+                                                    TaskGoalSet = taskNdx.TaskGoal
+                                                    TaskHasCheckboxSet = taskNdx.TaskHasCheckbox
+                                                    TaskIsntFloatingSet = taskNdx.TaskNotFloater
+                                                    
+                                                }
+                                            }
+                                        } else {}
                                         
                                     }
-                                    
-                                    
-                                    Spacer()
-                                    
                                     
                                 } label: {
                                     Text(taskNdx.TaskName)
@@ -117,11 +190,14 @@ struct TaskBuilderView: View {
                                 }
                                 
                                 
+                                
+                                
                             }
                         }
                     }
-                } else {
-                    Text("No Tasks yet")
+                } // END IF STATEMENT
+                else {
+                    Text("No Tasks")
                         .foregroundColor(ForeColor)
                 }
                 
@@ -196,6 +272,7 @@ struct TaskBuilderView: View {
             } else {}
             
             
+            
         }//onAppear{indexProtocols()}
         
         
@@ -205,7 +282,35 @@ struct TaskBuilderView: View {
     /*    ------------------------------------------------
                   ADD TASK
      ------------------------------------------------     */
+    
+    private func updateTask(taskToEdit: UUID) {
+        
+        var taskDataIteratorList: [Task] = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
+        
+        for ndx in 0..<taskDataIteratorList.count {
+            if taskDataIteratorList[ndx].id == taskToEdit {
+                taskDataIteratorList[ndx].TaskName = TaskNameSet
+                taskDataIteratorList[ndx].TaskGoal = TaskGoalSet
+                taskDataIteratorList[ndx].TaskUnit = TaskUnitSet
+                taskDataIteratorList[ndx].TaskDescription = TaskDescriptionSet
+                taskDataIteratorList[ndx].TaskDueDate = TaskDueDateSet
+                taskDataIteratorList[ndx].TaskReward = TaskRewardSet
+                taskDataIteratorList[ndx].TaskHasCheckbox = TaskHasCheckboxSet
+                
+                if taskDataIteratorList[ndx].TaskHasCheckbox == true {
+                    taskDataIteratorList[ndx].TaskGoal = 1
+                    taskDataIteratorList[ndx].TaskUnit = "units"
 
+                }
+            }
+        }
+        
+        UserDefaults.standard.setEncodable(taskDataIteratorList, forKey: "taskList")
+        ProtocolTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
+        
+    }
+    
+    
         
     private func addTask() {
         
@@ -236,10 +341,14 @@ struct TaskBuilderView: View {
         TaskDueDateSet = Date()
         TaskUnitSet = "units"
         TaskGoalSet = 1
-        TaskHasCheckboxSet = false
+        TaskHasCheckboxSet = true
         TaskIsntFloatingSet = true
         
+        
         shuntTodaysTasks(viewContext: context)
+        
+        ProtocolTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
+
     }
     
 

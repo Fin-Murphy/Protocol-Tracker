@@ -171,7 +171,7 @@ func shuntTodaysTasks (viewContext: NSManagedObjectContext) {
     
     if let outTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") {
         for index in outTaskData {
-            if Calendar.current.isDate((index.TaskDueDate), equalTo: Date(), toGranularity: .day) == true {
+            if (Calendar.current.isDate((index.TaskDueDate), equalTo: Date(), toGranularity: .day) == true) && (index.TaskNotFloater == true) {
                 shuntTask(taskToShunt: index, viewContext: viewContext)
             }
         }

@@ -17,6 +17,7 @@ struct PersistenceController {
         
         
         let newItem = Item(context: viewContext)
+        newItem.notFloater = true
         newItem.timestamp = Date()
         newItem.name = "Glitch prevention item"
         newItem.value = 0

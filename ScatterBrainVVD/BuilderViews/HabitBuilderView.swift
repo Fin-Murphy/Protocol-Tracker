@@ -351,9 +351,6 @@ struct HabitBuilderView: View {
                                         } else {}
                                     }.onMove(perform: move)
                                     
-                                    
-                                    
-                                    
                                 }
                         
                             }
@@ -363,7 +360,7 @@ struct HabitBuilderView: View {
                         }
                     
                     
-                    } else {Text("No Habits yet")}
+                    } else {Text("No Habits")}
                 }
             }
             
