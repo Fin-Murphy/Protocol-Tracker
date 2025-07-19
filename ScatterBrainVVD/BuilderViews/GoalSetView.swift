@@ -41,6 +41,8 @@ struct GoalSetView: View {
         .onAppear{dailyGoalSet = UserDefaults.standard.integer(forKey: "dailyGoal")}
         .foregroundColor(ForeColor)
         .bckMod()
+        
+        ProtocolAddView()
   
     }
 }

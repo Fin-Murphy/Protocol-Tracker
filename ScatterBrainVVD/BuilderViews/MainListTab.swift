@@ -8,8 +8,8 @@
 import SwiftUI
 import CoreData
 
+
 struct MainListTab: View {
-    
     
     // ---------------------------------------------------------------------------------------------------------------------
     // BINDINGS
@@ -84,8 +84,7 @@ struct MainListTab: View {
     }//END WELCOMEMESSAGEVIEW
     
     
-    
-    
+
     // ---------------------------------------------------------------------------------------------------------------------
     // BODY CONTENT
     // ---------------------------------------------------------------------------------------------------------------------
@@ -177,6 +176,14 @@ struct MainListTab: View {
                                             
                                             // ---------------------- BEGIN VALUE MODIFICATION
                                             
+                                            Button{
+                                                scootDate(refItem: item)
+                                            } label: {
+                                                Text("Move item to tomorrow")
+                                                    .bckMod()
+                                            }
+                                            
+                                            
                                             if item.hasCheckbox == false {
                                                 
                                                 if item.complete == true {
@@ -193,6 +200,7 @@ struct MainListTab: View {
                                                     
                                                 }
                                                 
+                                          
                                                 HStack{
                                                     
                                                     Button {
@@ -448,44 +456,43 @@ struct MainListTab: View {
                                             
                                             Spacer()
                                             
-                                        } // End of navigation link
-                                        label: {
+                                        } label: {
+                                        
+                                        
+                                        HStack{
                                             
+                                            if item.isTask == true {
+                                                Image(systemName: "t.square")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(width: 20,height: 20)
+                                            } else {
+                                                Image(systemName: "h.square")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(width: 20,height: 20)
+                                            }
                                             
-                                            HStack{
-                                                
-                                                if item.isTask == true {
-                                                    Image(systemName: "t.square")
-                                                        .resizable()
-                                                        .scaledToFit()
-                                                        .frame(width: 20,height: 20)
-                                                } else {
-                                                    Image(systemName: "h.square")
-                                                        .resizable()
-                                                        .scaledToFit()
-                                                        .frame(width: 20,height: 20)
-                                                }
-                                                
-                                                if item.complete == true {
-                                                    Text(String(item.name ?? ""))
-                                                        .strikethrough()
-                                                } else {
-                                                    Text(String(item.name ?? ""))
-                                                }
-                                                Spacer()
-                                                
-                                                if item.complete == true {
-                                                    Text("☑")
-                                                } else {
-                                                    Text("☐")
-                                                }
-                                                
-                                                if item.hasCheckbox == false {
-                                                    Text("\(item.value)/\(item.goal)")
-                                                    Text("   ")
-                                                }
+                                            if item.complete == true {
+                                                Text(String(item.name ?? ""))
+                                                    .strikethrough()
+                                            } else {
+                                                Text(String(item.name ?? ""))
+                                            }
+                                            Spacer()
+                                            
+                                            if item.complete == true {
+                                                Text("☑")
+                                            } else {
+                                                Text("☐")
+                                            }
+                                            
+                                            if item.hasCheckbox == false {
+                                                Text("\(item.value)/\(item.goal)")
+                                                Text("   ")
                                             }
                                         }
+                                    }
                                         .swipeActions(edge: .trailing) {
                                             Button("Complete") {
                                                 completeHabit(item: item, viewContext: viewContext, Celebrate: &Celebrate)
@@ -575,6 +582,13 @@ struct MainListTab: View {
                                             }.frame(width: 350)
                                             
                                             Spacer()
+                                            
+                                            Button{
+                                                scootDate(refItem: item)
+                                            } label: {
+                                                Text("Move item to tomorrow")
+                                                    .bckMod()
+                                            }
                                             
                                             // ---------------------- BEGIN VALUE MODIFICATION
                                             
@@ -780,6 +794,38 @@ struct MainListTab: View {
     
     private func setStatus(refItem: Item) {
         refItem.status = updateItemStatus
+        do {
+            try viewContext.save()
+        } catch {
+            let nsError = error as NSError
+            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        }
+        print(refItem.status)
+    }
+    
+    // ---------------------------------------------------------------------------------------------------------------------
+    // SCOOT DATE
+    // ---------------------------------------------------------------------------------------------------------------------
+
+    
+    private func scootDate(refItem: Item) {
+        
+        let newItem = Item(context: viewContext)
+        newItem.timestamp = (calendar.date(byAdding: .day, value: 1, to: Date())!)
+        newItem.name = refItem.name
+        newItem.goal = refItem.goal
+        newItem.unit = refItem.unit
+        newItem.whichProtocol = refItem.whichProtocol
+        newItem.complete = false
+        newItem.reward = refItem.reward
+        newItem.id = UUID()
+        newItem.hasStatus = refItem.hasStatus
+        newItem.hasCheckbox = refItem.hasCheckbox
+        newItem.notFloater = true
+        
+        
+        refItem.name = ("> " + (refItem.name ?? ""))
+        
         do {
             try viewContext.save()
         } catch {

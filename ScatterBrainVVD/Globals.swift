@@ -15,6 +15,40 @@ import SwiftUI
 //                    DATA STRUCTURES
 
 //------------------------------------------------------
+let AppDefinedProtocols: [HabitProtocol] = [HubermanProtocol]
+
+
+let HubermanProtocol: HabitProtocol = HabitProtocol(id: UUID(),
+                                                    ProtocolName: "Huberman Daily",
+                                                    ProtocolUnits: HubermanProtocolArray)
+
+let HubermanProtocolArray: [Habit] = [Habit(HabitName: "Morning Sunlight",
+                                       HabitGoal: 10,
+                                       HabitUnit: "minutes",
+                                       HabitProtocol: "Huberman Daily",
+                                       HabitStartDate: Calendar.current.startOfDay(for: Date()),
+                                       HabitRepeatValue: 1,
+                                       HabitDescription: "Getting sunlight in your eyes daily peaks cortisol in a healthy way, \n making you more awake and able to retain more alertness throghout the day",
+                                       HabitReward: 1,
+                                       HabitHasStatus: false,
+                                       HabitHasCheckbox: false,
+                                       HabitIsSubtask: false,
+                                       HabitSuperTask: nil),
+                                 Habit(HabitName: "Cold Exposure",
+                                        HabitGoal: 5,
+                                        HabitUnit: "minutes",
+                                        HabitProtocol: "Huberman Daily",
+                                        HabitStartDate: Calendar.current.startOfDay(for: Date()),
+                                        HabitRepeatValue: 1,
+                                        HabitDescription: "Cold exposure increase dopamine levels throught the day, leading to improved mood, motivaiton, alertness, and performance.",
+                                        HabitReward: 1,
+                                        HabitHasStatus: false,
+                                        HabitHasCheckbox: false,
+                                        HabitIsSubtask: false,
+                                        HabitSuperTask: nil)]
+
+
+
 
 func refreshVisualData(ForeColor:  inout Color) {
     currentScheme = getCurrentColorScheme()
@@ -29,27 +63,6 @@ func getCurrentColorScheme() -> ColorScheme {
 var currentScheme = getCurrentColorScheme()
 var ForeColor: Color = currentScheme == .dark ? .white : .black
 
-//let ForeColor: Color = Color.black
-
-
-class GlobalVars {
-    static let shared = GlobalVars()
-    private init() {}
-    
-    
-} // END CLASS GlobalVars
-
-extension View {
-    func hideKeyboard() {
-        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),
-                                       to: nil, from: nil, for: nil)
-    }
-}
-
-
-
-
-
 
 
 let valueRange = 1 ... 1000
@@ -57,13 +70,14 @@ let Today: Date = Date()
 let calendar: Calendar = .current
 
 
-struct HabitProtocol: Identifiable, Codable {
+struct HabitProtocol: Identifiable, Codable, Hashable {
     var id: UUID = UUID()
     var ProtocolName: String
+    var ProtocolUnits: [Habit] = []
 }
 
 
-struct Task: Identifiable, Codable {
+struct Task: Identifiable, Codable, Hashable {
     
     var id: UUID = UUID()
     var TaskName: String
