@@ -12,7 +12,6 @@ struct ContentView: View {
 
     @Environment(\.scenePhase) private var scenePhase
     
-    
         
     @State var selectedTab: Tabs = .HUB
     

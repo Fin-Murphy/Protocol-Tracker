@@ -68,18 +68,17 @@ struct TaskBuilderView: View {
                                         
                                         VStack{
                                             
-                                            
                                             List {
                                                 Text(taskNdx.TaskName)
                                                     .font(.title)
                                                     .padding()
                                                 Text("Item goal: \(taskNdx.TaskGoal) \(taskNdx.TaskUnit)" )
-                                                    .padding()
-                                                Text("Item Description: \n")
-                                                    .font(.title2)
-                                                Text("\(taskNdx.TaskDescription)" )
                                                 Text("Item due date: \(taskNdx.TaskDueDate, formatter: itemFormatter)")
-                                                
+                                                Section {
+                                                    Text("Item Description: \n")
+                                                        .font(.title2)
+                                                    Text("\(taskNdx.TaskDescription)" )
+                                                }
                                             }
                                                 
                                             
