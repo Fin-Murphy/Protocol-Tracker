@@ -70,22 +70,34 @@ struct TaskBuilderView: View {
                                             
                                             Spacer()
                                             
-                                            Text(taskNdx.TaskName)
-                                                .font(.title)
-                                                .padding()
-                                            Text("Item goal: \(taskNdx.TaskGoal) \(taskNdx.TaskUnit)" )
-                                                .font(.title)
-                                                .fontWeight(.bold)
-                                                .padding()
-                                            
-                                            Spacer()
-                                            
-                                            Text("Item Description: \n")
-                                                .font(.title2)
-                                            Text("\(taskNdx.TaskDescription)" )
-                                            
-                                            Text("Item due date: \(taskNdx.TaskDueDate)")
-                                            
+                                            List {
+                                                Section {
+                                                    Text(taskNdx.TaskName)
+                                                        .font(.title)
+                                                        .padding()
+                                                }
+                                                
+                                                Section {
+                                                    Text("Item goal: \(taskNdx.TaskGoal) \(taskNdx.TaskUnit)" )
+                                                        .fontWeight(.bold)
+                                                        .padding()
+                                                }
+                                                
+                                                Section {
+                                                    Text("Item Description: \n")
+                                                        .font(.title2)
+                                                
+                                                
+                                                    Text("\(taskNdx.TaskDescription)" )
+                                                }
+                                                
+                                                Section{
+                                                    
+                                                    Text("Item due date: \(taskNdx.TaskDueDate, formatter: itemFormatter)")
+                                                }
+
+                                            }
+                                                
                                             
                                             Spacer()
                                             
