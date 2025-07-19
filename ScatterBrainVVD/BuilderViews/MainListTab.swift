@@ -533,7 +533,9 @@ struct MainListTab: View {
                                                         
                                                         TextField("", value: $updateItemStatus, format: .number)
                                                             .frame(maxWidth: 100, alignment: .center)
-                                                    }.bckMod()
+                                                    }
+                                                    .bckMod()
+                                                   
                                                     
                                                     Button {setStatus(refItem: item)} label: {
                                                         Text("Save Habit Status")
