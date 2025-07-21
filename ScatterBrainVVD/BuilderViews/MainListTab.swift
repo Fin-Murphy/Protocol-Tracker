@@ -11,9 +11,8 @@ import CoreData
 struct listItemContent: View {
     
     
-    let item: Item
-    
-    
+    @State var item: Item
+        
     @Binding var Celebrate: Int16
         
     @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
@@ -220,13 +219,6 @@ struct listItemContent: View {
         
     }
     
-    
-    
-    
-    
-    
-    
-    
 }
 
 
@@ -235,8 +227,6 @@ struct MainListTab: View {
     // ---------------------------------------------------------------------------------------------------------------------
     // BINDINGS
     // ---------------------------------------------------------------------------------------------------------------------
-
-    
     
     @Binding var selectedTab: Tabs
         
@@ -249,9 +239,7 @@ struct MainListTab: View {
     // ---------------------------------------------------------------------------------------------------------------------
     // STATES
     // ---------------------------------------------------------------------------------------------------------------------
-
     
-
     @State var habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []  // MAKE BINDING
 
     @State var updateItemStatus: Int16 = 0

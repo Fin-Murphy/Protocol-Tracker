@@ -353,6 +353,7 @@ func addOne(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout In
         let nsError = error as NSError
         fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
     }
+    
 }
 
 func completeHabit(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout Int16) {
