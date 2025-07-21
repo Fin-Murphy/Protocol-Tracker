@@ -11,7 +11,6 @@ import CoreData
 struct ContentView: View {
 
     @Environment(\.scenePhase) private var scenePhase
-    
         
     @State var selectedTab: Tabs = .HUB
     
@@ -25,17 +24,13 @@ struct ContentView: View {
     
     @State var seenWelcome: Bool = !UserDefaults.standard.bool(forKey: "seenWelcome")
     
-
-    
     @Environment(\.managedObjectContext) public var viewContext
     
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
         animation: .default)
     private var items: FetchedResults<Item>
-    
-//    @State var passDownItems: [Item] = []
-    
+        
 
     var body: some View {
     
@@ -47,10 +42,8 @@ struct ContentView: View {
     
            if selectedTab == .Calendar {
                
-               
                CalendarView(SelectedDate: $SelectedDate, selectedTab: $selectedTab)
                 
-               
 /* *******************************************************
                        BOOK TAB
 ****************************************************** */
@@ -65,7 +58,7 @@ struct ContentView: View {
          }
             else if selectedTab == .Protocols {
                                     
-                HabitBuilderView(viewContext: _viewContext)
+                HabitBuilderView(viewContext: _viewContext, selectedTab: $selectedTab)
                     
                 
 /* *******************************************************

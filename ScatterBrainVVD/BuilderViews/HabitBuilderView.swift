@@ -10,8 +10,11 @@ import CoreData
 
 struct HabitBuilderView: View {
     
+    
+    
     @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
 
+    @Binding var selectedTab: Tabs
     
     @State var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
     
@@ -163,7 +166,26 @@ struct HabitBuilderView: View {
                                                     ZStack{
                                                         VStack {
                                                    
-                                                            HabitDetailView(habitNdx: habitNdx)
+//                                                            HabitDetailView(habitNdx: habitNdx)
+                                                            
+                                                            List{
+                                                                Text(habitNdx.HabitName)
+                                                                    .font(.title)
+                                                                    .padding()
+                                                                Text("Item is part of protocol \(habitNdx.HabitProtocol).")
+                                                                Text("Item start date: \(habitNdx.HabitStartDate, formatter: itemFormatter)" )
+                                                                Text("Item goal value: \(habitNdx.HabitGoal) \(habitNdx.HabitUnit)" )
+                                                                Text("Item repeats every \(habitNdx.HabitRepeatValue) days." )
+                                                                Text("Item Description: \n\n \(habitNdx.HabitDescription)" )
+                                                                if habitNdx.HabitHasSubtask == true {
+                                                                    Text("Subhabits:")
+                                                                    ForEach(habitData){ indexr in
+                                                                        if indexr.HabitSuperTask == habitNdx.id {
+                                                                            Text(indexr.HabitName)
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
                                                                                                                     
                                                             Button{DisplayHabitEditor = true} label: {
                                                                 Text("Edit habit")
@@ -220,6 +242,9 @@ struct HabitBuilderView: View {
                                                                         //------------------------------------
                                                                         DisplayHabitEditor = false
                                                                         indexProtocols()
+                                                                        
+                                                                        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+
                                                                         //crap commit
                                                                     } label: {Text("Save Habit")}
                                                                 }
@@ -262,7 +287,26 @@ struct HabitBuilderView: View {
                                                 ZStack{
                                                     VStack {
                                                
-                                                        HabitDetailView(habitNdx: habitNdx)
+//                                                        HabitDetailView(habitNdx: habitNdx)
+                                                        
+                                                        List{
+                                                            Text(habitNdx.HabitName)
+                                                                .font(.title)
+                                                                .padding()
+                                                            Text("Item is part of protocol \(habitNdx.HabitProtocol).")
+                                                            Text("Item start date: \(habitNdx.HabitStartDate, formatter: itemFormatter)" )
+                                                            Text("Item goal value: \(habitNdx.HabitGoal) \(habitNdx.HabitUnit)" )
+                                                            Text("Item repeats every \(habitNdx.HabitRepeatValue) days." )
+                                                            Text("Item Description: \n\n \(habitNdx.HabitDescription)" )
+                                                            if habitNdx.HabitHasSubtask == true {
+                                                                Text("Subhabits:")
+                                                                ForEach(habitData){ indexr in
+                                                                    if indexr.HabitSuperTask == habitNdx.id {
+                                                                        Text(indexr.HabitName)
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
                                                                                                                 
                                                         Button{DisplayHabitEditor = true} label: {
                                                             Text("Edit habit")
@@ -318,8 +362,10 @@ struct HabitBuilderView: View {
                                                                     updateHabit(habitToEdit: habitNdx.id)
                                                                     //------------------------------------
                                                                     DisplayHabitEditor = false
+                                                                    habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+                
                                                                     indexProtocols()
-                                                                    //crap commit
+                                                                    
                                                                 } label: {Text("Save Habit")}
                                                             }
                                                         }
@@ -570,6 +616,6 @@ struct HabitBuilderView: View {
 
 }
 
-#Preview {
-    HabitBuilderView()
-}
+//#Preview {
+//    HabitBuilderView(selectedTab: .HUB)
+//}

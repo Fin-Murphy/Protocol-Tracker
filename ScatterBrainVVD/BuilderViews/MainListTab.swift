@@ -10,7 +10,7 @@ import CoreData
 
 struct navLinkLabel: View {
     
-    @State var item: Item
+    @ObservedObject var item: Item
     
     var body: some View {
         
@@ -56,13 +56,15 @@ struct navLinkLabel: View {
 
 struct navLinkContent: View {
     
-    @State var item: Item
+    @Binding var forceUpdate: Bool
+    
+    @ObservedObject var item: Item
 
     @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
 
     @State var updateItemStatus: Int16 = 0
 
-    @Binding var Celebrate: Int16
+    @State var Celebrate: Int16
     
     var body: some View {
         
@@ -148,6 +150,7 @@ struct navLinkContent: View {
                 
                 Button {
                     addOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
+                    forceUpdate.toggle()
                     if item.value == item.goal {
                         
                     }
@@ -158,6 +161,7 @@ struct navLinkContent: View {
                 }
                 Button {
                     subOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
+                    forceUpdate.toggle()
                     if item.value == item.goal {
                         
                     }
@@ -174,6 +178,7 @@ struct navLinkContent: View {
             if item.complete == true {
                 Button{
                     subOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
+                    forceUpdate.toggle()
                 } label: {
                     Text("☑")
                         .font(.title)
@@ -184,6 +189,7 @@ struct navLinkContent: View {
             } else {
                 Button{
                     addOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
+                    forceUpdate.toggle()
                 } label: {
                     Text("☐")
                         .font(.title)
@@ -218,13 +224,12 @@ struct MainListTab: View {
     
     @Binding var SelectedDate: Date
 
+
 //    @Binding var moveCompleteHabits: Bool
     
     // ---------------------------------------------------------------------------------------------------------------------
     // STATES
     // ---------------------------------------------------------------------------------------------------------------------
-
-    
 
     @State var habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []  // MAKE BINDING
 
@@ -232,6 +237,7 @@ struct MainListTab: View {
 
     @State var seenWelcome: Bool = !UserDefaults.standard.bool(forKey: "seenWelcome")  // MAKE BINDING
     
+    @State var forceUpdate: Bool = false
     
     // ---------------------------------------------------------------------------------------------------------------------
     // COREDATA
@@ -312,7 +318,7 @@ struct MainListTab: View {
                                         NavigationLink {
                                             
                                             
-                                            navLinkContent(item: item, viewContext: _viewContext, Celebrate: $Celebrate)
+                                            navLinkContent(forceUpdate: $forceUpdate, item: item, viewContext: _viewContext, Celebrate: Celebrate)
                                             
                                         } label: {
                                             navLinkLabel(item: item)
@@ -344,7 +350,7 @@ struct MainListTab: View {
                                         
                                         NavigationLink {
                                             
-                                            navLinkContent(item: item, viewContext: _viewContext, Celebrate: $Celebrate)
+                                            navLinkContent(forceUpdate: $forceUpdate, item: item, viewContext: _viewContext, Celebrate: Celebrate)
                                             
                                         } // End of navigation link
                                         label: {

@@ -92,6 +92,7 @@ struct TaskBuilderView: View {
                                             
                                             Button{
                                                 shuntTask(taskToShunt: taskNdx, viewContext: context)
+                                                ProtocolTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
                                             } label: {
                                                 Text("Shunt Task").bckMod()
                                             }
