@@ -139,6 +139,25 @@ extension View {
 //------------------------------------------------------
 
 
+// ---------------------------------------------------------------------------------------------------------------------
+// SET STATUS
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+
+func setStatus(refItem: Item, viewContext: NSManagedObjectContext, updateItemStatus: Int16) {
+    refItem.status = updateItemStatus
+    do {
+        try viewContext.save()
+    } catch {
+        let nsError = error as NSError
+        fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+    }
+    print(refItem.status)
+}
+
+
+
 
 func shuntTask (taskToShunt: Task, viewContext: NSManagedObjectContext) {
     
