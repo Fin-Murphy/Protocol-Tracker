@@ -214,7 +214,7 @@ struct MainListTab: View {
     
     @Binding var SelectedDate: Date
 
-    @Binding var moveCompleteHabits: Bool
+//    @Binding var moveCompleteHabits: Bool
     
     // ---------------------------------------------------------------------------------------------------------------------
     // STATES
@@ -579,9 +579,9 @@ struct MainListTab: View {
                             
                         }//END LIST
                         
-                        .onAppear{
-                            moveCompleteHabits = UserDefaults.standard.bool(forKey: "displayCompletedHabits")
-                        }
+//                        .onAppear{
+//                            moveCompleteHabits = UserDefaults.standard.bool(forKey: "displayCompletedHabits")
+//                        }
        
                     }//END VSTACK
                     
