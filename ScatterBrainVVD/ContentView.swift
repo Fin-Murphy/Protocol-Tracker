@@ -26,6 +26,7 @@ struct ContentView: View {
     @State var seenWelcome: Bool = !UserDefaults.standard.bool(forKey: "seenWelcome")
     
 
+    
     @Environment(\.managedObjectContext) public var viewContext
     
     @FetchRequest(
