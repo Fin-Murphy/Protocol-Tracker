@@ -8,6 +8,227 @@
 import SwiftUI
 import CoreData
 
+struct listItemContent: View {
+    
+    
+    let item: Item
+    
+    
+    @Binding var Celebrate: Int16
+    
+    @State var updateItemStatus: Int16
+    
+    @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
+    
+    
+    
+    var body: some View {
+        
+        
+        NavigationLink {
+            
+            if item.complete == true {
+                Text(String(item.name ?? ""))
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .strikethrough()
+            } else {
+                Text(String(item.name ?? ""))
+                    .font(.title)
+                    .fontWeight(.bold)
+            }
+            
+            if item.hasStatus == true {
+                
+                
+                VStack {
+                    HStack {
+                        Text("Habit status:")
+                        
+                        TextField("", value: $updateItemStatus, format: .number)
+                            .frame(maxWidth: 100, alignment: .center)
+                    }
+                    .bckMod()
+                    
+                    Button {setStatus(refItem: item, viewContext: viewContext, updateItemStatus: updateItemStatus)} label: {
+                        Text("Save Habit Status")
+                        
+                    }
+                    .foregroundColor(.blue)
+                    .bckMod()
+                    
+                }
+                .onAppear{updateItemStatus = item.status}
+                .bckMod()
+                
+                
+            } else {}
+            
+            Spacer()
+            
+            ScrollView {
+                if item.isTask != true {
+                    
+                    Text(displayHabitDescription(identifier: item.name ?? ""))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .bckMod()
+                    
+                } else {
+                    
+                    Text(item.descriptor ?? "")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .bckMod()
+                }
+                
+                
+            }.frame(width: 350)
+            
+            Spacer()
+            
+            // ---------------------- BEGIN VALUE MODIFICATION
+            
+            Button{
+                scootDate(refItem: item, viewContext: viewContext)
+            } label: {
+                Text("Move item to tomorrow")
+                    .bckMod()
+            }
+            
+            
+            if item.hasCheckbox == false {
+                
+                if item.complete == true {
+                    Text("☑ \(item.value)/\(item.goal) \(item.unit ?? "")")
+                        .font(.title)
+                        .padding()
+                        .bckMod()
+                    
+                } else {
+                    Text("☐ \(item.value)/\(item.goal) \(item.unit ?? "")")
+                        .font(.title)
+                        .padding()
+                        .bckMod()
+                    
+                }
+                
+          
+                HStack{
+                    
+                    Button {
+                        addOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
+                        if item.value == item.goal {
+                            
+                        }
+                    }
+                    label: {
+                        Text("+ 1")
+                            .bckMod()
+                    }
+                    Button {
+                        subOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
+                        if item.value == item.goal {
+                            
+                        }
+                    }
+                    label: {
+                        Text("- 1")
+                            .bckMod()
+                    }
+                }
+                
+            } else {
+                
+                
+                if item.complete == true {
+                    Button{
+                        subOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
+                    } label: {
+                        Text("☑")
+                            .font(.title)
+                            .padding()
+                            .bckMod()
+                    }
+                    
+                } else {
+                    Button{
+                        addOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
+                    } label: {
+                        Text("☐")
+                            .font(.title)
+                            .padding()
+                            .bckMod()
+                    }
+                }
+            }
+            // ---------------------- END VALUE MODIFICATION
+            
+            
+            Spacer()
+            
+        } label: {
+            HStack{
+                
+                if item.isTask == true {
+                    Image(systemName: "t.square")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 20,height: 20)
+                } else {
+                    Image(systemName: "h.square")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 20,height: 20)
+                }
+                
+                if item.complete == true {
+                    Text(String(item.name ?? ""))
+                        .strikethrough()
+                } else {
+                    Text(String(item.name ?? ""))
+                }
+                Spacer()
+                
+                if item.complete == true {
+                    Text("☑")
+                } else {
+                    Text("☐")
+                }
+                
+                if item.hasCheckbox == false {
+                    Text("\(item.value)/\(item.goal)")
+                    Text("   ")
+                }
+            }
+        }
+        .swipeActions(edge: .trailing) {
+            Button("Complete") {
+                completeHabit(item: item, viewContext: viewContext, Celebrate: &Celebrate)
+                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                impactFeedback.impactOccurred()
+            }
+            .tint(.blue)
+            
+        }
+        .swipeActions(edge: .leading) {
+            Button("Delete") {
+                deleteEntity(withUUID: item.id ?? UUID(), viewContext: viewContext)
+            }
+            .tint(.red)
+        }
+        
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+}
+
 
 struct MainListTab: View {
     
@@ -97,6 +318,9 @@ struct MainListTab: View {
          
         VStack{
             
+            
+            /// JUST MOVED THE SETSTAT AND SCOOT TO GLOBALS
+            
             DateBarView(SelectedDate: $SelectedDate, Celebrate: $Celebrate)
             
             ZStack{
@@ -112,7 +336,10 @@ struct MainListTab: View {
                                     // How in the hell do I refactor this
                                     if (Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true && item.complete == false) || (item.notFloater == false && item.complete == false) {
                                         
-                                        NavigationLink {
+                                        listItemContent(item: item, Celebrate: $Celebrate, viewContext: _viewContext)
+                                        
+                                        
+                                   /*     NavigationLink {
                                             
                                             if item.complete == true {
                                                 Text(String(item.name ?? ""))
@@ -137,7 +364,7 @@ struct MainListTab: View {
                                                     }
                                                     .bckMod()
                                                     
-                                                    Button {setStatus(refItem: item)} label: {
+                                                    Button {setStatus(refItem: item, viewContext: viewContext, updateItemStatus: updateItemStatus)} label: {
                                                         Text("Save Habit Status")
                                                         
                                                     }
@@ -177,7 +404,7 @@ struct MainListTab: View {
                                             // ---------------------- BEGIN VALUE MODIFICATION
                                             
                                             Button{
-                                                scootDate(refItem: item)
+                                                scootDate(refItem: item, viewContext: _viewContext)
                                             } label: {
                                                 Text("Move item to tomorrow")
                                                     .bckMod()
@@ -300,13 +527,15 @@ struct MainListTab: View {
                                         }
                                         .swipeActions(edge: .leading) {
                                             Button("Delete") {
-                                                deleteEntity(withUUID: item.id ?? UUID())
+                                                deleteEntity(withUUID: item.id ?? UUID(), viewContext: viewContext)
                                             }
                                             .tint(.red)
                                         }
                                         
+                                    */
                                         
                                     } else {}
+                                    
                                     
                                 }
                                 
@@ -314,7 +543,7 @@ struct MainListTab: View {
                                     
                                     if (Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true && item.complete == true)  || (item.notFloater == false && item.complete == true) {
                                         
-                                        NavigationLink {
+                                   /*     NavigationLink {
                                             
                                             if item.complete == true {
                                                 Text(String(item.name ?? ""))
@@ -340,7 +569,7 @@ struct MainListTab: View {
                                                     .bckMod()
                                                     
                                                     
-                                                    Button {setStatus(refItem: item)} label: {
+                                                    Button {setStatus(refItem: item, viewContext: viewContext, updateItemStatus: updateItemStatus)} label: {
                                                         Text("Save Habit Status")
                                                         
                                                     }
@@ -457,42 +686,42 @@ struct MainListTab: View {
                                             Spacer()
                                             
                                         } label: {
-                                        
-                                        
-                                        HStack{
                                             
-                                            if item.isTask == true {
-                                                Image(systemName: "t.square")
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .frame(width: 20,height: 20)
-                                            } else {
-                                                Image(systemName: "h.square")
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .frame(width: 20,height: 20)
-                                            }
                                             
-                                            if item.complete == true {
-                                                Text(String(item.name ?? ""))
-                                                    .strikethrough()
-                                            } else {
-                                                Text(String(item.name ?? ""))
-                                            }
-                                            Spacer()
-                                            
-                                            if item.complete == true {
-                                                Text("☑")
-                                            } else {
-                                                Text("☐")
-                                            }
-                                            
-                                            if item.hasCheckbox == false {
-                                                Text("\(item.value)/\(item.goal)")
-                                                Text("   ")
+                                            HStack{
+                                                
+                                                if item.isTask == true {
+                                                    Image(systemName: "t.square")
+                                                        .resizable()
+                                                        .scaledToFit()
+                                                        .frame(width: 20,height: 20)
+                                                } else {
+                                                    Image(systemName: "h.square")
+                                                        .resizable()
+                                                        .scaledToFit()
+                                                        .frame(width: 20,height: 20)
+                                                }
+                                                
+                                                if item.complete == true {
+                                                    Text(String(item.name ?? ""))
+                                                        .strikethrough()
+                                                } else {
+                                                    Text(String(item.name ?? ""))
+                                                }
+                                                Spacer()
+                                                
+                                                if item.complete == true {
+                                                    Text("☑")
+                                                } else {
+                                                    Text("☐")
+                                                }
+                                                
+                                                if item.hasCheckbox == false {
+                                                    Text("\(item.value)/\(item.goal)")
+                                                    Text("   ")
+                                                }
                                             }
                                         }
-                                    }
                                         .swipeActions(edge: .trailing) {
                                             Button("Complete") {
                                                 completeHabit(item: item, viewContext: viewContext, Celebrate: &Celebrate)
@@ -504,10 +733,16 @@ struct MainListTab: View {
                                         }
                                         .swipeActions(edge: .leading) {
                                             Button("Delete") {
-                                                deleteEntity(withUUID: item.id ?? UUID())
+                                                deleteEntity(withUUID: item.id ?? UUID(), viewContext: viewContext)
                                             }
                                             .tint(.red)
-                                        }
+                                        } */
+                                        
+                                        
+                                        listItemContent(item: item, Celebrate: $Celebrate, viewContext: _viewContext)
+
+                                        
+                                        
                                     } else {}
                                     
                                 }
@@ -518,7 +753,7 @@ struct MainListTab: View {
                                     
                                     if (Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true) || (item.notFloater == false) {
                                         
-                                        NavigationLink {
+                                    /*    NavigationLink {
                                             
                                             if item.complete == true {
                                                 Text(String(item.name ?? ""))
@@ -542,9 +777,8 @@ struct MainListTab: View {
                                                             .frame(maxWidth: 100, alignment: .center)
                                                     }
                                                     .bckMod()
-                                                   
                                                     
-                                                    Button {setStatus(refItem: item)} label: {
+                                                    Button {setStatus(refItem: item, viewContext: viewContext, updateItemStatus: updateItemStatus)} label: {
                                                         Text("Save Habit Status")
                                                         
                                                     }
@@ -584,7 +818,7 @@ struct MainListTab: View {
                                             Spacer()
                                             
                                             Button{
-                                                scootDate(refItem: item)
+                                                scootDate(refItem: item, viewContext: _viewContext)
                                             } label: {
                                                 Text("Move item to tomorrow")
                                                     .bckMod()
@@ -716,11 +950,13 @@ struct MainListTab: View {
                                         }
                                         .swipeActions(edge: .leading) {
                                             Button("Delete") {
-                                                deleteEntity(withUUID: item.id ?? UUID())
+                                                deleteEntity(withUUID: item.id ?? UUID(), viewContext: viewContext)
                                             }
                                             .tint(.red)
-                                        }
+                                        } */
                                         
+                                        listItemContent(item: item, Celebrate: $Celebrate, viewContext: _viewContext)
+
                                         
                                     } else {}
                                     
@@ -785,56 +1021,55 @@ struct MainListTab: View {
             populateTasks()
         }
     }
-    
-    // ---------------------------------------------------------------------------------------------------------------------
-    // SET STATUS
-    // ---------------------------------------------------------------------------------------------------------------------
-
-    
-    
-    private func setStatus(refItem: Item) {
-        refItem.status = updateItemStatus
-        do {
-            try viewContext.save()
-        } catch {
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-        }
-        print(refItem.status)
-    }
-    
-    // ---------------------------------------------------------------------------------------------------------------------
-    // SCOOT DATE
-    // ---------------------------------------------------------------------------------------------------------------------
-
-    
-    private func scootDate(refItem: Item) {
-        
-        let newItem = Item(context: viewContext)
-        newItem.timestamp = (calendar.date(byAdding: .day, value: 1, to: Date())!)
-        newItem.name = refItem.name
-        newItem.goal = refItem.goal
-        newItem.unit = refItem.unit
-        newItem.whichProtocol = refItem.whichProtocol
-        newItem.complete = false
-        newItem.reward = refItem.reward
-        newItem.id = UUID()
-        newItem.hasStatus = refItem.hasStatus
-        newItem.hasCheckbox = refItem.hasCheckbox
-        newItem.notFloater = true
-        
-        
-        refItem.name = ("> " + (refItem.name ?? ""))
-        
-        do {
-            try viewContext.save()
-        } catch {
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-        }
-        print(refItem.status)
-    }
-    
+//    
+//    // ---------------------------------------------------------------------------------------------------------------------
+//    // SET STATUS
+//    // ---------------------------------------------------------------------------------------------------------------------
+//
+//    
+//    
+//    private func setStatus(refItem: Item, viewContext: NSManagedObjectContext, updateItemStatus: Int16) {
+//        refItem.status = updateItemStatus
+//        do {
+//            try viewContext.save()
+//        } catch {
+//            let nsError = error as NSError
+//            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+//        }
+//    }
+//    
+//    // ---------------------------------------------------------------------------------------------------------------------
+//    // SCOOT DATE
+//    // ---------------------------------------------------------------------------------------------------------------------
+//
+//    
+//    private func scootDate(refItem: Item, viewContext: NSManagedObjectContext) {
+//        
+//        let newItem = Item(context: viewContext)
+//        newItem.timestamp = (calendar.date(byAdding: .day, value: 1, to: Date())!)
+//        newItem.name = refItem.name
+//        newItem.goal = refItem.goal
+//        newItem.unit = refItem.unit
+//        newItem.whichProtocol = refItem.whichProtocol
+//        newItem.complete = false
+//        newItem.reward = refItem.reward
+//        newItem.id = UUID()
+//        newItem.hasStatus = refItem.hasStatus
+//        newItem.hasCheckbox = refItem.hasCheckbox
+//        newItem.notFloater = true
+//        
+//        
+//        refItem.name = ("> " + (refItem.name ?? ""))
+//        
+//        do {
+//            try viewContext.save()
+//        } catch {
+//            let nsError = error as NSError
+//            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+//        }
+//        print(refItem.status)
+//    }
+//    
     
     
     // ---------------------------------------------------------------------------------------------------------------------
@@ -843,7 +1078,7 @@ struct MainListTab: View {
 
     
     
-    private func deleteEntity(withUUID uuid: UUID) {
+    private func deleteEntity(withUUID uuid: UUID, viewContext: NSManagedObjectContext) {
         // Create a fetch request for your entity
         let request: NSFetchRequest<Item> = Item.fetchRequest()
         request.predicate = NSPredicate(format: "id == %@", uuid as CVarArg)
@@ -947,7 +1182,7 @@ struct MainListTab: View {
                 let taskDataInitialzier: [Task] = [returnedTask]
                 UserDefaults.standard.setEncodable(taskDataInitialzier, forKey: "taskList")
             }
-            deleteEntity(withUUID: item.id ?? UUID())
+            deleteEntity(withUUID: item.id ?? UUID(), viewContext: viewContext)
     }
 }
 
