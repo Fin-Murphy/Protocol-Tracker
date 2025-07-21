@@ -86,8 +86,8 @@ struct ContentView: View {
                 MainListTab(
                     selectedTab: $selectedTab,
                     Celebrate: $Celebrate,
-                    SelectedDate: $SelectedDate,
-                    moveCompleteHabits: $moveCompleteHabits
+                    SelectedDate: $SelectedDate//,
+//                    moveCompleteHabits: $moveCompleteHabits
                 )
                 
             }// END HUB TAB

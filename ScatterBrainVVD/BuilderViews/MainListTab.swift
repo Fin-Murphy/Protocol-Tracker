@@ -31,6 +31,7 @@ struct navLinkLabel: View {
             if item.complete == true {
                 Text(String(item.name ?? ""))
                     .strikethrough()
+                    .foregroundColor(.green)
             } else {
                 Text(String(item.name ?? ""))
             }
@@ -47,6 +48,9 @@ struct navLinkLabel: View {
                 Text("   ")
             }
         }
+        
+        
+        
     }
 }
 
