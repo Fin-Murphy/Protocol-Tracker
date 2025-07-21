@@ -15,12 +15,12 @@ struct listItemContent: View {
     
     
     @Binding var Celebrate: Int16
-    
-    @State var updateItemStatus: Int16
-    
+        
     @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
     
     
+    @State var updateItemStatus: Int16 = 0
+
     
     var body: some View {
         
