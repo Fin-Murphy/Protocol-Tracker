@@ -108,7 +108,8 @@ struct MainListTab: View {
                         
                         List {
                             
-                            if moveCompleteHabits == true {
+//                            if moveCompleteHabits == true {
+                                
                                 ForEach(items) { item in
                                     // How in the hell do I refactor this
                                     if (Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true && item.complete == false) || (item.notFloater == false && item.complete == false) {
@@ -505,7 +506,12 @@ struct MainListTab: View {
                                     
                                 }
                                 
-                            } else {
+                            // } // End used part of ifelse
+                            
+                           
+                            
+                            
+                            /*else { //Archived version of IfElse (Causes issues)
                                 
                                 ForEach(items) { item in
                                     
@@ -709,7 +715,7 @@ struct MainListTab: View {
                                     } else {}
                                     
                                 }
-                            }
+                            }*/
                             
                         }//END LIST
                         

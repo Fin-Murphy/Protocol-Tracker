@@ -31,12 +31,12 @@ struct GoalSetView: View {
             .foregroundColor(ForeColor)
             .bckMod()
             
-            Toggle("Move complete habits to bottom of list",isOn: $displayCompletedHabits)
-                .onAppear{displayCompletedHabits = UserDefaults.standard.bool(forKey: "displayCompletedHabits")}
-                .onChange(of: displayCompletedHabits) {
-                    UserDefaults.standard.set(displayCompletedHabits, forKey: "displayCompletedHabits")
-                }
-            
+//            Toggle("Move complete habits to bottom of list",isOn: $displayCompletedHabits)
+//                .onAppear{displayCompletedHabits = UserDefaults.standard.bool(forKey: "displayCompletedHabits")}
+//                .onChange(of: displayCompletedHabits) {
+//                    UserDefaults.standard.set(displayCompletedHabits, forKey: "displayCompletedHabits")
+//                }
+//            
         }
         .onAppear{dailyGoalSet = UserDefaults.standard.integer(forKey: "dailyGoal")}
         .foregroundColor(ForeColor)
