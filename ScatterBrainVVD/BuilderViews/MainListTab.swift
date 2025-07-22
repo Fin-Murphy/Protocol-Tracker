@@ -198,6 +198,16 @@ struct navLinkContent: View {
                 }
             }
         }
+        
+        
+        Button {
+            if item.notFloater == true {
+                scootItem(item: item, viewContext: viewContext)
+            }
+        } label: {
+            Text("Move this item to tomorrow?")
+        }
+        
         // ---------------------- END VALUE MODIFICATION
         
         
@@ -609,7 +619,7 @@ struct MainListTab: View {
                 checkDate()
                 
                 
-                
+
             } // END ZSTACK
             
         }//END VSTACK
@@ -620,13 +630,11 @@ struct MainListTab: View {
     
     // ---------------------------------------------------------------------------------------------------------------------
     
-    
-    // START PRIVATE FUNCITONS
-    
+    // START PRIVATE FUNCTIONS
     
     // ---------------------------------------------------------------------------------------------------------------------
 
-    
+
     
     public func checkDate() {
         if let savedDate = UserDefaults.standard.object(forKey: "DailyTaskPopulate?") as? Date {

@@ -139,6 +139,42 @@ extension View {
 //------------------------------------------------------
 
 
+
+// ---------------------------------------------------------------------------------------------------------------------
+// SCOOT ITEM
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+func scootItem(item: Item, viewContext: NSManagedObjectContext){
+    item.name = (">> " + (item.name ?? ""))
+    
+    let newItem = Item(context: viewContext)
+    newItem.timestamp = (calendar.date(byAdding: .day, value: 1, to: Date())!)
+    newItem.name = item.name
+    newItem.goal = item.goal
+    newItem.unit = item.unit
+    newItem.whichProtocol = item.whichProtocol
+    newItem.complete = false
+    newItem.reward = item.reward
+    newItem.id = UUID()
+    newItem.hasStatus = item.hasStatus
+    newItem.hasCheckbox = item.hasCheckbox
+    newItem.notFloater = true
+    
+    do {
+        try viewContext.save()
+    } catch {
+        // Replace this implementation with code to handle the error appropriately.
+        // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+        let nsError = error as NSError
+        fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+    }
+    
+    
+}
+
+
+
 // ---------------------------------------------------------------------------------------------------------------------
 // SET STATUS
 // ---------------------------------------------------------------------------------------------------------------------
