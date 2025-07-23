@@ -76,12 +76,23 @@ struct ProtocolListView: View {
                             
                        
                             ForEach(AppDefinedProtocolLibrary){adp in
+                                
                                 NavigationLink{
+                                    
+                                    Button {
+                                        incorporateProtocol(refProt: adp)
+                                    } label: {
+                                        Text("Add this protocol")
+                                            .bckMod()
+                                    }
+                                    
                                     List{
                                         ForEach(adp.ProtocolContent){cont in
                                             Text(cont.HabitName)
                                         }
                                     }
+                                    
+                                    
                                 } label: {
                                     Text(adp.ProtocolName)
                                 }
@@ -111,9 +122,21 @@ struct ProtocolListView: View {
         
     } // end body
     
-    
-    
-    
+    private func incorporateProtocol(refProt: HabitProtocol){
+        
+        var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+
+        for habit in refProt.ProtocolContent {
+            habitData.append(habit)
+        }
+        
+        UserDefaults.standard.setEncodable(habitData, forKey: "habitList")
+        
+        indexProtocols()
+        
+        listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") ?? []
+        
+    }
     
 }
 

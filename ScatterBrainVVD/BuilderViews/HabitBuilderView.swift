@@ -426,7 +426,6 @@ struct HabitBuilderView: View {
     }
         
     
-    
     // ------------------------------------ Spacer
     
     private func updateHabit(habitToEdit: UUID) {
