@@ -129,7 +129,6 @@ struct HabitBuilderView: View {
                 
                 HStack{
                     Text("Habits")
-                        
                         .fontWeight(.bold)
                         .font(.title)
                         .padding(.bottom)
