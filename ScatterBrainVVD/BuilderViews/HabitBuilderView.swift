@@ -37,15 +37,6 @@ struct HabitBuilderView: View {
     
     @State var displayByProtocol: Bool = false
     
-    private var closeButton: some View {
-        Image(systemName: "x.circle")
-            .resizable()
-            .foregroundColor(.white)
-            .scaledToFit()
-            .frame(width: 100,height: 24)
-            .bold()
-    }
-    
     private var habLister: some View {
         ForEach(habitData){ superTaskHabit in
             
@@ -132,6 +123,7 @@ struct HabitBuilderView: View {
                         .fontWeight(.bold)
                         .font(.title)
                         .padding(.bottom)
+                    
                     Button {
                         DisplayHabitMaker = true
                     } label: {

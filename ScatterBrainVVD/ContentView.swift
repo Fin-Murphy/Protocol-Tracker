@@ -60,7 +60,6 @@ struct ContentView: View {
                                     
                 HabitBuilderView(viewContext: _viewContext, selectedTab: $selectedTab)
                     
-                
 /* *******************************************************
             GOALS TAB
 ****************************************************** */

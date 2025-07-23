@@ -46,7 +46,14 @@ extension View {
     }
 }
 
-
+var closeButton: some View {
+    Image(systemName: "x.circle")
+        .resizable()
+        .foregroundColor(.white)
+        .scaledToFit()
+        .frame(width: 100,height: 24)
+        .bold()
+}
 
 
 
@@ -60,6 +67,7 @@ let calendar: Calendar = .current
 struct HabitProtocol: Identifiable, Codable {
     var id: UUID = UUID()
     var ProtocolName: String
+    var ProtocolContent: [Habit] = []
 }
 
 
