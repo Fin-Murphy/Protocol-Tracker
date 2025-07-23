@@ -146,7 +146,6 @@ extension View {
 
 
 func scootItem(item: Item, viewContext: NSManagedObjectContext){
-    item.name = (">> " + (item.name ?? ""))
     
     let newItem = Item(context: viewContext)
     newItem.timestamp = (calendar.date(byAdding: .day, value: 1, to: Date())!)
@@ -160,6 +159,8 @@ func scootItem(item: Item, viewContext: NSManagedObjectContext){
     newItem.hasStatus = item.hasStatus
     newItem.hasCheckbox = item.hasCheckbox
     newItem.notFloater = true
+    
+    item.name = (">> " + (item.name ?? ""))
     
     do {
         try viewContext.save()
@@ -309,8 +310,10 @@ func addOne(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout In
         if item.value >= item.goal {
             if item.complete == false {
                 Celebrate += item.reward
+                item.notFloater = true
             }
             item.complete = true
+            
         }
         
         if Celebrate >= UserDefaults.standard.integer(forKey: "dailyGoal") {
@@ -332,9 +335,12 @@ func completeHabit(item: Item, viewContext: NSManagedObjectContext, Celebrate: i
     
     if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true {
 
-        item.value = item.goal
-        item.complete = true
-        Celebrate += item.reward
+        if item.complete == false {
+            item.value = item.goal
+            item.complete = true
+            Celebrate += item.reward
+            item.notFloater = true
+        }
         
         if Celebrate >= UserDefaults.standard.integer(forKey: "dailyGoal") {
             celebrationProcedure()

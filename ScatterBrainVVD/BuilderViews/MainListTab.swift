@@ -199,15 +199,14 @@ struct navLinkContent: View {
             }
         }
         
-        
-        Button {
-            if item.notFloater == true {
+        if item.notFloater == true {
+            
+            Button {
                 scootItem(item: item, viewContext: viewContext)
+            } label: {
+                Text("Move this item to tomorrow?")
             }
-        } label: {
-            Text("Move this item to tomorrow?")
         }
-        
         // ---------------------- END VALUE MODIFICATION
         
         
@@ -602,6 +601,9 @@ struct MainListTab: View {
 //                        .onAppear{
 //                            moveCompleteHabits = UserDefaults.standard.bool(forKey: "displayCompletedHabits")
 //                        }
+                        .onAppear{
+                            testTasksForSillyness() 
+                        }
        
                     }//END VSTACK
                     
@@ -686,17 +688,27 @@ struct MainListTab: View {
     // POPULATE TASKS
     // ---------------------------------------------------------------------------------------------------------------------
 
-    
+    private func testTasksForSillyness() {
+        for taskFinder in items {
+            if taskFinder.notFloater == false {
+                taskFinder.timestamp = Date()
+            }
+        }
+    }
     
     
     private func populateTasks() {
+        
+        //Factor this out into seperate functions
         
         habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
         
         for taskFinder in items {
             if (taskFinder.isTask == true) && (Calendar.current.isDate((taskFinder.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) != true) && (taskFinder.complete == false) && (taskFinder.notFloater == true){
                     deshuntTask(item: taskFinder)
-            } else {}
+            } else if taskFinder.notFloater == false {
+                taskFinder.timestamp = Date()
+            }
         }
         
         shuntTodaysTasks(viewContext: viewContext)
