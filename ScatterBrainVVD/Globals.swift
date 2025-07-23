@@ -67,6 +67,7 @@ let calendar: Calendar = .current
 struct HabitProtocol: Identifiable, Codable {
     var id: UUID = UUID()
     var ProtocolName: String
+    var ProtocolDescription: String
     var ProtocolContent: [Habit] = []
 }
 
