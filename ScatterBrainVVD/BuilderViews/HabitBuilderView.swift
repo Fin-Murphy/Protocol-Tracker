@@ -468,34 +468,6 @@ struct HabitBuilderView: View {
         return "None"
     }
     
-    
-    
-    private func indexProtocols () {
-            
-            if var protocolArray: [HabitProtocol] = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") {
-            
-                    for ndx in habitData {
-                        var inArray = false
-                        print("Executing for item ", ndx.HabitName)
-                        for ndx2 in protocolArray {
-                            if ndx.HabitProtocol == ndx2.ProtocolName {
-                                inArray = true
-                            }
-                        }
-                        if inArray == false {
-                            protocolArray.append(HabitProtocol(ProtocolName: ndx.HabitProtocol))
-                        }
-                    }
-                
-                UserDefaults.standard.setEncodable(protocolArray, forKey: "protocol")
-                
-            } else {
-                let pArray: [HabitProtocol] = []
-                UserDefaults.standard.setEncodable(pArray, forKey: "protocol")
-            }
-        
-            habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
-        }
 
     private func openHabitBuilder() {
         DisplayHabitMaker = true

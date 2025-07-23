@@ -413,7 +413,7 @@ func indexProtocols () {
                         }
                     }
                     if inArray == false {
-                        protocolArray.append(HabitProtocol(ProtocolName: ndx.HabitProtocol))
+                        protocolArray.append(HabitProtocol(ProtocolName: ndx.HabitProtocol, ProtocolDescription: ""))
                     }
                 }
 
