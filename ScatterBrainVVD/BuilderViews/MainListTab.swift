@@ -109,11 +109,12 @@ struct navLinkContent: View {
         
         ScrollView {
             if item.isTask != true {
-                
-                Text(displayHabitDescription(identifier: item.name ?? ""))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding()
-                    .bckMod()
+                if displayHabitDescription(identifier: item.name ?? "") != "" {
+                    Text(displayHabitDescription(identifier: item.name ?? ""))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .bckMod()
+                }
                 
             } else {
                 
@@ -199,7 +200,7 @@ struct navLinkContent: View {
             }
         }
         
-        if item.notFloater == true {
+        if item.notFloater == true && item.complete == false {
             
             Button {
                 scootItem(item: item, viewContext: viewContext)

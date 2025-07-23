@@ -26,7 +26,7 @@ struct HabitBuilderView: View {
     @State var HabitProtocolSet: String = "Daily"
     @State var HabitUnitSet: String = "units"
     @State var HabitRepetitionSet: Int = 1
-    @State var HabitDescriptionSet: String = "This is a Habit"
+    @State var HabitDescriptionSet: String = ""
     @State var HabitHasStatusSet: Bool = false
     @State var HabitRewardSet: Int16 = 1
     @State var HabitStartDateSet: Date = Date()
@@ -498,7 +498,6 @@ struct HabitBuilderView: View {
             habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
         }
 
-    
     private func openHabitBuilder() {
         DisplayHabitMaker = true
     }
@@ -584,7 +583,7 @@ struct HabitBuilderView: View {
         HabitGoalSet = 1
         HabitUnitSet = "units"
         HabitProtocolSet = "Daily"
-        HabitDescriptionSet = "This is a Habit"
+        HabitDescriptionSet = ""
         HabitHasStatusSet = false
         HabitRewardSet = 1
         HabitStartDateSet = Date()
