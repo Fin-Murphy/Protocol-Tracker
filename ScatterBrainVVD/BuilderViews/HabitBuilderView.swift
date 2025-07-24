@@ -226,12 +226,29 @@ struct HabitBuilderView: View {
                                                                         TextField("", text: $HabitUnitSet)
                                                                     }
                                                                 }
+                                                                
+                                                                
+                                                                Toggle("Choose days of the week to repeat on?", isOn: $HabitUseDOWSet)
+                                                                if HabitUseDOWSet == true {
+                                                                    Toggle("Repeat on Sunday", isOn: $HabitOnSunSet)
+                                                                    Toggle("Repeat on Monday", isOn: $HabitOnMonSet)
+                                                                    Toggle("Repeat on Tuesday", isOn: $HabitOnTuesSet)
+                                                                    Toggle("Repeat on Wednesday", isOn: $HabitOnWedSet)
+                                                                    Toggle("Repeat on Thursday", isOn: $HabitOnThursSet)
+                                                                    Toggle("Repeat on Friday", isOn: $HabitOnFriSet)
+                                                                    Toggle("Repeat on Saturday", isOn: $HabitOnSatSet)
+                                                                } else {
+                                                                    Section(header: Text("Habit Interval (1 = Daily, 7 = Weekly, etc):")) {
+                                                                        TextField("", value: $HabitRepetitionSet, format: .number)
+                                                                    }
+                                                                }
+                                                                
                                                                 Section(header: Text("Habit Protocol:")) {
                                                                     TextField("", text: $HabitProtocolSet)
                                                                 }
-                                                                Section(header: Text("Habit Interval (1 = Daily, 7 = Weekly, etc):")) {
-                                                                    TextField("", value: $HabitRepetitionSet, format: .number)
-                                                                }
+                                                                
+                                                          
+                                                                
                                                                 Section(header: Text("Habit Details")) {
                                                                     TextEditor(text: $HabitDescriptionSet)
                                                                         .frame(minHeight: 100)
@@ -275,6 +292,17 @@ struct HabitBuilderView: View {
                                                                 HabitRewardSet = habitNdx.HabitReward
                                                                 HabitHasCheckboxSet = habitNdx.HabitHasCheckbox
                                                                 HabitHasStatusSet = habitNdx.HabitHasStatus
+                                                                
+                                                                HabitUseDOWSet = habitNdx.HabitUseDow
+                                                                
+                                                                HabitOnSunSet = habitNdx.HabitOnSun
+                                                                HabitOnMonSet = habitNdx.HabitOnMon
+                                                                HabitOnTuesSet = habitNdx.HabitOnTues
+                                                                HabitOnWedSet = habitNdx.HabitOnWed
+                                                                HabitOnThursSet = habitNdx.HabitOnThurs
+                                                                HabitOnFriSet = habitNdx.HabitOnFri
+                                                                HabitOnSatSet = habitNdx.HabitOnSat
+                                                                
                                                             }
                                                         } else {}
                                                     }
@@ -347,12 +375,29 @@ struct HabitBuilderView: View {
                                                                     TextField("", text: $HabitUnitSet)
                                                                 }
                                                             }
+                                                            
+                                                            
+                                                            Toggle("Choose days of the week to repeat on?", isOn: $HabitUseDOWSet)
+                                                            if HabitUseDOWSet == true {
+                                                                Toggle("Repeat on Sunday", isOn: $HabitOnSunSet)
+                                                                Toggle("Repeat on Monday", isOn: $HabitOnMonSet)
+                                                                Toggle("Repeat on Tuesday", isOn: $HabitOnTuesSet)
+                                                                Toggle("Repeat on Wednesday", isOn: $HabitOnWedSet)
+                                                                Toggle("Repeat on Thursday", isOn: $HabitOnThursSet)
+                                                                Toggle("Repeat on Friday", isOn: $HabitOnFriSet)
+                                                                Toggle("Repeat on Saturday", isOn: $HabitOnSatSet)
+                                                            } else {
+                                                                Section(header: Text("Habit Interval (1 = Daily, 7 = Weekly, etc):")) {
+                                                                    TextField("", value: $HabitRepetitionSet, format: .number)
+                                                                }
+                                                            }
+                                                            
                                                             Section(header: Text("Habit Protocol:")) {
                                                                 TextField("", text: $HabitProtocolSet)
                                                             }
-                                                            Section(header: Text("Habit Interval (1 = Daily, 7 = Weekly, etc):")) {
-                                                                TextField("", value: $HabitRepetitionSet, format: .number)
-                                                            }
+                                                            
+                                                      
+                                                            
                                                             Section(header: Text("Habit Details")) {
                                                                 TextEditor(text: $HabitDescriptionSet)
                                                                     .frame(minHeight: 100)
@@ -377,10 +422,11 @@ struct HabitBuilderView: View {
                                                                     updateHabit(habitToEdit: habitNdx.id)
                                                                     //------------------------------------
                                                                     DisplayHabitEditor = false
-                                                                    habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
-                
                                                                     indexProtocols()
                                                                     
+                                                                    habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+
+                                                                    //crap commit
                                                                 } label: {Text("Save Habit")}
                                                             }
                                                         }
@@ -396,7 +442,16 @@ struct HabitBuilderView: View {
                                                             HabitHasCheckboxSet = habitNdx.HabitHasCheckbox
                                                             HabitHasStatusSet = habitNdx.HabitHasStatus
                                                             
-                                                            //Add content for DOW repetition
+                                                            HabitUseDOWSet = habitNdx.HabitUseDow
+                                                            
+                                                            HabitOnSunSet = habitNdx.HabitOnSun
+                                                            HabitOnMonSet = habitNdx.HabitOnMon
+                                                            HabitOnTuesSet = habitNdx.HabitOnTues
+                                                            HabitOnWedSet = habitNdx.HabitOnWed
+                                                            HabitOnThursSet = habitNdx.HabitOnThurs
+                                                            HabitOnFriSet = habitNdx.HabitOnFri
+                                                            HabitOnSatSet = habitNdx.HabitOnSat
+                                                            
                                                         }
                                                     } else {}
                                                 }
@@ -451,7 +506,6 @@ struct HabitBuilderView: View {
         }.onAppear{indexProtocols()}
     }
         
-    
     // ------------------------------------ Spacer
     
     private func updateHabit(habitToEdit: UUID) {
@@ -470,6 +524,16 @@ struct HabitBuilderView: View {
                 habitDataIteratorList[ndx].HabitReward = HabitRewardSet
                 habitDataIteratorList[ndx].HabitHasStatus = HabitHasStatusSet
                 habitDataIteratorList[ndx].HabitHasCheckbox = HabitHasCheckboxSet
+                
+                habitDataIteratorList[ndx].HabitUseDow = HabitUseDOWSet
+                
+                habitDataIteratorList[ndx].HabitOnSun = HabitOnSunSet
+                habitDataIteratorList[ndx].HabitOnMon = HabitOnMonSet
+                habitDataIteratorList[ndx].HabitOnTues = HabitOnTuesSet
+                habitDataIteratorList[ndx].HabitOnWed = HabitOnWedSet
+                habitDataIteratorList[ndx].HabitOnThurs = HabitOnThursSet
+                habitDataIteratorList[ndx].HabitOnFri = HabitOnFriSet
+                habitDataIteratorList[ndx].HabitOnSat = HabitOnSatSet
                 
                 // Add content for DOW repetition
                 
@@ -592,8 +656,16 @@ struct HabitBuilderView: View {
             newItem.hasStatus = inputHabit.HabitHasStatus
             newItem.hasCheckbox = inputHabit.HabitHasCheckbox
             newItem.notFloater = true
-
-            //ADD DOW STUFF HERE
+            
+//            newItem.useDow = inputHabit.HabitUseDow
+//
+//            newItem.rSun = inputHabit.HabitOnSun
+//            newItem.rMon = inputHabit.HabitOnMon
+//            newItem.rTues = inputHabit.HabitOnTues
+//            newItem.rWed = inputHabit.HabitOnWed
+//            newItem.rThur = inputHabit.HabitOnThurs
+//            newItem.rFri = inputHabit.HabitOnFri
+//            newItem.rSat = inputHabit.HabitOnSat
             
         }
             

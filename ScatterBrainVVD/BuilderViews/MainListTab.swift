@@ -745,7 +745,16 @@ struct MainListTab: View {
                 newItem.hasStatus = index.HabitHasStatus
                 newItem.hasCheckbox = index.HabitHasCheckbox
                 newItem.notFloater = true
-    
+                
+//                newItem.useDow = index.HabitUseDow
+//
+//                newItem.rSun = index.HabitOnSun
+//                newItem.rMon = index.HabitOnMon
+//                newItem.rTues = index.HabitOnTues
+//                newItem.rWed = index.HabitOnWed
+//                newItem.rThur = index.HabitOnThurs
+//                newItem.rFri = index.HabitOnFri
+//                newItem.rSat = index.HabitOnSat
             }
         }
 
