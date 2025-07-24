@@ -103,6 +103,8 @@ struct Habit: Identifiable, Codable, Hashable {
     var HabitHasSubtask: Bool = false
     var HabitSuperTask: UUID?
     
+    var HabitUseDow: Bool = false
+    
     var HabitOnSun: Bool = false
     var HabitOnMon: Bool = false
     var HabitOnTues: Bool = false

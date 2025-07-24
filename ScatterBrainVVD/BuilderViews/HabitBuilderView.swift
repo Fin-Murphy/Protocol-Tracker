@@ -36,7 +36,7 @@ struct HabitBuilderView: View {
     @State var HabitHasSubTaskSet: Bool = false
     @State var HabitSuperTaskSet: UUID? = nil
     
-    @State var HabitUseDOW: Bool = false
+    @State var HabitUseDOWSet: Bool = false
     // -------------------------------------- DOW REP VALS
     @State var HabitOnMonSet: Bool = false
     @State var HabitOnTuesSet: Bool = false
@@ -87,8 +87,8 @@ struct HabitBuilderView: View {
 //          
 //            } else {
             
-                Toggle("Choose days of the week to repeat on?", isOn: $HabitUseDOW)
-                if HabitUseDOW == true {
+                Toggle("Choose days of the week to repeat on?", isOn: $HabitUseDOWSet)
+                if HabitUseDOWSet == true {
                     Toggle("Repeat on Sunday", isOn: $HabitOnSunSet)
                     Toggle("Repeat on Monday", isOn: $HabitOnMonSet)
                     Toggle("Repeat on Tuesday", isOn: $HabitOnTuesSet)
@@ -522,6 +522,16 @@ struct HabitBuilderView: View {
             HabitUnitSet = "units"
         }
         
+        if HabitUseDOWSet == false {
+            HabitOnMonSet = false
+            HabitOnTuesSet = false
+            HabitOnWedSet = false
+            HabitOnThursSet = false
+            HabitOnFriSet = false
+            HabitOnSatSet = false
+            HabitOnSunSet = false
+        }
+        
         if HabitIsSubtaskSet == true && HabitSuperTaskSet != nil {
             for index in 0..<habitData.count {
                 if habitData[index].id == HabitSuperTaskSet {
@@ -545,6 +555,7 @@ struct HabitBuilderView: View {
                                 HabitIsSubtask: HabitIsSubtaskSet,
                                 HabitSuperTask: HabitSuperTaskSet,
                                 
+                                HabitUseDow: HabitUseDOWSet,
                                      
                                 HabitOnSun: HabitOnSunSet,
                                 HabitOnMon: HabitOnMonSet,
@@ -582,6 +593,8 @@ struct HabitBuilderView: View {
             newItem.hasCheckbox = inputHabit.HabitHasCheckbox
             newItem.notFloater = true
 
+            //ADD DOW STUFF HERE
+            
         }
             
         
@@ -598,6 +611,14 @@ struct HabitBuilderView: View {
         HabitIsSubtaskSet = false
         HabitSuperTaskSet = nil
         HabitHasSubTaskSet = false
+        
+        HabitOnMonSet = false
+        HabitOnTuesSet = false
+        HabitOnWedSet = false
+        HabitOnThursSet = false
+        HabitOnFriSet = false
+        HabitOnSatSet = false
+        HabitOnSunSet = false
         
         habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
         
