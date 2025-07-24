@@ -11,6 +11,13 @@
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="notFloater" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="reward" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="rFri" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="rMon" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="rSat" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="rSun" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="rThur" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="rTues" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="rWed" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="status" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="unit" optional="YES" attributeType="String"/>

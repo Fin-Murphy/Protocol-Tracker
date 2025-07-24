@@ -21,6 +21,7 @@ struct HabitBuilderView: View {
     @State var DisplayHabitMaker: Bool = false
     @State var DisplayHabitEditor: Bool = false
     
+    
     @State var HabitNameSet: String = ""
     @State var HabitGoalSet: Int16 = 1
     @State var HabitProtocolSet: String = "Daily"
@@ -35,6 +36,17 @@ struct HabitBuilderView: View {
     @State var HabitHasSubTaskSet: Bool = false
     @State var HabitSuperTaskSet: UUID? = nil
     
+    @State var HabitUseDOW: Bool = false
+    // -------------------------------------- DOW REP VALS
+    @State var HabitOnMonSet: Bool = false
+    @State var HabitOnTuesSet: Bool = false
+    @State var HabitOnWedSet: Bool = false
+    @State var HabitOnThursSet: Bool = false
+    @State var HabitOnFriSet: Bool = false
+    @State var HabitOnSatSet: Bool = false
+    @State var HabitOnSunSet: Bool = false
+    // --------------------------------------
+
     @State var displayByProtocol: Bool = false
     
     private var habLister: some View {
@@ -74,13 +86,26 @@ struct HabitBuilderView: View {
 //                    habLister
 //          
 //            } else {
+            
+                Toggle("Choose days of the week to repeat on?", isOn: $HabitUseDOW)
+                if HabitUseDOW == true {
+                    Toggle("Repeat on Sunday", isOn: $HabitOnSunSet)
+                    Toggle("Repeat on Monday", isOn: $HabitOnMonSet)
+                    Toggle("Repeat on Tuesday", isOn: $HabitOnTuesSet)
+                    Toggle("Repeat on Wednesday", isOn: $HabitOnWedSet)
+                    Toggle("Repeat on Thursday", isOn: $HabitOnThursSet)
+                    Toggle("Repeat on Friday", isOn: $HabitOnFriSet)
+                    Toggle("Repeat on Saturday", isOn: $HabitOnSatSet)
+                } else {
+                    Section(header: Text("Habit Interval (1 = Daily, 7 = Weekly, etc):")) {
+                        TextField("", value: $HabitRepetitionSet, format: .number)
+                    }
+                }
                 
                 Section(header: Text("Habit Protocol:")) {
                     TextField("", text: $HabitProtocolSet)
                 }
-                Section(header: Text("Habit Interval (1 = Daily, 7 = Weekly, etc):")) {
-                    TextField("", value: $HabitRepetitionSet, format: .number)
-                }
+ 
                 Section(header: Text("Habit Details")) {
                     TextEditor(text: $HabitDescriptionSet)
                         .frame(minHeight: 100)
@@ -106,7 +131,6 @@ struct HabitBuilderView: View {
             }
         }
     }
-    
     
     // -----------------------------------------------
     //                  END VAR DECLARATIONS
@@ -371,6 +395,8 @@ struct HabitBuilderView: View {
                                                             HabitRewardSet = habitNdx.HabitReward
                                                             HabitHasCheckboxSet = habitNdx.HabitHasCheckbox
                                                             HabitHasStatusSet = habitNdx.HabitHasStatus
+                                                            
+                                                            //Add content for DOW repetition
                                                         }
                                                     } else {}
                                                 }
@@ -445,6 +471,8 @@ struct HabitBuilderView: View {
                 habitDataIteratorList[ndx].HabitHasStatus = HabitHasStatusSet
                 habitDataIteratorList[ndx].HabitHasCheckbox = HabitHasCheckboxSet
                 
+                // Add content for DOW repetition
+                
                 if habitDataIteratorList[ndx].HabitHasCheckbox == true {
                     habitDataIteratorList[ndx].HabitGoal = 1
                     habitDataIteratorList[ndx].HabitUnit = "units"
@@ -458,7 +486,6 @@ struct HabitBuilderView: View {
     }
     
     
-    
     private func displayNameByUUID (id: UUID) -> String {
         for index in habitData {
             if index.id == id {
@@ -467,8 +494,8 @@ struct HabitBuilderView: View {
         }
         return "None"
     }
-    
 
+    
     private func openHabitBuilder() {
         DisplayHabitMaker = true
     }

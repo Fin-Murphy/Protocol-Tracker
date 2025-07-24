@@ -700,6 +700,15 @@ struct MainListTab: View {
     
     private func populateTasks() {
         
+        
+//        let date = Date()
+//        let formatter = DateFormatter()
+//        formatter.dateFormat = "EEEE" // Full day name (e.g., "Monday")
+//        let dayOfWeek = formatter.string(from: date)
+        
+        // Add functionality for DOW repetition instead of just interval repetition 
+        
+        
         //Factor this out into seperate functions
         
         habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []

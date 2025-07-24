@@ -27,7 +27,8 @@ struct ProtocolListView: View {
                     .font(.title)
                     .padding(.bottom)
             }
-        }
+        }.foregroundColor(ForeColor)
+        
         ZStack {
             
             NavigationView {
@@ -88,7 +89,12 @@ struct ProtocolListView: View {
                                     
                                     List{
                                         ForEach(adp.ProtocolContent){cont in
-                                            Text(cont.HabitName)
+                                            NavigationLink {
+                                                Text(cont.HabitName)
+                                                Button{incorporateHabit(refHab: cont)} label:
+                                                {Text("Add this habit")}
+                                            } label: {  Text(cont.HabitName) }
+                                          
                                         }
                                     }
                                     
@@ -117,9 +123,6 @@ struct ProtocolListView: View {
         }// End Zstack
         
         
-        
-        
-        
     } // end body
     
     private func incorporateProtocol(refProt: HabitProtocol){
@@ -137,6 +140,22 @@ struct ProtocolListView: View {
         listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") ?? []
         
     }
+    
+    private func incorporateHabit(refHab: Habit){
+        
+        var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+
+        habitData.append(refHab)
+        
+        UserDefaults.standard.setEncodable(habitData, forKey: "habitList")
+        
+        indexProtocols()
+        
+        listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") ?? []
+        
+    }
+    
+    
     
 }
 

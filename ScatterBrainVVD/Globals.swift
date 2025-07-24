@@ -403,6 +403,27 @@ func indexProtocols () {
 
 
         if var protocolArray: [HabitProtocol] = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") {
+            var slicer: Int = 0
+            var ndxInArray: Bool = false
+                
+                for ndx in protocolArray {
+                    print("Iteration \(slicer), protocol is \(ndx.ProtocolName)")
+                    ndxInArray = false
+                    
+                    for ndx2 in habitData {
+                        if ndx.ProtocolName == ndx2.HabitProtocol {
+                            ndxInArray = true
+                        }
+                    }
+                    
+                    if ndxInArray == false {
+                        print("removing \(ndx.ProtocolName), index is \(slicer)")
+                        protocolArray.remove(at: slicer) 
+                    } else {slicer += 1}
+                    
+                }
+                
+            
 
                 for ndx in habitData {
                     var inArray = false
@@ -420,7 +441,7 @@ func indexProtocols () {
             UserDefaults.standard.setEncodable(protocolArray, forKey: "protocol")
 
         } else {
-            let pArray: [HabitProtocol] = [/*TaskProtocol(ProtocolName: "Daily")*/]
+            let pArray: [HabitProtocol] = []
             UserDefaults.standard.setEncodable(pArray, forKey: "protocol")
         }
     }

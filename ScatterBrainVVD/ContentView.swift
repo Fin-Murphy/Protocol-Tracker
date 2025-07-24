@@ -11,7 +11,7 @@ import CoreData
 struct ContentView: View {
 
     @Environment(\.scenePhase) private var scenePhase
-        
+    
     @State var selectedTab: Tabs = .HUB
     
     @State var SelectedDate: Date = Date()
@@ -44,6 +44,7 @@ struct ContentView: View {
                
                CalendarView(SelectedDate: $SelectedDate, selectedTab: $selectedTab)
                 
+               
 /* *******************************************************
                        BOOK TAB
 ****************************************************** */
@@ -70,11 +71,9 @@ struct ContentView: View {
 /* *******************************************************
             MAIN TASK TAB
 ****************************************************** */
-            
                 
             } else if selectedTab == .HUB {
             
-                
                 MainListTab(
                     selectedTab: $selectedTab,
                     Celebrate: $Celebrate,
@@ -89,14 +88,11 @@ struct ContentView: View {
             TabBar(selectedTab: $selectedTab)
        }
         
-    
        .onAppear{refreshVisualData(ForeColor: &ForeColor)}
        .onChange(of: scenePhase) {/*newval in*/
                refreshVisualData(ForeColor: &ForeColor)
        }
     }
-    
-    
 }
 
 #Preview {
