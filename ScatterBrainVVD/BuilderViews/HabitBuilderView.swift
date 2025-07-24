@@ -543,7 +543,16 @@ struct HabitBuilderView: View {
                                 HabitHasStatus: HabitHasStatusSet,
                                 HabitHasCheckbox: HabitHasCheckboxSet,
                                 HabitIsSubtask: HabitIsSubtaskSet,
-                                HabitSuperTask: HabitSuperTaskSet)
+                                HabitSuperTask: HabitSuperTaskSet,
+                                
+                                     
+                                HabitOnSun: HabitOnSunSet,
+                                HabitOnMon: HabitOnMonSet,
+                                HabitOnTues: HabitOnTuesSet,
+                                HabitOnWed: HabitOnWedSet,
+                                HabitOnThurs: HabitOnThursSet,
+                                HabitOnFri: HabitOnFriSet,
+                                HabitOnSat: HabitOnSatSet)
         
         if var outData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") {
 
