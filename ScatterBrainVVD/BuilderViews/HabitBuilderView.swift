@@ -653,34 +653,56 @@ struct HabitBuilderView: View {
         }
         
             
+        if index.HabitUseDow == false {
             
-        if (daysBetween(start: Calendar.current.startOfDay(for: inputHabit.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) >= 0) && (daysBetween(start:  Calendar.current.startOfDay(for: inputHabit.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) % inputHabit.HabitRepeatValue == 0) {
-                                    
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
-            newItem.name = inputHabit.HabitName
-            newItem.goal = inputHabit.HabitGoal
-            newItem.unit = inputHabit.HabitUnit
-            newItem.whichProtocol = inputHabit.HabitProtocol
-            newItem.complete = false
-            newItem.reward = inputHabit.HabitReward
-            newItem.id = UUID()
-            newItem.hasStatus = inputHabit.HabitHasStatus
-            newItem.hasCheckbox = inputHabit.HabitHasCheckbox
-            newItem.notFloater = true
+            if (daysBetween(start: Calendar.current.startOfDay(for: index.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) >= 0)
+                && (daysBetween(start:  Calendar.current.startOfDay(for: index.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) % index.HabitRepeatValue == 0) {
+                                        
+                let newItem = Item(context: viewContext)
+                newItem.timestamp = Date()
+                newItem.name = index.HabitName
+                newItem.goal = index.HabitGoal
+                newItem.unit = index.HabitUnit
+                newItem.whichProtocol = index.HabitProtocol
+                newItem.complete = false
+                newItem.reward = index.HabitReward
+                newItem.id = UUID()
+                newItem.hasStatus = index.HabitHasStatus
+                newItem.hasCheckbox = index.HabitHasCheckbox
+                newItem.notFloater = true
+
+            }
+
+        } else {
             
-//            newItem.useDow = inputHabit.HabitUseDow
-//
-//            newItem.rSun = inputHabit.HabitOnSun
-//            newItem.rMon = inputHabit.HabitOnMon
-//            newItem.rTues = inputHabit.HabitOnTues
-//            newItem.rWed = inputHabit.HabitOnWed
-//            newItem.rThur = inputHabit.HabitOnThurs
-//            newItem.rFri = inputHabit.HabitOnFri
-//            newItem.rSat = inputHabit.HabitOnSat
+            if  (index.HabitOnMon == true && dayOfWeek == "Monday") ||
+                (index.HabitOnTues == true && dayOfWeek == "Tuesday") ||
+                (index.HabitOnWed == true && dayOfWeek == "Wednesday") ||
+                (index.HabitOnThurs == true && dayOfWeek == "Thursday") ||
+                (index.HabitOnFri == true && dayOfWeek == "Friday") ||
+                (index.HabitOnSat == true && dayOfWeek == "Saturday") ||
+                (index.HabitOnSun == true && dayOfWeek == "Sunday")
+            {
+                    
+                let newItem = Item(context: viewContext)
+                newItem.timestamp = Date()
+                newItem.name = index.HabitName
+                newItem.goal = index.HabitGoal
+                newItem.unit = index.HabitUnit
+                newItem.whichProtocol = index.HabitProtocol
+                newItem.complete = false
+                newItem.reward = index.HabitReward
+                newItem.id = UUID()
+                newItem.hasStatus = index.HabitHasStatus
+                newItem.hasCheckbox = index.HabitHasCheckbox
+                newItem.notFloater = true
+      
+            }
             
         }
-            
+
+        
+        
         
         DisplayHabitMaker = false
         HabitNameSet = ""
