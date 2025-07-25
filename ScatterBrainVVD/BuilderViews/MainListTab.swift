@@ -701,16 +701,15 @@ struct MainListTab: View {
     private func populateTasks() {
         
         
-//        let date = Date()
-//        let formatter = DateFormatter()
-//        formatter.dateFormat = "EEEE" // Full day name (e.g., "Monday")
-//        let dayOfWeek = formatter.string(from: date)
+        let date = Date()
+        
+        let dformatter = DateFormatter()
+        dformatter.dateFormat = "EEEE"
+        let dayOfWeek = dformatter.string(from: date)
         
         // Add functionality for DOW repetition instead of just interval repetition 
         
-        
-        //Factor this out into seperate functions
-        
+        //Factor this out into seperate functions?
         habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
         
         for taskFinder in items {
@@ -726,36 +725,57 @@ struct MainListTab: View {
         for index in habitData {
             print("\(index.HabitName) - \(daysBetween(start: index.HabitStartDate,end: Calendar.current.startOfDay(for: Date())))")
         }
-
         
         for index in habitData {
             
-            
-            if (daysBetween(start: Calendar.current.startOfDay(for: index.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) >= 0) && (daysBetween(start:  Calendar.current.startOfDay(for: index.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) % index.HabitRepeatValue == 0) {
-                                        
-                let newItem = Item(context: viewContext)
-                newItem.timestamp = Date()
-                newItem.name = index.HabitName
-                newItem.goal = index.HabitGoal
-                newItem.unit = index.HabitUnit
-                newItem.whichProtocol = index.HabitProtocol
-                newItem.complete = false
-                newItem.reward = index.HabitReward
-                newItem.id = UUID()
-                newItem.hasStatus = index.HabitHasStatus
-                newItem.hasCheckbox = index.HabitHasCheckbox
-                newItem.notFloater = true
+            if index.HabitUseDow == false {
                 
-//                newItem.useDow = index.HabitUseDow
-//
-//                newItem.rSun = index.HabitOnSun
-//                newItem.rMon = index.HabitOnMon
-//                newItem.rTues = index.HabitOnTues
-//                newItem.rWed = index.HabitOnWed
-//                newItem.rThur = index.HabitOnThurs
-//                newItem.rFri = index.HabitOnFri
-//                newItem.rSat = index.HabitOnSat
+                if (daysBetween(start: Calendar.current.startOfDay(for: index.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) >= 0)
+                    && (daysBetween(start:  Calendar.current.startOfDay(for: index.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) % index.HabitRepeatValue == 0) {
+                                            
+                    let newItem = Item(context: viewContext)
+                    newItem.timestamp = Date()
+                    newItem.name = index.HabitName
+                    newItem.goal = index.HabitGoal
+                    newItem.unit = index.HabitUnit
+                    newItem.whichProtocol = index.HabitProtocol
+                    newItem.complete = false
+                    newItem.reward = index.HabitReward
+                    newItem.id = UUID()
+                    newItem.hasStatus = index.HabitHasStatus
+                    newItem.hasCheckbox = index.HabitHasCheckbox
+                    newItem.notFloater = true
+
+                }
+
+            } else {
+                
+                if  (index.HabitOnMon == true && dayOfWeek == "Monday") ||
+                    (index.HabitOnTues == true && dayOfWeek == "Tuesday") ||
+                    (index.HabitOnWed == true && dayOfWeek == "Wednesday") ||
+                    (index.HabitOnThurs == true && dayOfWeek == "Thursday") ||
+                    (index.HabitOnFri == true && dayOfWeek == "Friday") ||
+                    (index.HabitOnSat == true && dayOfWeek == "Saturday") ||
+                    (index.HabitOnSun == true && dayOfWeek == "Sunday")
+                {
+                        
+                    let newItem = Item(context: viewContext)
+                    newItem.timestamp = Date()
+                    newItem.name = index.HabitName
+                    newItem.goal = index.HabitGoal
+                    newItem.unit = index.HabitUnit
+                    newItem.whichProtocol = index.HabitProtocol
+                    newItem.complete = false
+                    newItem.reward = index.HabitReward
+                    newItem.id = UUID()
+                    newItem.hasStatus = index.HabitHasStatus
+                    newItem.hasCheckbox = index.HabitHasCheckbox
+                    newItem.notFloater = true
+          
+                }
+                
             }
+            
         }
 
         do {

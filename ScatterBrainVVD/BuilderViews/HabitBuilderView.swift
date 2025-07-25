@@ -132,6 +132,13 @@ struct HabitBuilderView: View {
         }
     }
     
+    private var habitEditorForm: some View {
+        
+        Text("Stub")
+        
+        
+    }
+    
     // -----------------------------------------------
     //                  END VAR DECLARATIONS
     // ----------------------------------------------
@@ -171,7 +178,11 @@ struct HabitBuilderView: View {
                                         Text(index.ProtocolName)
                                             .font(.title2)
                                             .fontWeight(.bold)
-                                            .padding(.top)
+                                            .
+                                        
+                                        
+                                        
+                                        padding(.top)
                                         
                                         ForEach(habitData) { habitNdx in
                                             
@@ -304,6 +315,7 @@ struct HabitBuilderView: View {
                                                                 HabitOnSatSet = habitNdx.HabitOnSat
                                                                 
                                                             }
+                                                            
                                                         } else {}
                                                     }
                                                 } label: {
