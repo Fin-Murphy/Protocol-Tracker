@@ -353,6 +353,7 @@ struct HabitBuilderView: View {
                                                             Text("Item goal value: \(habitNdx.HabitGoal) \(habitNdx.HabitUnit)" )
                                                             
                                                             if habitNdx.HabitUseDow == true {
+                                                                
                                                                 if habitNdx.HabitOnSun == true {Text("Item repeats on Sunday")} else {}
                                                                 if habitNdx.HabitOnMon == true {Text("Item repeats on Monday")} else {}
                                                                 if habitNdx.HabitOnTues == true {Text("Item repeats on Tuesday")} else {}
