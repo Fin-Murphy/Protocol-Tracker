@@ -351,7 +351,23 @@ struct HabitBuilderView: View {
                                                             Text("Item is part of protocol \(habitNdx.HabitProtocol).")
                                                             Text("Item start date: \(habitNdx.HabitStartDate, formatter: itemFormatter)" )
                                                             Text("Item goal value: \(habitNdx.HabitGoal) \(habitNdx.HabitUnit)" )
-                                                            Text("Item repeats every \(habitNdx.HabitRepeatValue) days." )
+                                                            
+                                                            if habitNdx.HabitUseDow == true {
+                                                                if habitNdx.HabitOnSun == true {Text("Item repeats on Sunday")} else {}
+                                                                if habitNdx.HabitOnMon == true {Text("Item repeats on Monday")} else {}
+                                                                if habitNdx.HabitOnTues == true {Text("Item repeats on Tuesday")} else {}
+                                                                if habitNdx.HabitOnWed == true {Text("Item repeats on Wednesday")} else {}
+                                                                if habitNdx.HabitOnThurs == true {Text("Item repeats on Thursday")} else {}
+                                                                if habitNdx.HabitOnFri == true {Text("Item repeats on Friday")} else {}
+                                                                if habitNdx.HabitOnSat == true {Text("Item repeats on Saturday")} else {}
+
+                                                            } else {
+                                                                Text("Item repeats every \(habitNdx.HabitRepeatValue) days." )
+                                                            }
+                                                            
+                                                            
+                                                            
+                                                            
                                                             Text("Item Description: \n\n \(habitNdx.HabitDescription)" )
                                                             if habitNdx.HabitHasSubtask == true {
                                                                 Text("Subhabits:")
@@ -623,7 +639,6 @@ struct HabitBuilderView: View {
             UserDefaults.standard.setEncodable(habitData, forKey: "habitList")
         } else {}
         
-            
         let inputHabit:Habit = Habit(HabitName: HabitNameSet,
                                 HabitGoal: HabitGoalSet,
                                 HabitUnit: HabitUnitSet,
@@ -658,7 +673,6 @@ struct HabitBuilderView: View {
             UserDefaults.standard.setEncodable(initHabitList, forKey: "habitList")
         }
         
-            
         if inputHabit.HabitUseDow == false {
             
             if (daysBetween(start: Calendar.current.startOfDay(for: inputHabit.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) >= 0)
