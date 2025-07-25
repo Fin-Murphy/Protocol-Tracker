@@ -593,6 +593,12 @@ struct HabitBuilderView: View {
 
     private func addItem() {
         
+        let date = Date()
+        
+        let dformatter = DateFormatter()
+        dformatter.dateFormat = "EEEE"
+        let dayOfWeek = dformatter.string(from: date)
+        
         if HabitHasCheckboxSet == true {
             HabitGoalSet = 1
             HabitUnitSet = "units"
@@ -653,48 +659,48 @@ struct HabitBuilderView: View {
         }
         
             
-        if index.HabitUseDow == false {
+        if inputHabit.HabitUseDow == false {
             
-            if (daysBetween(start: Calendar.current.startOfDay(for: index.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) >= 0)
-                && (daysBetween(start:  Calendar.current.startOfDay(for: index.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) % index.HabitRepeatValue == 0) {
+            if (daysBetween(start: Calendar.current.startOfDay(for: inputHabit.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) >= 0)
+                && (daysBetween(start:  Calendar.current.startOfDay(for: inputHabit.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) % inputHabit.HabitRepeatValue == 0) {
                                         
                 let newItem = Item(context: viewContext)
                 newItem.timestamp = Date()
-                newItem.name = index.HabitName
-                newItem.goal = index.HabitGoal
-                newItem.unit = index.HabitUnit
-                newItem.whichProtocol = index.HabitProtocol
+                newItem.name = inputHabit.HabitName
+                newItem.goal = inputHabit.HabitGoal
+                newItem.unit = inputHabit.HabitUnit
+                newItem.whichProtocol = inputHabit.HabitProtocol
                 newItem.complete = false
-                newItem.reward = index.HabitReward
+                newItem.reward = inputHabit.HabitReward
                 newItem.id = UUID()
-                newItem.hasStatus = index.HabitHasStatus
-                newItem.hasCheckbox = index.HabitHasCheckbox
+                newItem.hasStatus = inputHabit.HabitHasStatus
+                newItem.hasCheckbox = inputHabit.HabitHasCheckbox
                 newItem.notFloater = true
 
             }
 
         } else {
             
-            if  (index.HabitOnMon == true && dayOfWeek == "Monday") ||
-                (index.HabitOnTues == true && dayOfWeek == "Tuesday") ||
-                (index.HabitOnWed == true && dayOfWeek == "Wednesday") ||
-                (index.HabitOnThurs == true && dayOfWeek == "Thursday") ||
-                (index.HabitOnFri == true && dayOfWeek == "Friday") ||
-                (index.HabitOnSat == true && dayOfWeek == "Saturday") ||
-                (index.HabitOnSun == true && dayOfWeek == "Sunday")
+            if  (inputHabit.HabitOnMon == true && dayOfWeek == "Monday") ||
+                (inputHabit.HabitOnTues == true && dayOfWeek == "Tuesday") ||
+                (inputHabit.HabitOnWed == true && dayOfWeek == "Wednesday") ||
+                (inputHabit.HabitOnThurs == true && dayOfWeek == "Thursday") ||
+                (inputHabit.HabitOnFri == true && dayOfWeek == "Friday") ||
+                (inputHabit.HabitOnSat == true && dayOfWeek == "Saturday") ||
+                (inputHabit.HabitOnSun == true && dayOfWeek == "Sunday")
             {
                     
                 let newItem = Item(context: viewContext)
                 newItem.timestamp = Date()
-                newItem.name = index.HabitName
-                newItem.goal = index.HabitGoal
-                newItem.unit = index.HabitUnit
-                newItem.whichProtocol = index.HabitProtocol
+                newItem.name = inputHabit.HabitName
+                newItem.goal = inputHabit.HabitGoal
+                newItem.unit = inputHabit.HabitUnit
+                newItem.whichProtocol = inputHabit.HabitProtocol
                 newItem.complete = false
-                newItem.reward = index.HabitReward
+                newItem.reward = inputHabit.HabitReward
                 newItem.id = UUID()
-                newItem.hasStatus = index.HabitHasStatus
-                newItem.hasCheckbox = index.HabitHasCheckbox
+                newItem.hasStatus = inputHabit.HabitHasStatus
+                newItem.hasCheckbox = inputHabit.HabitHasCheckbox
                 newItem.notFloater = true
       
             }
