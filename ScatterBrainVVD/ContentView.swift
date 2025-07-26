@@ -89,7 +89,7 @@ struct ContentView: View {
        }
         
        .onAppear{refreshVisualData(ForeColor: &ForeColor)}
-       .onChange(of: scenePhase) {/*newval in*/
+       .onChange(of: scenePhase) {
                refreshVisualData(ForeColor: &ForeColor)
        }
     }

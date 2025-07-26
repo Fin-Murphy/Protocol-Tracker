@@ -261,6 +261,11 @@ struct MainListTab: View {
         sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
         animation: .default)
     private var items: FetchedResults<Item>
+        
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \HabitItem.name, ascending: true)],
+        animation: .default)
+    private var habits: FetchedResults<HabitItem>
 
     
     

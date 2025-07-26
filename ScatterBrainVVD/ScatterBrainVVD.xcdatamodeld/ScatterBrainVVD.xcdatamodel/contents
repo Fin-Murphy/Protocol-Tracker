@@ -1,7 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788.4" systemVersion="24F74" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <entity name="Entity" representedClassName="Entity" syncable="YES" codeGenerationType="class">
+    <entity name="HabitItem" representedClassName="HabitItem" syncable="YES" codeGenerationType="class">
+        <attribute name="descript" optional="YES" attributeType="String"/>
+        <attribute name="goal" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="hasCheckbox" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="hasStatus" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="hasSubtask" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isSubtask" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="onFri" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="onMon" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="onSat" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="onSun" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="onThurs" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="onTues" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="onWed" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="repeatValue" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="reward" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="startDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="superTask" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="unit" optional="YES" attributeType="String"/>
+        <attribute name="useDow" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="whichProtocol" optional="YES" attributeType="String"/>
     </entity>
     <entity name="Item" representedClassName="Item" syncable="YES" codeGenerationType="class">
         <attribute name="complete" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>

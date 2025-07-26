@@ -25,6 +25,11 @@ struct PersistenceController {
         newItem.unit = "unit"
         newItem.whichProtocol = "Daily"
         newItem.hasStatus = true
+        
+        let newHabitItem = HabitItem(context: viewContext)
+        newHabitItem.name = "Glitch prevention item"
+
+
             
             
         do {
