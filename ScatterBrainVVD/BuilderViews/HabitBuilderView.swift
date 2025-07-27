@@ -10,13 +10,16 @@ import CoreData
 
 struct HabitBuilderView: View {
     
-    
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \HabitItem.name, ascending: true)],
+        animation: .default)
+    private var habitData: FetchedResults<HabitItem>
     
     @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
 
     @Binding var selectedTab: Tabs
     
-    @State var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+   // @State var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
     
     @State var DisplayHabitMaker: Bool = false
     @State var DisplayHabitEditor: Bool = false
@@ -26,7 +29,7 @@ struct HabitBuilderView: View {
     @State var HabitGoalSet: Int16 = 1
     @State var HabitProtocolSet: String = "Daily"
     @State var HabitUnitSet: String = "units"
-    @State var HabitRepetitionSet: Int = 1
+    @State var HabitRepetitionSet: Int16 = 1
     @State var HabitDescriptionSet: String = ""
     @State var HabitHasStatusSet: Bool = false
     @State var HabitRewardSet: Int16 = 1
@@ -49,18 +52,18 @@ struct HabitBuilderView: View {
 
     @State var displayByProtocol: Bool = false
     
-    private var habLister: some View {
-        ForEach(habitData){ superTaskHabit in
-            
-            if superTaskHabit.HabitIsSubtask == false {
-                Button{
-                    HabitSuperTaskSet = superTaskHabit.id
-                } label: {
-                    Text(superTaskHabit.HabitName)
-                }
-            }
-        }
-    }
+//    private var habLister: some View {
+//        ForEach($habitData){ superTaskHabit in
+//            
+//            if superTaskHabit.isSubtask == false {
+//                Button{
+//                    HabitSuperTaskSet = superTaskHabit.id
+//                } label: {
+//                    Text(superTaskHabit.HabitName)
+//                }
+//            }
+//        }
+//    }
     
     private var habitBuilderForm: some View {
         
@@ -132,12 +135,6 @@ struct HabitBuilderView: View {
         }
     }
     
-    private var habitEditorForm: some View {
-        
-        Text("Stub")
-        
-        
-    }
     
     // -----------------------------------------------
     //                  END VAR DECLARATIONS
@@ -186,7 +183,7 @@ struct HabitBuilderView: View {
                                         
                                         ForEach(habitData) { habitNdx in
                                             
-                                            if habitNdx.HabitProtocol == index.ProtocolName && habitNdx.HabitIsSubtask == false {
+                                            if habitNdx.whichProtocol == index.ProtocolName && habitNdx.isSubtask == false {
                                                 
                                                 NavigationLink{
                                                     ZStack{
@@ -198,20 +195,20 @@ struct HabitBuilderView: View {
                                                                 Text(habitNdx.HabitName)
                                                                     .font(.title)
                                                                     .padding()
-                                                                Text("Item is part of protocol \(habitNdx.HabitProtocol).")
-                                                                Text("Item start date: \(habitNdx.HabitStartDate, formatter: itemFormatter)" )
-                                                                Text("Item goal value: \(habitNdx.HabitGoal) \(habitNdx.HabitUnit)" )
-                                                                Text("Item repeats every \(habitNdx.HabitRepeatValue) days." )
-                                                                Text("Item Description: \n\n \(habitNdx.HabitDescription)" )
-                                                                if habitNdx.HabitHasSubtask == true {
+                                                                Text("Item is part of protocol \(habitNdx.whichProtocol).")
+                                                                Text("Item start date: \(habitNdx.startDate, formatter: itemFormatter)" )
+                                                                Text("Item goal value: \(habitNdx.goal) \(habitNdx.unit)" )
+                                                                Text("Item repeats every \(habitNdx.repeatValue) days." )
+                                                                Text("Item Description: \n\n \(habitNdx.descript)" )
+                                                                if habitNdx.hasSubtask == true {
                                                                     Text("Subhabits:")
                                                                     ForEach(habitData){ indexr in
-                                                                        if indexr.HabitSuperTask == habitNdx.id {
-                                                                            Text(indexr.HabitName)
+                                                                        if indexr.superTask == habitNdx.id {
+                                                                            Text(indexr.name)
                                                                         }
                                                                     }
                                                                 }
-                                                            }
+                                                        }
                                                                                                                     
                                                             Button{DisplayHabitEditor = true} label: {
                                                                 Text("Edit habit")
@@ -281,38 +278,36 @@ struct HabitBuilderView: View {
                                                                 Section {
                                                                     Button {
                                                                         //------------------------------------
-                                                                        updateHabit(habitToEdit: habitNdx.id)
+                                                                        updateHabit(habitToEdit: habitNdx)
                                                                         //------------------------------------
                                                                         DisplayHabitEditor = false
                                                                         indexProtocols()
                                                                         
-                                                                        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
-
                                                                         //crap commit
                                                                     } label: {Text("Save Habit")}
                                                                 }
                                                             }
                                                             .onAppear{
-                                                                HabitNameSet = habitNdx.HabitName
-                                                                HabitGoalSet = habitNdx.HabitGoal
-                                                                HabitUnitSet = habitNdx.HabitUnit
-                                                                HabitProtocolSet = habitNdx.HabitProtocol
-                                                                HabitRepetitionSet = habitNdx.HabitRepeatValue
-                                                                HabitDescriptionSet = habitNdx.HabitDescription
-                                                                HabitStartDateSet = habitNdx.HabitStartDate
-                                                                HabitRewardSet = habitNdx.HabitReward
-                                                                HabitHasCheckboxSet = habitNdx.HabitHasCheckbox
-                                                                HabitHasStatusSet = habitNdx.HabitHasStatus
+                                                                HabitNameSet = habitNdx.name
+                                                                HabitGoalSet = habitNdx.goal
+                                                                HabitUnitSet = habitNdx.unit
+                                                                HabitProtocolSet = habitNdx.whichProtocol
+                                                                HabitRepetitionSet = habitNdx.repeatValue
+                                                                HabitDescriptionSet = habitNdx.descript
+                                                                HabitStartDateSet = habitNdx.startDate
+                                                                HabitRewardSet = habitNdx.reward
+                                                                HabitHasCheckboxSet = habitNdx.hasCheckbox
+                                                                HabitHasStatusSet = habitNdx.hasStatus
                                                                 
-                                                                HabitUseDOWSet = habitNdx.HabitUseDow
+                                                                HabitUseDOWSet = habitNdx.useDow
                                                                 
-                                                                HabitOnSunSet = habitNdx.HabitOnSun
-                                                                HabitOnMonSet = habitNdx.HabitOnMon
-                                                                HabitOnTuesSet = habitNdx.HabitOnTues
-                                                                HabitOnWedSet = habitNdx.HabitOnWed
-                                                                HabitOnThursSet = habitNdx.HabitOnThurs
-                                                                HabitOnFriSet = habitNdx.HabitOnFri
-                                                                HabitOnSatSet = habitNdx.HabitOnSat
+                                                                HabitOnSunSet = habitNdx.OnSun
+                                                                HabitOnMonSet = habitNdx.OnMon
+                                                                HabitOnTuesSet = habitNdx.OnTues
+                                                                HabitOnWedSet = habitNdx.OnWed
+                                                                HabitOnThursSet = habitNdx.OnThurs
+                                                                HabitOnFriSet = habitNdx.OnFri
+                                                                HabitOnSatSet = habitNdx.OnSat
                                                                 
                                                             }
                                                             
@@ -321,11 +316,11 @@ struct HabitBuilderView: View {
                                                 } label: {
                                                     HStack {
                                                         //-----------------------------------------------------
-                                                        Text(habitNdx.HabitName)
+                                                        Text(habitNdx.name)
                                                         
                                                         Spacer()
                                                         
-                                                        Text("\(habitNdx.HabitGoal) \(habitNdx.HabitUnit)")
+                                                        Text("\(habitNdx.goal) \(habitNdx.unit)")
                                                         //-----------------------------------------------------
                                                     }
                                                 }
@@ -336,7 +331,7 @@ struct HabitBuilderView: View {
                                     
                                     ForEach(habitData) { habitNdx in
                                         
-                                        if habitNdx.HabitIsSubtask == false {
+                                        if habitNdx.isSubtask == false {
                                             
                                             NavigationLink{
                                                 ZStack{
@@ -345,36 +340,36 @@ struct HabitBuilderView: View {
 //                                                        HabitDetailView(habitNdx: habitNdx)
                                                         
                                                         List{
-                                                            Text(habitNdx.HabitName)
+                                                            Text(habitNdx.name)
                                                                 .font(.title)
                                                                 .padding()
-                                                            Text("Item is part of protocol \(habitNdx.HabitProtocol).")
-                                                            Text("Item start date: \(habitNdx.HabitStartDate, formatter: itemFormatter)" )
-                                                            Text("Item goal value: \(habitNdx.HabitGoal) \(habitNdx.HabitUnit)" )
+                                                            Text("Item is part of protocol \(habitNdx.whichProtocol).")
+                                                            Text("Item start date: \(habitNdx.startDate, formatter: itemFormatter)" )
+                                                            Text("Item goal value: \(habitNdx.goal) \(habitNdx.unit)" )
                                                             
-                                                            if habitNdx.HabitUseDow == true {
+                                                            if habitNdx.useDow == true {
                                                                 
-                                                                if habitNdx.HabitOnSun == true {Text("Item repeats on Sunday")} else {}
-                                                                if habitNdx.HabitOnMon == true {Text("Item repeats on Monday")} else {}
-                                                                if habitNdx.HabitOnTues == true {Text("Item repeats on Tuesday")} else {}
-                                                                if habitNdx.HabitOnWed == true {Text("Item repeats on Wednesday")} else {}
-                                                                if habitNdx.HabitOnThurs == true {Text("Item repeats on Thursday")} else {}
-                                                                if habitNdx.HabitOnFri == true {Text("Item repeats on Friday")} else {}
-                                                                if habitNdx.HabitOnSat == true {Text("Item repeats on Saturday")} else {}
+                                                                if habitNdx.onSun == true {Text("Item repeats on Sunday")} else {}
+                                                                if habitNdx.onMon == true {Text("Item repeats on Monday")} else {}
+                                                                if habitNdx.onTues == true {Text("Item repeats on Tuesday")} else {}
+                                                                if habitNdx.onWed == true {Text("Item repeats on Wednesday")} else {}
+                                                                if habitNdx.onThurs == true {Text("Item repeats on Thursday")} else {}
+                                                                if habitNdx.onFri == true {Text("Item repeats on Friday")} else {}
+                                                                if habitNdx.onSat == true {Text("Item repeats on Saturday")} else {}
 
                                                             } else {
-                                                                Text("Item repeats every \(habitNdx.HabitRepeatValue) days." )
+                                                                Text("Item repeats every \(habitNdx.repeatValue) days." )
                                                             }
                                                             
                                                             
                                                             
                                                             
-                                                            Text("Item Description: \n\n \(habitNdx.HabitDescription)" )
-                                                            if habitNdx.HabitHasSubtask == true {
+                                                            Text("Item Description: \n\n \(habitNdx.descript)" )
+                                                            if habitNdx.hasSubtask == true {
                                                                 Text("Subhabits:")
                                                                 ForEach(habitData){ indexr in
-                                                                    if indexr.HabitSuperTask == habitNdx.id {
-                                                                        Text(indexr.HabitName)
+                                                                    if indexr.superTask == habitNdx.id {
+                                                                        Text(indexr.name)
                                                                     }
                                                                 }
                                                             }
@@ -448,38 +443,36 @@ struct HabitBuilderView: View {
                                                             Section {
                                                                 Button {
                                                                     //------------------------------------
-                                                                    updateHabit(habitToEdit: habitNdx.id)
+                                                                    updateHabit(habitToEdit: habitNdx)
                                                                     //------------------------------------
                                                                     DisplayHabitEditor = false
                                                                     indexProtocols()
                                                                     
-                                                                    habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
-
                                                                     //crap commit
                                                                 } label: {Text("Save Habit")}
                                                             }
                                                         }
                                                         .onAppear{
-                                                            HabitNameSet = habitNdx.HabitName
-                                                            HabitGoalSet = habitNdx.HabitGoal
-                                                            HabitUnitSet = habitNdx.HabitUnit
-                                                            HabitProtocolSet = habitNdx.HabitProtocol
-                                                            HabitRepetitionSet = habitNdx.HabitRepeatValue
-                                                            HabitDescriptionSet = habitNdx.HabitDescription
-                                                            HabitStartDateSet = habitNdx.HabitStartDate
-                                                            HabitRewardSet = habitNdx.HabitReward
-                                                            HabitHasCheckboxSet = habitNdx.HabitHasCheckbox
-                                                            HabitHasStatusSet = habitNdx.HabitHasStatus
+                                                            HabitNameSet = habitNdx.name
+                                                            HabitGoalSet = habitNdx.goal
+                                                            HabitUnitSet = habitNdx.unit
+                                                            HabitProtocolSet = habitNdx.whichProtocol
+                                                            HabitRepetitionSet = habitNdx.repeatValue
+                                                            HabitDescriptionSet = habitNdx.descript
+                                                            HabitStartDateSet = habitNdx.startDate
+                                                            HabitRewardSet = habitNdx.reward
+                                                            HabitHasCheckboxSet = habitNdx.hasCheckbox
+                                                            HabitHasStatusSet = habitNdx.hasStatus
                                                             
-                                                            HabitUseDOWSet = habitNdx.HabitUseDow
+                                                            HabitUseDOWSet = habitNdx.useDow
                                                             
-                                                            HabitOnSunSet = habitNdx.HabitOnSun
-                                                            HabitOnMonSet = habitNdx.HabitOnMon
-                                                            HabitOnTuesSet = habitNdx.HabitOnTues
-                                                            HabitOnWedSet = habitNdx.HabitOnWed
-                                                            HabitOnThursSet = habitNdx.HabitOnThurs
-                                                            HabitOnFriSet = habitNdx.HabitOnFri
-                                                            HabitOnSatSet = habitNdx.HabitOnSat
+                                                            HabitOnSunSet = habitNdx.OnSun
+                                                            HabitOnMonSet = habitNdx.OnMon
+                                                            HabitOnTuesSet = habitNdx.OnTues
+                                                            HabitOnWedSet = habitNdx.OnWed
+                                                            HabitOnThursSet = habitNdx.OnThurs
+                                                            HabitOnFriSet = habitNdx.OnFri
+                                                            HabitOnSatSet = habitNdx.OnSat
                                                             
                                                         }
                                                     } else {}
@@ -487,11 +480,11 @@ struct HabitBuilderView: View {
                                             } label: {
                                                 HStack {
                                                     //-----------------------------------------------------
-                                                    Text(habitNdx.HabitName)
+                                                    Text(habitNdx.name)
                                                     
                                                     Spacer()
                                                     
-                                                    Text("\(habitNdx.HabitGoal) \(habitNdx.HabitUnit)")
+                                                    Text("\(habitNdx.goal) \(habitNdx.unit)")
                                                     //-----------------------------------------------------
                                                 }
                                             }
@@ -537,76 +530,71 @@ struct HabitBuilderView: View {
         
     // ------------------------------------ Spacer
     
-    private func updateHabit(habitToEdit: UUID) {
-        
-        var habitDataIteratorList: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
-        
-        for ndx in 0..<habitDataIteratorList.count {
-            if habitDataIteratorList[ndx].id == habitToEdit {
-                habitDataIteratorList[ndx].HabitName = HabitNameSet
-                habitDataIteratorList[ndx].HabitGoal = HabitGoalSet
-                habitDataIteratorList[ndx].HabitUnit = HabitUnitSet
-                habitDataIteratorList[ndx].HabitProtocol = HabitProtocolSet
-                habitDataIteratorList[ndx].HabitRepeatValue = HabitRepetitionSet
-                habitDataIteratorList[ndx].HabitDescription = HabitDescriptionSet
-                habitDataIteratorList[ndx].HabitStartDate = HabitStartDateSet
-                habitDataIteratorList[ndx].HabitReward = HabitRewardSet
-                habitDataIteratorList[ndx].HabitHasStatus = HabitHasStatusSet
-                habitDataIteratorList[ndx].HabitHasCheckbox = HabitHasCheckboxSet
+    private func updateHabit(habitToEdit: HabitItem) {
+
+        habitToEdit.name = HabitNameSet
+        habitToEdit.goal = HabitGoalSet
+        habitToEdit.unit = HabitUnitSet
+        habitToEdit.whichProtocol = HabitProtocolSet
+        habitToEdit.repeatValue = HabitRepetitionSet
+        habitToEdit.descript = HabitDescriptionSet
+        habitToEdit.startDate = HabitStartDateSet
+        habitToEdit.reward = HabitRewardSet
+        habitToEdit.hasStatus = HabitHasStatusSet
+        habitToEdit.hasCheckbox = HabitHasCheckboxSet
                 
-                habitDataIteratorList[ndx].HabitUseDow = HabitUseDOWSet
+        habitToEdit.useDow = HabitUseDOWSet
                 
-                habitDataIteratorList[ndx].HabitOnSun = HabitOnSunSet
-                habitDataIteratorList[ndx].HabitOnMon = HabitOnMonSet
-                habitDataIteratorList[ndx].HabitOnTues = HabitOnTuesSet
-                habitDataIteratorList[ndx].HabitOnWed = HabitOnWedSet
-                habitDataIteratorList[ndx].HabitOnThurs = HabitOnThursSet
-                habitDataIteratorList[ndx].HabitOnFri = HabitOnFriSet
-                habitDataIteratorList[ndx].HabitOnSat = HabitOnSatSet
-                
-                // Add content for DOW repetition
-                
-                if habitDataIteratorList[ndx].HabitHasCheckbox == true {
-                    habitDataIteratorList[ndx].HabitGoal = 1
-                    habitDataIteratorList[ndx].HabitUnit = "units"
-                }
-            }
+        habitToEdit.onSun = HabitOnSunSet
+        habitToEdit.onMon = HabitOnMonSet
+        habitToEdit.onTues = HabitOnTuesSet
+        habitToEdit.onWed = HabitOnWedSet
+        habitToEdit.onThurs = HabitOnThursSet
+        habitToEdit.onFri = HabitOnFriSet
+        habitToEdit.onSat = HabitOnSatSet
+                                
+        if habitToEdit.hasCheckbox == true {
+            habitToEdit.goal = 1
+            habitToEdit.unit = "units"
         }
         
-        UserDefaults.standard.setEncodable(habitDataIteratorList, forKey: "habitList")
-        
-        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
-    }
-    
-    
-    private func displayNameByUUID (id: UUID) -> String {
-        for index in habitData {
-            if index.id == id {
-                return index.HabitName
-            }
+        do {
+            try viewContext.save()
+        } catch {
+            let nsError = error as NSError
+            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
         }
-        return "None"
+        
+        
     }
+    
 
     
     private func openHabitBuilder() {
         DisplayHabitMaker = true
     }
+    
+    
+    
+    private func rmHabit(withUUID uuid: UUID) {
+        // Create a fetch request for your entity
+        let request: NSFetchRequest<Item> = Item.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", uuid as CVarArg)
+        request.fetchLimit = 1
         
-    private func rmHabit(id: UUID) {
-        if var outHabitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") {
-            var iterator = 0
-            for index in outHabitData {
-                if index.id == id {
-                    outHabitData.remove(at: iterator)
-                }
-                iterator += 1
+        do {
+            let results = try viewContext.fetch(request)
+            if let entityToDelete = results.first {
+                viewContext.delete(entityToDelete)
+                try viewContext.save()
             }
-            UserDefaults.standard.setEncodable(outHabitData, forKey: "habitList")
+        } catch {
+            print("Error deleting entity: \(error)")
         }
-        
-        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
     }
+    
+    
+    
 
     private func addItem() {
         
@@ -631,91 +619,113 @@ struct HabitBuilderView: View {
             HabitOnSunSet = false
         }
         
-        if HabitIsSubtaskSet == true && HabitSuperTaskSet != nil {
-            for index in 0..<habitData.count {
-                if habitData[index].id == HabitSuperTaskSet {
-                    habitData[index].HabitHasSubtask = true
-                }
-            }
-            UserDefaults.standard.setEncodable(habitData, forKey: "habitList")
-        } else {}
+//        if HabitIsSubtaskSet == true && HabitSuperTaskSet != nil {
+//            for index in 0..<habitData.count {
+//                if habitData[index].id == HabitSuperTaskSet {
+////                    habitData[index].hasSubtask = true
+//                }
+//            }
+////            UserDefaults.standard.setEncodable(habitData, forKey: "habitList")
+//        } else {}
         
-        let inputHabit:Habit = Habit(HabitName: HabitNameSet,
-                                HabitGoal: HabitGoalSet,
-                                HabitUnit: HabitUnitSet,
-                                HabitProtocol: HabitProtocolSet,
-                                HabitStartDate: Calendar.current.startOfDay(for: HabitStartDateSet),
-                                HabitRepeatValue: HabitRepetitionSet,
-                                HabitDescription: HabitDescriptionSet,
-                                HabitReward: Int16(HabitRewardSet),
-                                HabitHasStatus: HabitHasStatusSet,
-                                HabitHasCheckbox: HabitHasCheckboxSet,
-                                HabitIsSubtask: HabitIsSubtaskSet,
-                                HabitSuperTask: HabitSuperTaskSet,
-                                
-                                HabitUseDow: HabitUseDOWSet,
-                                     
-                                HabitOnSun: HabitOnSunSet,
-                                HabitOnMon: HabitOnMonSet,
-                                HabitOnTues: HabitOnTuesSet,
-                                HabitOnWed: HabitOnWedSet,
-                                HabitOnThurs: HabitOnThursSet,
-                                HabitOnFri: HabitOnFriSet,
-                                HabitOnSat: HabitOnSatSet)
+//        let inputHabit:Habit = Habit(HabitName: HabitNameSet,
+//                                HabitGoal: HabitGoalSet,
+//                                HabitUnit: HabitUnitSet,
+//                                HabitProtocol: HabitProtocolSet,
+//                                HabitStartDate: Calendar.current.startOfDay(for: HabitStartDateSet),
+//                                HabitRepeatValue: HabitRepetitionSet,
+//                                HabitDescription: HabitDescriptionSet,
+//                                HabitReward: Int16(HabitRewardSet),
+//                                HabitHasStatus: HabitHasStatusSet,
+//                                HabitHasCheckbox: HabitHasCheckboxSet,
+//                                HabitIsSubtask: HabitIsSubtaskSet,
+//                                HabitSuperTask: HabitSuperTaskSet,
+//                                
+//                                HabitUseDow: HabitUseDOWSet,
+//                                     
+//                                HabitOnSun: HabitOnSunSet,
+//                                HabitOnMon: HabitOnMonSet,
+//                                HabitOnTues: HabitOnTuesSet,
+//                                HabitOnWed: HabitOnWedSet,
+//                                HabitOnThurs: HabitOnThursSet,
+//                                HabitOnFri: HabitOnFriSet,
+//                                HabitOnSat: HabitOnSatSet)
         
-        if var outData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") {
-
-            outData.append(inputHabit)
-            UserDefaults.standard.setEncodable(outData, forKey: "habitList")
-            
-        } else {
-
-            let initHabitList:[Habit] = [inputHabit]
-            UserDefaults.standard.setEncodable(initHabitList, forKey: "habitList")
+        let newHabitItem = HabitItem(context: viewContext)
+        
+        newHabitItem.name = HabitNameSet
+        newHabitItem.goal = HabitGoalSet
+        newHabitItem.unit = HabitUnitSet
+        newHabitItem.whichProtocol = HabitProtocolSet
+        newHabitItem.repeatValue = HabitRepetitionSet
+        newHabitItem.descript = HabitDescriptionSet
+        newHabitItem.startDate = Calendar.current.startOfDay(for: HabitStartDateSet)
+        newHabitItem.reward = HabitRewardSet
+        newHabitItem.hasStatus = HabitHasStatusSet
+        newHabitItem.hasCheckbox = HabitHasCheckboxSet
+                
+        newHabitItem.useDow = HabitUseDOWSet
+                
+        newHabitItem.onSun = HabitOnSunSet
+        newHabitItem.onMon = HabitOnMonSet
+        newHabitItem.onTues = HabitOnTuesSet
+        newHabitItem.onWed = HabitOnWedSet
+        newHabitItem.onThurs = HabitOnThursSet
+        newHabitItem.onFri = HabitOnFriSet
+        newHabitItem.onSat = HabitOnSatSet
+        
+        do {
+            try viewContext.save()
+        } catch {
+            let nsError = error as NSError
+            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
         }
         
-        if inputHabit.HabitUseDow == false {
+        
+        //Code To shove new habit on creation if the repetition matches properly
+        
+        if newHabitItem.useDow == false {
             
-            if (daysBetween(start: Calendar.current.startOfDay(for: inputHabit.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) >= 0)
-                && (daysBetween(start:  Calendar.current.startOfDay(for: inputHabit.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) % inputHabit.HabitRepeatValue == 0) {
+            if (daysBetween(start: Calendar.current.startOfDay(for: newHabitItem.startDate ?? Date()),end: Calendar.current.startOfDay(for: Date())) >= 0)
+                && (daysBetween(start:  Calendar.current.startOfDay(for: newHabitItem.startDate ?? Date()),end: Calendar.current.startOfDay(for: Date())) % Int(newHabitItem.repeatValue) == 0) {
                                         
                 let newItem = Item(context: viewContext)
                 newItem.timestamp = Date()
-                newItem.name = inputHabit.HabitName
-                newItem.goal = inputHabit.HabitGoal
-                newItem.unit = inputHabit.HabitUnit
-                newItem.whichProtocol = inputHabit.HabitProtocol
+                newItem.name = newHabitItem.name
+                newItem.goal = newHabitItem.goal
+                newItem.unit = newHabitItem.unit
+                newItem.whichProtocol = newHabitItem.whichProtocol
                 newItem.complete = false
-                newItem.reward = inputHabit.HabitReward
+                newItem.reward = newHabitItem.reward
                 newItem.id = UUID()
-                newItem.hasStatus = inputHabit.HabitHasStatus
-                newItem.hasCheckbox = inputHabit.HabitHasCheckbox
+                newItem.hasStatus = newHabitItem.hasStatus
+                newItem.hasCheckbox = newHabitItem.hasCheckbox
                 newItem.notFloater = true
 
             }
 
         } else {
             
-            if  (inputHabit.HabitOnMon == true && dayOfWeek == "Monday") ||
-                (inputHabit.HabitOnTues == true && dayOfWeek == "Tuesday") ||
-                (inputHabit.HabitOnWed == true && dayOfWeek == "Wednesday") ||
-                (inputHabit.HabitOnThurs == true && dayOfWeek == "Thursday") ||
-                (inputHabit.HabitOnFri == true && dayOfWeek == "Friday") ||
-                (inputHabit.HabitOnSat == true && dayOfWeek == "Saturday") ||
-                (inputHabit.HabitOnSun == true && dayOfWeek == "Sunday")
+            if  (newHabitItem.onMon == true && dayOfWeek == "Monday") ||
+                (newHabitItem.onTues == true && dayOfWeek == "Tuesday") ||
+                (newHabitItem.onWed == true && dayOfWeek == "Wednesday") ||
+                (newHabitItem.onThurs == true && dayOfWeek == "Thursday") ||
+                (newHabitItem.onFri == true && dayOfWeek == "Friday") ||
+                (newHabitItem.onSat == true && dayOfWeek == "Saturday") ||
+                (newHabitItem.onSun == true && dayOfWeek == "Sunday")
             {
                     
                 let newItem = Item(context: viewContext)
                 newItem.timestamp = Date()
-                newItem.name = inputHabit.HabitName
-                newItem.goal = inputHabit.HabitGoal
-                newItem.unit = inputHabit.HabitUnit
-                newItem.whichProtocol = inputHabit.HabitProtocol
+                newItem.name = newHabitItem.name
+                newItem.goal = newHabitItem.goal
+                newItem.unit = newHabitItem.unit
+                newItem.whichProtocol = newHabitItem.whichProtocol
                 newItem.complete = false
-                newItem.reward = inputHabit.HabitReward
+                newItem.reward = newHabitItem.reward
                 newItem.id = UUID()
-                newItem.hasStatus = inputHabit.HabitHasStatus
-                newItem.hasCheckbox = inputHabit.HabitHasCheckbox
+                newItem.hasStatus = newHabitItem.hasStatus
+                newItem.hasCheckbox = newHabitItem.hasCheckbox
                 newItem.notFloater = true
       
             }
@@ -746,17 +756,15 @@ struct HabitBuilderView: View {
         HabitOnFriSet = false
         HabitOnSatSet = false
         HabitOnSunSet = false
-        
-        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
-        
+                
         indexProtocols()
 
     }
 
     private func move(from source: IndexSet, to destination: Int) {
-        habitData.move(fromOffsets: source, toOffset: destination)
-        UserDefaults.standard.setEncodable(habitData, forKey: "habitList")
-        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+//        habitData.move(fromOffsets: source, toOffset: destination)
+//        UserDefaults.standard.setEncodable(habitData, forKey: "habitList")
+//        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
     }
 
 }
