@@ -229,7 +229,7 @@ struct HabitBuilderView: View {
                                                             Button{DisplayHabitEditor = true} label: {
                                                                 Text("Edit habit")
                                                             }
-                                                            Button{rmHabit(withUUID: habitNdx.id ?? UUID())} label: {
+                                                            Button{deleteEntityHab(withUUID: habitNdx.id ?? UUID(), viewContext: viewContext)} label: {
                                                                 Text("Remove this habit")
                                                             }
                                                         }
@@ -401,7 +401,7 @@ struct HabitBuilderView: View {
                                                         Button{DisplayHabitEditor = true} label: {
                                                             Text("Edit habit")
                                                         }
-                                                        Button{rmHabit(withUUID: habitNdx.id ?? UUID())} label: {
+                                                        Button{deleteEntityHab(withUUID: habitNdx.id ?? UUID(), viewContext: viewContext)} label: {
                                                             Text("Remove this habit")
                                                         }
                                                     }
@@ -599,24 +599,6 @@ struct HabitBuilderView: View {
     
     private func openHabitBuilder() {
         DisplayHabitMaker = true
-    }
-    
-    
-    
-    private func rmHabit(withUUID: UUID) {
-        let request: NSFetchRequest<HabitItem> = HabitItem.fetchRequest()
-        request.predicate = NSPredicate(format: "id == %@", withUUID as CVarArg)
-        request.fetchLimit = 1
-        
-        do {
-            let results = try viewContext.fetch(request)
-            if let entityToDelete = results.first {
-                viewContext.delete(entityToDelete)
-                try viewContext.save()
-            }
-        } catch {
-            print("Error deleting entity: \(error)")
-        }
     }
     
     

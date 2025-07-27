@@ -200,6 +200,9 @@ func scootItem(item: Item, viewContext: NSManagedObjectContext){
 
 
 
+
+
+
 // ---------------------------------------------------------------------------------------------------------------------
 // SET STATUS
 // ---------------------------------------------------------------------------------------------------------------------
@@ -234,6 +237,25 @@ func deleteEntity(withUUID uuid: UUID, viewContext: NSManagedObjectContext) {
         print("Error deleting entity: \(error)")
     }
 }
+
+func deleteEntityHab(withUUID uuid: UUID, viewContext: NSManagedObjectContext) {
+    // Create a fetch request for your entity
+    let request: NSFetchRequest<HabitItem> = HabitItem.fetchRequest()
+    request.predicate = NSPredicate(format: "id == %@", uuid as CVarArg)
+    request.fetchLimit = 1
+    
+    do {
+        let results = try viewContext.fetch(request)
+        if let entityToDelete = results.first {
+            viewContext.delete(entityToDelete)
+            try viewContext.save()
+        }
+    } catch {
+        print("Error deleting entity: \(error)")
+    }
+}
+
+
 
 func shuntTask (taskToShunt: Task, viewContext: NSManagedObjectContext) {
     

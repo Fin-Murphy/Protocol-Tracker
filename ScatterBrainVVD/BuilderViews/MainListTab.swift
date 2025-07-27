@@ -349,7 +349,7 @@ struct MainListTab: View {
                                         }
                                         .swipeActions(edge: .leading) {
                                             Button("Delete") {
-                                                deleteEntity(withUUID: item.id ?? UUID())
+                                                deleteEntity(withUUID: item.id ?? UUID(), viewContext: viewContext)
                                             }
                                             .tint(.red)
                                         }
@@ -383,7 +383,7 @@ struct MainListTab: View {
                                         }
                                         .swipeActions(edge: .leading) {
                                             Button("Delete") {
-                                                deleteEntity(withUUID: item.id ?? UUID())
+                                                deleteEntity(withUUID: item.id ?? UUID(), viewContext: viewContext)
                                             }
                                             .tint(.red)
                                         }
@@ -671,25 +671,6 @@ struct MainListTab: View {
 
     
     
-    private func deleteEntity(withUUID uuid: UUID) {
-        // Create a fetch request for your entity
-        let request: NSFetchRequest<Item> = Item.fetchRequest()
-        request.predicate = NSPredicate(format: "id == %@", uuid as CVarArg)
-        request.fetchLimit = 1
-        
-        do {
-            let results = try viewContext.fetch(request)
-            if let entityToDelete = results.first {
-                viewContext.delete(entityToDelete)
-                try viewContext.save()
-            }
-        } catch {
-            print("Error deleting entity: \(error)")
-        }
-    } //END FUNC DELETE ENTITY
-    
-    
-    
     // ---------------------------------------------------------------------------------------------------------------------
     // POPULATE TASKS
     // ---------------------------------------------------------------------------------------------------------------------
@@ -735,8 +716,10 @@ struct MainListTab: View {
             
             if index.useDow == false {
                 
-                if (daysBetween(start: Calendar.current.startOfDay(for: index.startDate ?? Date()),end: Calendar.current.startOfDay(for: Date())) >= 0)
-                    && (daysBetween(start:  Calendar.current.startOfDay(for: index.startDate ?? Date()),end: Calendar.current.startOfDay(for: Date())) % Int(index.repeatValue) == 0) {
+                if (daysBetween(start: Calendar.current.startOfDay(for: index.startDate ?? Date()),
+                                end: Calendar.current.startOfDay(for: Date())) >= 0)
+                    && (daysBetween(start:  Calendar.current.startOfDay(for: index.startDate ?? Date()),
+                                 end: Calendar.current.startOfDay(for: Date())) % Int(index.repeatValue) == 0) {
                                             
                     let newItem = Item(context: viewContext)
                     newItem.timestamp = Date()
@@ -800,9 +783,6 @@ struct MainListTab: View {
     // ---------------------------------------------------------------------------------------------------------------------
 
     
-    
-    
-    
     private func deshuntTask(item: Item) {
 //        print("Running deshunt for item \(item.name ?? "")")
 //            print("Successful!")
@@ -823,7 +803,7 @@ struct MainListTab: View {
                 let taskDataInitialzier: [Task] = [returnedTask]
                 UserDefaults.standard.setEncodable(taskDataInitialzier, forKey: "taskList")
             }
-            deleteEntity(withUUID: item.id ?? UUID())
+            deleteEntity(withUUID: item.id ?? UUID(), viewContext: viewContext)
     }
 }
 
