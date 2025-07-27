@@ -516,7 +516,7 @@ struct HabitBuilderView: View {
                                                 }
                                             }
                                         } else {}
-                                    }.onMove(perform: move) //Keep commented out for now, possibly problematic
+                                    }.onMove(perform: move)
                                     
                                 } // END ELSE (DISPLAY BY PROTOCOL)
                         
@@ -655,28 +655,6 @@ struct HabitBuilderView: View {
 ////            UserDefaults.standard.setEncodable(habitData, forKey: "habitList")
 //        } else {}
         
-//        let inputHabit:Habit = Habit(HabitName: HabitNameSet,
-//                                HabitGoal: HabitGoalSet,
-//                                HabitUnit: HabitUnitSet,
-//                                HabitProtocol: HabitProtocolSet,
-//                                HabitStartDate: Calendar.current.startOfDay(for: HabitStartDateSet),
-//                                HabitRepeatValue: HabitRepetitionSet,
-//                                HabitDescription: HabitDescriptionSet,
-//                                HabitReward: Int16(HabitRewardSet),
-//                                HabitHasStatus: HabitHasStatusSet,
-//                                HabitHasCheckbox: HabitHasCheckboxSet,
-//                                HabitIsSubtask: HabitIsSubtaskSet,
-//                                HabitSuperTask: HabitSuperTaskSet,
-//                                
-//                                HabitUseDow: HabitUseDOWSet,
-//                                     
-//                                HabitOnSun: HabitOnSunSet,
-//                                HabitOnMon: HabitOnMonSet,
-//                                HabitOnTues: HabitOnTuesSet,
-//                                HabitOnWed: HabitOnWedSet,
-//                                HabitOnThurs: HabitOnThursSet,
-//                                HabitOnFri: HabitOnFriSet,
-//                                HabitOnSat: HabitOnSatSet)
         
         let newHabitItem = HabitItem(context: viewContext)
         
