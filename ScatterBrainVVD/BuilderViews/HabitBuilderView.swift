@@ -18,9 +18,7 @@ struct HabitBuilderView: View {
     @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
 
     @Binding var selectedTab: Tabs
-    
-   // @State var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
-    
+        
     @State var DisplayHabitMaker: Bool = false
     @State var DisplayHabitEditor: Bool = false
     
