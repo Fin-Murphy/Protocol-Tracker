@@ -52,6 +52,8 @@ struct HabitBuilderView: View {
 
     @State var displayByProtocol: Bool = false
     
+    @State var listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol")
+    
 //    private var habLister: some View {
 //        ForEach($habitData){ superTaskHabit in
 //            
@@ -160,9 +162,10 @@ struct HabitBuilderView: View {
                             .padding(.bottom)
                     }
                 }.foregroundColor(ForeColor)
-                    Toggle("Display by Protocol", isOn: $displayByProtocol).frame(maxWidth: 210)
                 
-                if let listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") {
+                Toggle("Display by Protocol", isOn: $displayByProtocol).frame(maxWidth: 210)
+                
+//                if let listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") {
 
                 if habitData.isEmpty != true {
                     
@@ -170,56 +173,69 @@ struct HabitBuilderView: View {
                             
                             List {
                                 if displayByProtocol == true {
-                                    ForEach(listOfProtocols) { index in
-                                        
+                                    ForEach(listOfProtocols!) { index in
+//
                                         Text(index.ProtocolName)
                                             .font(.title2)
                                             .fontWeight(.bold)
-                                            .
-                                        
-                                        
-                                        
-                                        padding(.top)
-                                        
+                                            .padding(.top)
+//
                                         ForEach(habitData) { habitNdx in
-                                            
+//
                                             if habitNdx.whichProtocol == index.ProtocolName && habitNdx.isSubtask == false {
-                                                
+//
                                                 NavigationLink{
                                                     ZStack{
                                                         VStack {
-                                                   
-//                                                            HabitDetailView(habitNdx: habitNdx)
-                                                            
+                                                                                                           
                                                             List{
-                                                                Text(habitNdx.HabitName)
+                                                                Text(habitNdx.name ?? "")
                                                                     .font(.title)
                                                                     .padding()
-                                                                Text("Item is part of protocol \(habitNdx.whichProtocol).")
-                                                                Text("Item start date: \(habitNdx.startDate, formatter: itemFormatter)" )
-                                                                Text("Item goal value: \(habitNdx.goal) \(habitNdx.unit)" )
-                                                                Text("Item repeats every \(habitNdx.repeatValue) days." )
-                                                                Text("Item Description: \n\n \(habitNdx.descript)" )
-                                                                if habitNdx.hasSubtask == true {
-                                                                    Text("Subhabits:")
-                                                                    ForEach(habitData){ indexr in
-                                                                        if indexr.superTask == habitNdx.id {
-                                                                            Text(indexr.name)
-                                                                        }
-                                                                    }
+                                                                Text("Item is part of protocol \(habitNdx.whichProtocol ?? "").")
+                                                                Text("Item start date: \(habitNdx.startDate ?? Date(), formatter: itemFormatter)" )
+                                                                Text("Item goal value: \(habitNdx.goal) \(habitNdx.unit ?? "")" )
+                                                                
+                                                                if habitNdx.useDow == true {
+                                                                    
+                                                                    if habitNdx.onSun == true {Text("Item repeats on Sunday")} else {}
+                                                                    if habitNdx.onMon == true {Text("Item repeats on Monday")} else {}
+                                                                    if habitNdx.onTues == true {Text("Item repeats on Tuesday")} else {}
+                                                                    if habitNdx.onWed == true {Text("Item repeats on Wednesday")} else {}
+                                                                    if habitNdx.onThurs == true {Text("Item repeats on Thursday")} else {}
+                                                                    if habitNdx.onFri == true {Text("Item repeats on Friday")} else {}
+                                                                    if habitNdx.onSat == true {Text("Item repeats on Saturday")} else {}
+
+                                                                } else {
+                                                                    Text("Item repeats every \(habitNdx.repeatValue) days." )
                                                                 }
-                                                        }
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                Text("Item Description: \n\n \(habitNdx.descript ?? "")" )
+                                                                
+    //                                                            if habitNdx.hasSubtask == true {
+    //                                                                Text("Subhabits:")
+    //                                                                ForEach(habitData){ indexr in
+    //                                                                    if indexr.superTask == habitNdx.id {
+    //                                                                        Text(indexr.name)
+    //                                                                    }
+    //                                                                }
+    //                                                            }
+                                                                
+                                                            }
                                                                                                                     
                                                             Button{DisplayHabitEditor = true} label: {
                                                                 Text("Edit habit")
                                                             }
-                                                            Button{rmHabit(id: habitNdx.id)} label: {
+                                                            Button{rmHabit(withUUID: habitNdx.id ?? UUID())} label: {
                                                                 Text("Remove this habit")
                                                             }
                                                         }
-                                                        
+//
                                                         if DisplayHabitEditor == true {
-                                                            
+
                                                             Form {
 
                                                                 Section(header: Text("Habit Name:")) {
@@ -234,8 +250,8 @@ struct HabitBuilderView: View {
                                                                         TextField("", text: $HabitUnitSet)
                                                                     }
                                                                 }
-                                                                
-                                                                
+
+
                                                                 Toggle("Choose days of the week to repeat on?", isOn: $HabitUseDOWSet)
                                                                 if HabitUseDOWSet == true {
                                                                     Toggle("Repeat on Sunday", isOn: $HabitOnSunSet)
@@ -250,13 +266,13 @@ struct HabitBuilderView: View {
                                                                         TextField("", value: $HabitRepetitionSet, format: .number)
                                                                     }
                                                                 }
-                                                                
+
                                                                 Section(header: Text("Habit Protocol:")) {
                                                                     TextField("", text: $HabitProtocolSet)
                                                                 }
-                                                                
-                                                          
-                                                                
+
+
+
                                                                 Section(header: Text("Habit Details")) {
                                                                     TextEditor(text: $HabitDescriptionSet)
                                                                         .frame(minHeight: 100)
@@ -278,55 +294,63 @@ struct HabitBuilderView: View {
                                                                 Section {
                                                                     Button {
                                                                         //------------------------------------
+                                                                        //Keep commented out for now, possibly problematic
                                                                         updateHabit(habitToEdit: habitNdx)
                                                                         //------------------------------------
                                                                         DisplayHabitEditor = false
                                                                         indexProtocols()
-                                                                        
+
                                                                         //crap commit
                                                                     } label: {Text("Save Habit")}
                                                                 }
                                                             }
                                                             .onAppear{
-                                                                HabitNameSet = habitNdx.name
-                                                                HabitGoalSet = habitNdx.goal
-                                                                HabitUnitSet = habitNdx.unit
-                                                                HabitProtocolSet = habitNdx.whichProtocol
-                                                                HabitRepetitionSet = habitNdx.repeatValue
-                                                                HabitDescriptionSet = habitNdx.descript
-                                                                HabitStartDateSet = habitNdx.startDate
-                                                                HabitRewardSet = habitNdx.reward
-                                                                HabitHasCheckboxSet = habitNdx.hasCheckbox
-                                                                HabitHasStatusSet = habitNdx.hasStatus
-                                                                
-                                                                HabitUseDOWSet = habitNdx.useDow
-                                                                
-                                                                HabitOnSunSet = habitNdx.OnSun
-                                                                HabitOnMonSet = habitNdx.OnMon
-                                                                HabitOnTuesSet = habitNdx.OnTues
-                                                                HabitOnWedSet = habitNdx.OnWed
-                                                                HabitOnThursSet = habitNdx.OnThurs
-                                                                HabitOnFriSet = habitNdx.OnFri
-                                                                HabitOnSatSet = habitNdx.OnSat
-                                                                
+
+                                                                //Keep commented out for now, possibly problematic
+
+
+//
+                                                        HabitNameSet = habitNdx.name ?? ""
+                                                        HabitGoalSet = habitNdx.goal
+                                                        HabitUnitSet = habitNdx.unit ?? "unit"
+                                                        HabitProtocolSet = habitNdx.whichProtocol ?? "Daily"
+                                                        HabitRepetitionSet = habitNdx.repeatValue
+                                                        HabitDescriptionSet = habitNdx.descript ?? ""
+                                                        HabitStartDateSet = habitNdx.startDate ?? Date()
+                                                        HabitRewardSet = habitNdx.reward
+                                                        HabitHasCheckboxSet = habitNdx.hasCheckbox
+                                                        HabitHasStatusSet = habitNdx.hasStatus
+//
+                                                        HabitUseDOWSet = habitNdx.useDow
+//
+                                                        HabitOnSunSet = habitNdx.onSun
+                                                        HabitOnMonSet = habitNdx.onMon
+                                                        HabitOnTuesSet = habitNdx.onTues
+                                                        HabitOnWedSet = habitNdx.onWed
+                                                        HabitOnThursSet = habitNdx.onThurs
+                                                        HabitOnFriSet = habitNdx.onFri
+                                                        HabitOnSatSet = habitNdx.onSat//
+//
                                                             }
-                                                            
+
                                                         } else {}
                                                     }
                                                 } label: {
                                                     HStack {
                                                         //-----------------------------------------------------
-                                                        Text(habitNdx.name)
-                                                        
+                                                        Text(habitNdx.name ?? "")
+
                                                         Spacer()
-                                                        
-                                                        Text("\(habitNdx.goal) \(habitNdx.unit)")
+
+                                                        Text("\(habitNdx.goal) \(habitNdx.unit ?? "")")
                                                         //-----------------------------------------------------
                                                     }
                                                 }
                                             } else {}
                                         }.onMove(perform: move)
                                     }
+                                    
+                                    
                                 } else {
                                     
                                     ForEach(habitData) { habitNdx in
@@ -336,16 +360,14 @@ struct HabitBuilderView: View {
                                             NavigationLink{
                                                 ZStack{
                                                     VStack {
-                                               
-//                                                        HabitDetailView(habitNdx: habitNdx)
-                                                        
+                                                                                                       
                                                         List{
-                                                            Text(habitNdx.name)
+                                                            Text(habitNdx.name ?? "")
                                                                 .font(.title)
                                                                 .padding()
-                                                            Text("Item is part of protocol \(habitNdx.whichProtocol).")
-                                                            Text("Item start date: \(habitNdx.startDate, formatter: itemFormatter)" )
-                                                            Text("Item goal value: \(habitNdx.goal) \(habitNdx.unit)" )
+                                                            Text("Item is part of protocol \(habitNdx.whichProtocol ?? "").")
+                                                            Text("Item start date: \(habitNdx.startDate ?? Date(), formatter: itemFormatter)" )
+                                                            Text("Item goal value: \(habitNdx.goal) \(habitNdx.unit ?? "")" )
                                                             
                                                             if habitNdx.useDow == true {
                                                                 
@@ -364,21 +386,23 @@ struct HabitBuilderView: View {
                                                             
                                                             
                                                             
-                                                            Text("Item Description: \n\n \(habitNdx.descript)" )
-                                                            if habitNdx.hasSubtask == true {
-                                                                Text("Subhabits:")
-                                                                ForEach(habitData){ indexr in
-                                                                    if indexr.superTask == habitNdx.id {
-                                                                        Text(indexr.name)
-                                                                    }
-                                                                }
-                                                            }
+                                                            Text("Item Description: \n\n \(habitNdx.descript ?? "")" )
+                                                            
+//                                                            if habitNdx.hasSubtask == true {
+//                                                                Text("Subhabits:")
+//                                                                ForEach(habitData){ indexr in
+//                                                                    if indexr.superTask == habitNdx.id {
+//                                                                        Text(indexr.name)
+//                                                                    }
+//                                                                }
+//                                                            }
+                                                            
                                                         }
                                                                                                                 
                                                         Button{DisplayHabitEditor = true} label: {
                                                             Text("Edit habit")
                                                         }
-                                                        Button{rmHabit(id: habitNdx.id)} label: {
+                                                        Button{rmHabit(withUUID: habitNdx.id ?? UUID())} label: {
                                                             Text("Remove this habit")
                                                         }
                                                     }
@@ -443,6 +467,7 @@ struct HabitBuilderView: View {
                                                             Section {
                                                                 Button {
                                                                     //------------------------------------
+                                                                    //Keep commented out for now, possibly problematic
                                                                     updateHabit(habitToEdit: habitNdx)
                                                                     //------------------------------------
                                                                     DisplayHabitEditor = false
@@ -453,45 +478,47 @@ struct HabitBuilderView: View {
                                                             }
                                                         }
                                                         .onAppear{
-                                                            HabitNameSet = habitNdx.name
+                                                            
+                                                            
+                                                            HabitNameSet = habitNdx.name ?? ""
                                                             HabitGoalSet = habitNdx.goal
-                                                            HabitUnitSet = habitNdx.unit
-                                                            HabitProtocolSet = habitNdx.whichProtocol
+                                                            HabitUnitSet = habitNdx.unit ?? "unit"
+                                                            HabitProtocolSet = habitNdx.whichProtocol ?? "Daily"
                                                             HabitRepetitionSet = habitNdx.repeatValue
-                                                            HabitDescriptionSet = habitNdx.descript
-                                                            HabitStartDateSet = habitNdx.startDate
+                                                            HabitDescriptionSet = habitNdx.descript ?? ""
+                                                            HabitStartDateSet = habitNdx.startDate ?? Date()
                                                             HabitRewardSet = habitNdx.reward
                                                             HabitHasCheckboxSet = habitNdx.hasCheckbox
                                                             HabitHasStatusSet = habitNdx.hasStatus
-                                                            
+//                                                            
                                                             HabitUseDOWSet = habitNdx.useDow
-                                                            
-                                                            HabitOnSunSet = habitNdx.OnSun
-                                                            HabitOnMonSet = habitNdx.OnMon
-                                                            HabitOnTuesSet = habitNdx.OnTues
-                                                            HabitOnWedSet = habitNdx.OnWed
-                                                            HabitOnThursSet = habitNdx.OnThurs
-                                                            HabitOnFriSet = habitNdx.OnFri
-                                                            HabitOnSatSet = habitNdx.OnSat
+//                                                            
+                                                            HabitOnSunSet = habitNdx.onSun
+                                                            HabitOnMonSet = habitNdx.onMon
+                                                            HabitOnTuesSet = habitNdx.onTues
+                                                            HabitOnWedSet = habitNdx.onWed
+                                                            HabitOnThursSet = habitNdx.onThurs
+                                                            HabitOnFriSet = habitNdx.onFri
+                                                            HabitOnSatSet = habitNdx.onSat
                                                             
                                                         }
                                                     } else {}
-                                                }
+                                                }// end zstack
                                             } label: {
                                                 HStack {
                                                     //-----------------------------------------------------
-                                                    Text(habitNdx.name)
+                                                    Text(habitNdx.name ?? "")
                                                     
                                                     Spacer()
                                                     
-                                                    Text("\(habitNdx.goal) \(habitNdx.unit)")
+                                                    Text("\(habitNdx.goal) \(habitNdx.unit ?? "")")
                                                     //-----------------------------------------------------
                                                 }
                                             }
                                         } else {}
-                                    }.onMove(perform: move)
+                                    }.onMove(perform: move) //Keep commented out for now, possibly problematic
                                     
-                                }
+                                } // END ELSE (DISPLAY BY PROTOCOL)
                         
                             }
 //                            .toolbar {
@@ -501,7 +528,8 @@ struct HabitBuilderView: View {
                     
                     
                     } else {Text("No Habits")}
-                }
+//                } // END PROT LIST CONDITIONAL
+                
             }
             
             if DisplayHabitMaker == true {
@@ -513,7 +541,7 @@ struct HabitBuilderView: View {
                         closeButton
                     }.padding()
 
-                    habitBuilderForm
+                   habitBuilderForm
                     
                 } // VSTACK
                 .frame(width:300,height:700)
@@ -576,10 +604,9 @@ struct HabitBuilderView: View {
     
     
     
-    private func rmHabit(withUUID uuid: UUID) {
-        // Create a fetch request for your entity
-        let request: NSFetchRequest<Item> = Item.fetchRequest()
-        request.predicate = NSPredicate(format: "id == %@", uuid as CVarArg)
+    private func rmHabit(withUUID: UUID) {
+        let request: NSFetchRequest<HabitItem> = HabitItem.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", withUUID as CVarArg)
         request.fetchLimit = 1
         
         do {
