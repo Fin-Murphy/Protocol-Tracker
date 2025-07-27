@@ -241,7 +241,7 @@ struct MainListTab: View {
     // STATES
     // ---------------------------------------------------------------------------------------------------------------------
 
-    @State var habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []  // MAKE BINDING
+//    @State var habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []  // MAKE BINDING
 
     @State var updateItemStatus: Int16 = 0
 
@@ -265,7 +265,7 @@ struct MainListTab: View {
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \HabitItem.name, ascending: true)],
         animation: .default)
-    private var habits: FetchedResults<HabitItem>
+    private var habitData: FetchedResults<HabitItem>
 
     
     
@@ -715,7 +715,7 @@ struct MainListTab: View {
         // Add functionality for DOW repetition instead of just interval repetition 
         
         //Factor this out into seperate functions?
-        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+//        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
         
         for taskFinder in items {
             if (taskFinder.isTask == true) && (Calendar.current.isDate((taskFinder.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) != true) && (taskFinder.complete == false) && (taskFinder.notFloater == true){
@@ -728,53 +728,53 @@ struct MainListTab: View {
         shuntTodaysTasks(viewContext: viewContext)
         
         for index in habitData {
-            print("\(index.HabitName) - \(daysBetween(start: index.HabitStartDate,end: Calendar.current.startOfDay(for: Date())))")
+            print("\(index.name ?? "") - \(daysBetween(start: index.startDate ?? Date(),end: Calendar.current.startOfDay(for: Date())))")
         }
         
         for index in habitData {
             
-            if index.HabitUseDow == false {
+            if index.useDow == false {
                 
-                if (daysBetween(start: Calendar.current.startOfDay(for: index.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) >= 0)
-                    && (daysBetween(start:  Calendar.current.startOfDay(for: index.HabitStartDate),end: Calendar.current.startOfDay(for: Date())) % index.HabitRepeatValue == 0) {
+                if (daysBetween(start: Calendar.current.startOfDay(for: index.startDate ?? Date()),end: Calendar.current.startOfDay(for: Date())) >= 0)
+                    && (daysBetween(start:  Calendar.current.startOfDay(for: index.startDate ?? Date()),end: Calendar.current.startOfDay(for: Date())) % Int(index.repeatValue) == 0) {
                                             
                     let newItem = Item(context: viewContext)
                     newItem.timestamp = Date()
-                    newItem.name = index.HabitName
-                    newItem.goal = index.HabitGoal
-                    newItem.unit = index.HabitUnit
-                    newItem.whichProtocol = index.HabitProtocol
+                    newItem.name = index.name
+                    newItem.goal = index.goal
+                    newItem.unit = index.unit
+                    newItem.whichProtocol = index.whichProtocol
                     newItem.complete = false
-                    newItem.reward = index.HabitReward
+                    newItem.reward = index.reward
                     newItem.id = UUID()
-                    newItem.hasStatus = index.HabitHasStatus
-                    newItem.hasCheckbox = index.HabitHasCheckbox
+                    newItem.hasStatus = index.hasStatus
+                    newItem.hasCheckbox = index.hasCheckbox
                     newItem.notFloater = true
 
                 }
 
             } else {
                 
-                if  (index.HabitOnMon == true && dayOfWeek == "Monday") ||
-                    (index.HabitOnTues == true && dayOfWeek == "Tuesday") ||
-                    (index.HabitOnWed == true && dayOfWeek == "Wednesday") ||
-                    (index.HabitOnThurs == true && dayOfWeek == "Thursday") ||
-                    (index.HabitOnFri == true && dayOfWeek == "Friday") ||
-                    (index.HabitOnSat == true && dayOfWeek == "Saturday") ||
-                    (index.HabitOnSun == true && dayOfWeek == "Sunday")
+                if  (index.onMon == true && dayOfWeek == "Monday") ||
+                    (index.onTues == true && dayOfWeek == "Tuesday") ||
+                    (index.onWed == true && dayOfWeek == "Wednesday") ||
+                    (index.onThurs == true && dayOfWeek == "Thursday") ||
+                    (index.onFri == true && dayOfWeek == "Friday") ||
+                    (index.onSat == true && dayOfWeek == "Saturday") ||
+                    (index.onSun == true && dayOfWeek == "Sunday")
                 {
                         
                     let newItem = Item(context: viewContext)
                     newItem.timestamp = Date()
-                    newItem.name = index.HabitName
-                    newItem.goal = index.HabitGoal
-                    newItem.unit = index.HabitUnit
-                    newItem.whichProtocol = index.HabitProtocol
+                    newItem.name = index.name
+                    newItem.goal = index.goal
+                    newItem.unit = index.unit
+                    newItem.whichProtocol = index.whichProtocol
                     newItem.complete = false
-                    newItem.reward = index.HabitReward
+                    newItem.reward = index.reward
                     newItem.id = UUID()
-                    newItem.hasStatus = index.HabitHasStatus
-                    newItem.hasCheckbox = index.HabitHasCheckbox
+                    newItem.hasStatus = index.hasStatus
+                    newItem.hasCheckbox = index.hasCheckbox
                     newItem.notFloater = true
           
                 }

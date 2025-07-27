@@ -308,7 +308,6 @@ struct HabitBuilderView: View {
 
                                                                 //Keep commented out for now, possibly problematic
 
-
 //
                                                         HabitNameSet = habitNdx.name ?? ""
                                                         HabitGoalSet = habitNdx.goal
@@ -657,6 +656,8 @@ struct HabitBuilderView: View {
         
         
         let newHabitItem = HabitItem(context: viewContext)
+        
+        newHabitItem.id = UUID()
         
         newHabitItem.name = HabitNameSet
         newHabitItem.goal = HabitGoalSet
