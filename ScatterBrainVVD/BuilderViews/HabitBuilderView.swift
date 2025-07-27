@@ -596,14 +596,6 @@ struct HabitBuilderView: View {
     }
     
 
-    
-    private func openHabitBuilder() {
-        DisplayHabitMaker = true
-    }
-    
-    
-    
-
     private func addItem() {
         
         let date = Date()
