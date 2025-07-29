@@ -11,9 +11,9 @@ import CoreData
 struct TaskBuilderView: View {
     
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \HabitItem.name, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \TaskItem.name, ascending: true)],
         animation: .default)
-    private var habitData: FetchedResults<HabitItem>
+    private var taskData: FetchedResults<TaskItem>
     
     @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
 
@@ -30,14 +30,6 @@ struct TaskBuilderView: View {
     @State var TaskGoalSet: Int16 = 1
     @State var TaskHasCheckboxSet: Bool = true
     @State var TaskIsntFloatingSet: Bool = true
-    
-    
-    //refactor to CoreData
-    
-    //Build CoreData item for taskData first
-    @State var taskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
-    
-
     
     
     var body: some View {
@@ -78,15 +70,15 @@ struct TaskBuilderView: View {
                                         VStack{
                                             
                                             List {
-                                                Text(taskNdx.TaskName)
+                                                Text(taskNdx.name ?? "")
                                                     .font(.title)
                                                     .padding()
-                                                Text("Item goal: \(taskNdx.TaskGoal) \(taskNdx.TaskUnit)" )
-                                                Text("Item due date: \(taskNdx.TaskDueDate, formatter: itemFormatter)")
+                                                Text("Item goal: \(taskNdx.goal) \(taskNdx.unit ?? "")" )
+                                                Text("Item due date: \(taskNdx.dueDate ?? Date(), formatter: itemFormatter)")
                                                 Section {
                                                     Text("Item Description: \n")
                                                         .font(.title2)
-                                                    Text("\(taskNdx.TaskDescription)" )
+                                                    Text("\(taskNdx.descript)" )
                                                 }
                                             }
                                                 
@@ -101,14 +93,13 @@ struct TaskBuilderView: View {
                                             
                                             Button{
                                                 shuntTask(taskToShunt: taskNdx, viewContext: viewContext)
-                                                taskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
+//                                                taskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
                                             } label: {
                                                 Text("Shunt Task").bckMod()
                                             }
                                             
                                             Button{
                                                 rmTask(id: taskNdx.id)
-                                                //                                        selectedTab = .HUB
                                             } label: {
                                                 Text("Remove this task").bckMod()
                                             }
@@ -164,7 +155,7 @@ struct TaskBuilderView: View {
                                                     Section{
                                                         Button{
                                                             DisplayTaskEditor = false
-                                                            updateTask(taskToEdit: taskNdx.id)
+                                                            updateTask(taskToEdit: taskNdx)
                                                             
                                                         } label: {
                                                             Text("Save Habit")
@@ -174,14 +165,14 @@ struct TaskBuilderView: View {
                                                     
                                                 }.onAppear{
                                                     
-                                                    TaskNameSet = taskNdx.TaskName
-                                                    TaskDescriptionSet = taskNdx.TaskDescription
-                                                    TaskRewardSet = taskNdx.TaskReward
-                                                    TaskDueDateSet = taskNdx.TaskDueDate
-                                                    TaskUnitSet = taskNdx.TaskUnit
-                                                    TaskGoalSet = taskNdx.TaskGoal
-                                                    TaskHasCheckboxSet = taskNdx.TaskHasCheckbox
-                                                    TaskIsntFloatingSet = taskNdx.TaskNotFloater
+                                                    TaskNameSet = taskNdx.name
+                                                    TaskDescriptionSet = taskNdx.descript
+                                                    TaskRewardSet = taskNdx.reward
+                                                    TaskDueDateSet = taskNdx.dueDate
+                                                    TaskUnitSet = taskNdx.unit
+                                                    TaskGoalSet = taskNdx.goal
+                                                    TaskHasCheckboxSet = taskNdx.hasCheckbox
+                                                    TaskIsntFloatingSet = taskNdx.notFloater
                                                     
                                                 }
                                             }
@@ -190,7 +181,7 @@ struct TaskBuilderView: View {
                                     }
                                     
                                 } label: {
-                                    Text(taskNdx.TaskName)
+                                    Text(taskNdx.name ?? "")
                                     
                                 }
                                 
@@ -288,60 +279,76 @@ struct TaskBuilderView: View {
                   ADD TASK
      ------------------------------------------------     */
     
-    private func updateTask(taskToEdit: UUID) {
+    private func updateTask(taskToEdit: TaskItem) {
         
-        var taskDataIteratorList: [Task] = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
-        
-        for ndx in 0..<taskDataIteratorList.count {
-            if taskDataIteratorList[ndx].id == taskToEdit {
-                taskDataIteratorList[ndx].TaskName = TaskNameSet
-                taskDataIteratorList[ndx].TaskGoal = TaskGoalSet
-                taskDataIteratorList[ndx].TaskUnit = TaskUnitSet
-                taskDataIteratorList[ndx].TaskDescription = TaskDescriptionSet
-                taskDataIteratorList[ndx].TaskDueDate = TaskDueDateSet
-                taskDataIteratorList[ndx].TaskReward = TaskRewardSet
-                taskDataIteratorList[ndx].TaskHasCheckbox = TaskHasCheckboxSet
+//        var taskDataIteratorList: [Task] = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
+         
+//        for ndx in 0..<taskDataIteratorList.count {
+//            if taskDataIteratorList[ndx].id == taskToEdit {
                 
-                if taskDataIteratorList[ndx].TaskHasCheckbox == true {
-                    taskDataIteratorList[ndx].TaskGoal = 1
-                    taskDataIteratorList[ndx].TaskUnit = "units"
+                
+        taskToEdit.name = TaskNameSet
+        taskToEdit.goal = TaskGoalSet
+        taskToEdit.unit = TaskUnitSet
+        taskToEdit.descript = TaskDescriptionSet
+        taskToEdit.dueDate = TaskDueDateSet
+        taskToEdit.reward = TaskRewardSet
+        taskToEdit.hasCheckbox = TaskHasCheckboxSet
+                
+        if taskToEdit.hasCheckbox == true {
+            taskToEdit.goal = 1
+            taskToEdit.unit = "units"
 
-                }
-            }
         }
         
-        UserDefaults.standard.setEncodable(taskDataIteratorList, forKey: "taskList")
-        taskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
+        do {
+            try viewContext.save()
+        } catch {
+            let nsError = error as NSError
+            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        }
         
+        
+//            }
+//        }
+//        
+//        UserDefaults.standard.setEncodable(taskDataIteratorList, forKey: "taskList")
+//        taskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
+//        
     }
     
     
         
     private func addTask() {
         
-        let inputTask:Task = Task(TaskName: TaskNameSet,
-                                    TaskDescription: TaskDescriptionSet,
-                                    TaskReward: TaskRewardSet,
-                                    TaskDueDate: TaskDueDateSet,
-                                    TaskUnit: TaskUnitSet,
-                                    TaskGoal: TaskGoalSet,
-                                    TaskHasCheckbox: TaskHasCheckboxSet,
-                                    TaskNotFloater: TaskIsntFloatingSet)
-        
-        if var outTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") {
-
-            outTaskData.append(inputTask)
-            UserDefaults.standard.setEncodable(outTaskData, forKey: "taskList")
-            
-        } else {
-
-            let initTaskList:[Task] = [inputTask]
-            UserDefaults.standard.setEncodable(initTaskList, forKey: "taskList")
+        if TaskHasCheckboxSet == true {
+            TaskGoalSet = 1
         }
+        
+        let newTaskItem = TaskItem(context: viewContext)
+        
+        newTaskItem.id = UUID()
+        
+        newTaskItem.name = TaskNameSet
+        newTaskItem.goal = TaskGoalSet
+        newTaskItem.unit = TaskUnitSet
+        newTaskItem.descript = TaskDescriptionSet
+        newTaskItem.reward = TaskRewardSet
+        newTaskItem.dueDate = TaskDueDateSet
+        newTaskItem.hasCheckbox = TaskHasCheckboxSet
+        newTaskItem.notFloater = TaskIsntFloatingSet
+
+        do {
+            try viewContext.save()
+        } catch {
+            let nsError = error as NSError
+            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        }
+        
         
         DisplayTaskMaker = false
         TaskNameSet = "Task"
-        TaskDescriptionSet = "This is a Task"
+        TaskDescriptionSet = ""
         TaskRewardSet = 1
         TaskDueDateSet = Date()
         TaskUnitSet = "units"
@@ -349,11 +356,8 @@ struct TaskBuilderView: View {
         TaskHasCheckboxSet = true
         TaskIsntFloatingSet = true
         
-        
         shuntTodaysTasks(viewContext: viewContext)
-        
-        taskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
-
+     
     }
     
 
