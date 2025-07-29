@@ -34,7 +34,7 @@ struct TaskBuilderView: View {
     
     //refactor to CoreData
     
-    //Build CoreData item for taskData first 
+    //Build CoreData item for taskData first
     @State var taskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
     
 
