@@ -309,12 +309,7 @@ struct TaskBuilderView: View {
         }
         
         
-//            }
-//        }
-//        
-//        UserDefaults.standard.setEncodable(taskDataIteratorList, forKey: "taskList")
-//        taskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
-//        
+
     }
     
     
