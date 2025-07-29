@@ -66,7 +66,7 @@ struct ContentView: View {
 ****************************************************** */
             } else if selectedTab == .Goals {
                 
-                TaskBuilderView(context: _viewContext, selectedTab: $selectedTab)
+                TaskBuilderView(viewContext: _viewContext, selectedTab: $selectedTab)
                 
 /* *******************************************************
             MAIN TASK TAB

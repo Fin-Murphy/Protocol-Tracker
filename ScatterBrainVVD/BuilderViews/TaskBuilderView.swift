@@ -10,7 +10,12 @@ import CoreData
 
 struct TaskBuilderView: View {
     
-    @Environment(\.managedObjectContext) var context: NSManagedObjectContext
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \HabitItem.name, ascending: true)],
+        animation: .default)
+    private var habitData: FetchedResults<HabitItem>
+    
+    @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
 
     @Binding var selectedTab: Tabs
     
@@ -26,7 +31,11 @@ struct TaskBuilderView: View {
     @State var TaskHasCheckboxSet: Bool = true
     @State var TaskIsntFloatingSet: Bool = true
     
-    @State var ProtocolTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
+    
+    //refactor to CoreData
+    
+    //Build CoreData item for taskData first 
+    @State var taskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
     
 
     
@@ -56,11 +65,11 @@ struct TaskBuilderView: View {
                     
                 }.foregroundColor(ForeColor)
                 
-                if ProtocolTaskData.isEmpty == false {
+                if taskData.isEmpty == false {
                 
                     NavigationView {
                         List{
-                            ForEach(ProtocolTaskData) { taskNdx in
+                            ForEach(taskData) { taskNdx in
                                 
                                 NavigationLink{
                                     
@@ -91,8 +100,8 @@ struct TaskBuilderView: View {
                                             }
                                             
                                             Button{
-                                                shuntTask(taskToShunt: taskNdx, viewContext: context)
-                                                ProtocolTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
+                                                shuntTask(taskToShunt: taskNdx, viewContext: viewContext)
+                                                taskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
                                             } label: {
                                                 Text("Shunt Task").bckMod()
                                             }
@@ -302,7 +311,7 @@ struct TaskBuilderView: View {
         }
         
         UserDefaults.standard.setEncodable(taskDataIteratorList, forKey: "taskList")
-        ProtocolTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
+        taskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
         
     }
     
@@ -341,9 +350,9 @@ struct TaskBuilderView: View {
         TaskIsntFloatingSet = true
         
         
-        shuntTodaysTasks(viewContext: context)
+        shuntTodaysTasks(viewContext: viewContext)
         
-        ProtocolTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
+        taskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
 
     }
     

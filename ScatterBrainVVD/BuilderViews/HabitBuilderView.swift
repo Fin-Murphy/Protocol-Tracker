@@ -593,6 +593,7 @@ struct HabitBuilderView: View {
         
     }
     
+    
 
     private func addItem() {
         
@@ -709,8 +710,6 @@ struct HabitBuilderView: View {
             }
             
         }
-
-        
         
         
         DisplayHabitMaker = false
@@ -740,7 +739,14 @@ struct HabitBuilderView: View {
     }
 
     private func move(from source: IndexSet, to destination: Int) {
-//        habitData.move(fromOffsets: source, toOffset: destination)
+//        $habitData.move(fromOffsets: source, toOffset: destination)
+//        
+//        do {
+//            try viewContext.save()
+//        } catch {
+//            let nsError = error as NSError
+//            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+//        }
 //        UserDefaults.standard.setEncodable(habitData, forKey: "habitList")
 //        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
     }
