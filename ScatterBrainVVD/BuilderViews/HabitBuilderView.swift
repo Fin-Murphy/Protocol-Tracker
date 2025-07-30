@@ -227,7 +227,7 @@ struct HabitBuilderView: View {
                                                             Button{DisplayHabitEditor = true} label: {
                                                                 Text("Edit habit")
                                                             }
-                                                            Button{deleteEntityHab(withUUID: habitNdx.id ?? UUID(), viewContext: viewContext)} label: {
+                                                            Button{deleteEntityHabit(withUUID: habitNdx.id ?? UUID(), viewContext: viewContext)} label: {
                                                                 Text("Remove this habit")
                                                             }
                                                         }
@@ -399,7 +399,7 @@ struct HabitBuilderView: View {
                                                         Button{DisplayHabitEditor = true} label: {
                                                             Text("Edit habit")
                                                         }
-                                                        Button{deleteEntityHab(withUUID: habitNdx.id ?? UUID(), viewContext: viewContext)} label: {
+                                                        Button{deleteEntityHabit(withUUID: habitNdx.id ?? UUID(), viewContext: viewContext)} label: {
                                                             Text("Remove this habit")
                                                         }
                                                     }

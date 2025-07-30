@@ -27,7 +27,10 @@ struct PersistenceController {
         newItem.hasStatus = true
         
         let newHabitItem = HabitItem(context: viewContext)
-        newHabitItem.name = "Glitch prevention item"
+        newHabitItem.name = "Glitch prevention Habit"
+
+        let newTaskItem = TaskItem(context: viewContext)
+        newTaskItem.name = "Glitch prevention Task"
 
 
             

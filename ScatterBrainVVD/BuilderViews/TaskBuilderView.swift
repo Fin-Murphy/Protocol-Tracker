@@ -56,17 +56,17 @@ struct TaskBuilderView: View {
                     
                     
                 }.foregroundColor(ForeColor)
-                
+//                
                 if taskData.isEmpty == false {
-                
+//                
                     NavigationView {
                         List{
                             ForEach(taskData) { taskNdx in
-                                
+//                                
                                 NavigationLink{
-                                    
+//                                    
                                     ZStack {
-                                        
+//                                        
                                         VStack{
                                             
                                             List {
@@ -78,7 +78,7 @@ struct TaskBuilderView: View {
                                                 Section {
                                                     Text("Item Description: \n")
                                                         .font(.title2)
-                                                    Text("\(taskNdx.descript)" )
+                                                    Text("\(String(describing: taskNdx.descript))" )
                                                 }
                                             }
                                                 
@@ -99,7 +99,7 @@ struct TaskBuilderView: View {
                                             }
                                             
                                             Button{
-                                                rmTask(id: taskNdx.id)
+                                                deleteEntityTask(withUUID: taskNdx.id ?? UUID(), viewContext: viewContext)
                                             } label: {
                                                 Text("Remove this task").bckMod()
                                             }
@@ -116,7 +116,7 @@ struct TaskBuilderView: View {
                                                 Form {
                                                     
                                                     Section(header: Text("Task Name:")) {
-                                                        TextField("", text: $TaskNameSet).ignoresSafeArea(.keyboard)
+                                                        TextField("", text: $TaskNameSet)
                                                     }
                                                     Toggle("Use checkbox instead of units", isOn: $TaskHasCheckboxSet)
                                                     if TaskHasCheckboxSet == false {
@@ -165,11 +165,11 @@ struct TaskBuilderView: View {
                                                     
                                                 }.onAppear{
                                                     
-                                                    TaskNameSet = taskNdx.name
-                                                    TaskDescriptionSet = taskNdx.descript
+                                                    TaskNameSet = taskNdx.name ?? ""
+                                                    TaskDescriptionSet = taskNdx.descript ?? ""
                                                     TaskRewardSet = taskNdx.reward
-                                                    TaskDueDateSet = taskNdx.dueDate
-                                                    TaskUnitSet = taskNdx.unit
+                                                    TaskDueDateSet = taskNdx.dueDate ?? Date()
+                                                    TaskUnitSet = taskNdx.unit ?? ""
                                                     TaskGoalSet = taskNdx.goal
                                                     TaskHasCheckboxSet = taskNdx.hasCheckbox
                                                     TaskIsntFloatingSet = taskNdx.notFloater
@@ -177,17 +177,17 @@ struct TaskBuilderView: View {
                                                 }
                                             }
                                         } else {}
-                                        
+//                                        
                                     }
-                                    
+//                                    
                                 } label: {
                                     Text(taskNdx.name ?? "")
                                     
                                 }
-                                
-                                
-                                
-                                
+//                                
+//                                
+//                                
+//                                
                             }
                         }
                     }
@@ -197,7 +197,7 @@ struct TaskBuilderView: View {
                         .foregroundColor(ForeColor)
                 }
                 
-            }
+            } // End Vstack
             
             if DisplayTaskMaker == true {
                 
@@ -216,7 +216,7 @@ struct TaskBuilderView: View {
                     Form {
                         
                         Section(header: Text("Task Name:")) {
-                            TextField("", text: $TaskNameSet).ignoresSafeArea(.keyboard)
+                            TextField("", text: $TaskNameSet)
                         }
                         Toggle("Use checkbox instead of units", isOn: $TaskHasCheckboxSet)
                         if TaskHasCheckboxSet == false {
@@ -269,7 +269,7 @@ struct TaskBuilderView: View {
             
             
             
-        }//onAppear{indexProtocols()}
+        }
         
         
     }
@@ -280,11 +280,7 @@ struct TaskBuilderView: View {
      ------------------------------------------------     */
     
     private func updateTask(taskToEdit: TaskItem) {
-        
-//        var taskDataIteratorList: [Task] = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
-         
-//        for ndx in 0..<taskDataIteratorList.count {
-//            if taskDataIteratorList[ndx].id == taskToEdit {
+
                 
                 
         taskToEdit.name = TaskNameSet
@@ -298,7 +294,6 @@ struct TaskBuilderView: View {
         if taskToEdit.hasCheckbox == true {
             taskToEdit.goal = 1
             taskToEdit.unit = "units"
-
         }
         
         do {
@@ -355,5 +350,13 @@ struct TaskBuilderView: View {
      
     }
     
+    func shuntTodaysTasks (viewContext: NSManagedObjectContext) {
+        
+        for index in taskData {
+            if (Calendar.current.isDate((index.dueDate ?? Date()), equalTo: Date(), toGranularity: .day) == true) && (index.notFloater == true) {
+                shuntTask(taskToShunt: index, viewContext: viewContext)
+            }
+        }
+    }
 
 }

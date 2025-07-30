@@ -238,7 +238,7 @@ func deleteEntity(withUUID uuid: UUID, viewContext: NSManagedObjectContext) {
     }
 }
 
-func deleteEntityHab(withUUID uuid: UUID, viewContext: NSManagedObjectContext) {
+func deleteEntityHabit(withUUID uuid: UUID, viewContext: NSManagedObjectContext) {
     // Create a fetch request for your entity
     let request: NSFetchRequest<HabitItem> = HabitItem.fetchRequest()
     request.predicate = NSPredicate(format: "id == %@", uuid as CVarArg)
@@ -255,26 +255,44 @@ func deleteEntityHab(withUUID uuid: UUID, viewContext: NSManagedObjectContext) {
     }
 }
 
+func deleteEntityTask(withUUID uuid: UUID, viewContext: NSManagedObjectContext) {
+    // Create a fetch request for your entity
+    let request: NSFetchRequest<TaskItem> = TaskItem.fetchRequest()
+    request.predicate = NSPredicate(format: "id == %@", uuid as CVarArg)
+    request.fetchLimit = 1
+    
+    do {
+        let results = try viewContext.fetch(request)
+        if let entityToDelete = results.first {
+            viewContext.delete(entityToDelete)
+            try viewContext.save()
+        }
+    } catch {
+        print("Error deleting entity: \(error)")
+    }
+}
 
 
-func shuntTask (taskToShunt: Task, viewContext: NSManagedObjectContext) {
+
+func shuntTask (taskToShunt: TaskItem, viewContext: NSManagedObjectContext) {
     
     let newItem = Item(context: viewContext)
     newItem.timestamp = Date()
-    newItem.name = taskToShunt.TaskName
-    newItem.goal = taskToShunt.TaskGoal
-    newItem.unit = taskToShunt.TaskUnit
+    newItem.name = taskToShunt.name
+    newItem.goal = taskToShunt.goal
+    newItem.unit = taskToShunt.unit
     newItem.complete = false
-    newItem.reward = taskToShunt.TaskReward
+    newItem.reward = taskToShunt.reward
     newItem.isTask = true
     newItem.id = UUID()
-    newItem.descriptor = taskToShunt.TaskDescription
-    newItem.hasCheckbox = taskToShunt.TaskHasCheckbox
-    newItem.notFloater = taskToShunt.TaskNotFloater
-    rmTask(id: taskToShunt.id)
+    newItem.descriptor = taskToShunt.descript
+    newItem.hasCheckbox = taskToShunt.hasCheckbox
+    newItem.notFloater = taskToShunt.notFloater
+    
     
     do {
         try viewContext.save()
+        deleteEntityTask(withUUID: taskToShunt.id ?? UUID(), viewContext: viewContext)
     } catch {
         // Replace this implementation with code to handle the error appropriately.
         // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
@@ -284,19 +302,28 @@ func shuntTask (taskToShunt: Task, viewContext: NSManagedObjectContext) {
 }
 
 
-func shuntTodaysTasks (viewContext: NSManagedObjectContext) {
-    
-    if let outTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") {
-        for index in outTaskData {
-            if (Calendar.current.isDate((index.TaskDueDate), equalTo: Date(), toGranularity: .day) == true) && (index.TaskNotFloater == true) {
-                shuntTask(taskToShunt: index, viewContext: viewContext)
-            }
-        }
-    } else {
-        print("Failure for task due date checker")
-    }
-    
-}
+//func shuntTodaysTasks (viewContext: NSManagedObjectContext) {
+//    
+////    if let outTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") {
+//    @FetchRequest(
+//        sortDescriptors: [NSSortDescriptor(keyPath: \TaskItem.name, ascending: true)],
+//        animation: .default)
+//    var outTaskData: FetchedResults<TaskItem>
+//    
+//    let request: NSFetchRequest<TaskItem> = TaskItem.fetchRequest()
+//    request.predicate = NSPredicate(format: "id == %@", uuid as CVarArg)
+//    
+//    
+//    for index in outTaskData {
+//        if (Calendar.current.isDate((index.dueDate ?? Date()), equalTo: Date(), toGranularity: .day) == true) && (index.notFloater == true) {
+//            shuntTask(taskToShunt: index, viewContext: viewContext)
+//        }
+//    }
+////    } else {
+////        print("Failure for task due date checker")
+////    }
+//    
+//}
 
 
 func displayHabitDescription (identifier: String) -> String {
