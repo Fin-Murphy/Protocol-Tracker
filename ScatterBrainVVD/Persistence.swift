@@ -15,7 +15,6 @@ struct PersistenceController {
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
         
-        
         let newItem = Item(context: viewContext)
         newItem.notFloater = true
         newItem.timestamp = Date()
@@ -28,13 +27,14 @@ struct PersistenceController {
         
         let newHabitItem = HabitItem(context: viewContext)
         newHabitItem.name = "Glitch prevention Habit"
+        newHabitItem.id = UUID()
+
 
         let newTaskItem = TaskItem(context: viewContext)
         newTaskItem.name = "Glitch prevention Task"
+        newTaskItem.id = UUID()
 
 
-            
-            
         do {
             try viewContext.save()
         } catch {

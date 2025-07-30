@@ -16,8 +16,6 @@ struct HabitBuilderView: View {
     private var habitData: FetchedResults<HabitItem>
     
     @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
-
-    @Binding var selectedTab: Tabs
         
     @State var DisplayHabitMaker: Bool = false
     @State var DisplayHabitEditor: Bool = false

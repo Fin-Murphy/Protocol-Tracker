@@ -302,28 +302,21 @@ func shuntTask (taskToShunt: TaskItem, viewContext: NSManagedObjectContext) {
 }
 
 
-//func shuntTodaysTasks (viewContext: NSManagedObjectContext) {
-//    
-////    if let outTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") {
-//    @FetchRequest(
-//        sortDescriptors: [NSSortDescriptor(keyPath: \TaskItem.name, ascending: true)],
-//        animation: .default)
-//    var outTaskData: FetchedResults<TaskItem>
-//    
-//    let request: NSFetchRequest<TaskItem> = TaskItem.fetchRequest()
-//    request.predicate = NSPredicate(format: "id == %@", uuid as CVarArg)
-//    
-//    
-//    for index in outTaskData {
-//        if (Calendar.current.isDate((index.dueDate ?? Date()), equalTo: Date(), toGranularity: .day) == true) && (index.notFloater == true) {
-//            shuntTask(taskToShunt: index, viewContext: viewContext)
-//        }
-//    }
-////    } else {
-////        print("Failure for task due date checker")
-////    }
-//    
-//}
+func shuntTodaysTasks (viewContext: NSManagedObjectContext) {
+    do {
+        let request: NSFetchRequest<TaskItem> = TaskItem.fetchRequest()
+        let taskData = try viewContext.fetch(request)
+        
+        for index in taskData {
+            if (Calendar.current.isDate((index.dueDate ?? Date()), equalTo: Date(), toGranularity: .day) == true) && (index.notFloater == true) {
+                shuntTask(taskToShunt: index, viewContext: viewContext)
+            }
+        }
+    } catch {
+        let nsError = error as NSError
+        fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+    }
+}
 
 
 func displayHabitDescription (identifier: String) -> String {

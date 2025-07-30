@@ -16,8 +16,6 @@ struct TaskBuilderView: View {
     private var taskData: FetchedResults<TaskItem>
     
     @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
-
-    @Binding var selectedTab: Tabs
     
     @State var DisplayTaskMaker: Bool = false
     @State var DisplayTaskEditor: Bool = false
@@ -302,13 +300,9 @@ struct TaskBuilderView: View {
             let nsError = error as NSError
             fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
         }
-        
-        
 
     }
     
-    
-        
     private func addTask() {
         
         if TaskHasCheckboxSet == true {
@@ -349,14 +343,10 @@ struct TaskBuilderView: View {
         shuntTodaysTasks(viewContext: viewContext)
      
     }
-    
-    func shuntTodaysTasks (viewContext: NSManagedObjectContext) {
-        
-        for index in taskData {
-            if (Calendar.current.isDate((index.dueDate ?? Date()), equalTo: Date(), toGranularity: .day) == true) && (index.notFloater == true) {
-                shuntTask(taskToShunt: index, viewContext: viewContext)
-            }
-        }
-    }
 
+
+}
+
+#Preview {
+    TaskBuilderView()
 }

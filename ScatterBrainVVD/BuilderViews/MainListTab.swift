@@ -604,9 +604,6 @@ struct MainListTab: View {
                             
                         }//END LIST
                         
-//                        .onAppear{
-//                            moveCompleteHabits = UserDefaults.standard.bool(forKey: "displayCompletedHabits")
-//                        }
                         .onAppear{
                             testTasksForSillyness() 
                         }

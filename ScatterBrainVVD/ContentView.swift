@@ -59,14 +59,14 @@ struct ContentView: View {
          }
             else if selectedTab == .Protocols {
                                     
-                HabitBuilderView(viewContext: _viewContext, selectedTab: $selectedTab)
+                HabitBuilderView(viewContext: _viewContext)
                     
 /* *******************************************************
             GOALS TAB
 ****************************************************** */
             } else if selectedTab == .Goals {
                 
-                TaskBuilderView(viewContext: _viewContext, selectedTab: $selectedTab)
+                TaskBuilderView(viewContext: _viewContext)
                 
 /* *******************************************************
             MAIN TASK TAB
