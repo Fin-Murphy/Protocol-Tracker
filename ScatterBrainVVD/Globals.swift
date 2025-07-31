@@ -269,8 +269,6 @@ func deleteEntityTask(withUUID uuid: UUID, viewContext: NSManagedObjectContext) 
     }
 }
 
-
-
 func shuntTask (taskToShunt: TaskItem, viewContext: NSManagedObjectContext) {
     
     let newItem = Item(context: viewContext)
@@ -315,7 +313,6 @@ func shuntTodaysTasks (viewContext: NSManagedObjectContext) {
     }
 }
 
-
 func displayHabitDescription (identifier: String) -> String {
 
     for index in UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? [] {
@@ -325,15 +322,6 @@ func displayHabitDescription (identifier: String) -> String {
     }
     return "No description"
 }
-
-func resetUserDefaults () {
-    UserDefaults.standard.removeObject(forKey: "DailyTaskPopulate?")
-    
-//        UserDefaults.standard.removeObject(forKey: "habitList")
-//        UserDefaults.standard.removeObject(forKey: "protocol")
-//
-}
-
 
 func daysBetween(start: Date, end: Date) -> Int {
     let calendar = Calendar.current

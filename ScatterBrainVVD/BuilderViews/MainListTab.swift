@@ -226,8 +226,6 @@ struct MainListTab: View {
     // BINDINGS
     // ---------------------------------------------------------------------------------------------------------------------
 
-    
-    
     @Binding var selectedTab: Tabs
         
     @Binding var Celebrate: Int16
@@ -265,14 +263,15 @@ struct MainListTab: View {
     private var habitData: FetchedResults<HabitItem>
 
     
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \TaskItem.name, ascending: true)],
+        animation: .default)
+    private var taskData: FetchedResults<TaskItem>
     
     // ---------------------------------------------------------------------------------------------------------------------
     // WELCOME MESSAGE
     // ---------------------------------------------------------------------------------------------------------------------
 
-    
-    
-    
     private var welcomeMessageView: some View {
     
         VStack{
@@ -295,6 +294,8 @@ struct MainListTab: View {
             
         }.bckMod()
     }//END WELCOMEMESSAGEVIEW
+
+    
     
     
     
@@ -302,10 +303,6 @@ struct MainListTab: View {
     // ---------------------------------------------------------------------------------------------------------------------
     // BODY CONTENT
     // ---------------------------------------------------------------------------------------------------------------------
-
-    
-    
-    
     
     var body: some View {
          
@@ -320,7 +317,6 @@ struct MainListTab: View {
                     VStack{
                         
                         List {
-                            
                                 ForEach(items) { item in
                                     if (Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true && item.complete == false) || (item.notFloater == false && item.complete == false) {
                                         
@@ -382,10 +378,7 @@ struct MainListTab: View {
                                             .tint(.red)
                                         }
                                     } else {}
-                                    
                                 }
-                                
-                        
                             
                         }//END LIST
                         
@@ -412,8 +405,6 @@ struct MainListTab: View {
         
     } // END VIEWABLE CONTENT
     
-    
-    
     // ---------------------------------------------------------------------------------------------------------------------
     
     // START PRIVATE FUNCTIONS
@@ -439,15 +430,7 @@ struct MainListTab: View {
         }
     }
     
-    
-    
-    
-    // ---------------------------------------------------------------------------------------------------------------------
-    // DELETE ENTITY
-    // ---------------------------------------------------------------------------------------------------------------------
 
-    
-    
     // ---------------------------------------------------------------------------------------------------------------------
     // POPULATE TASKS
     // ---------------------------------------------------------------------------------------------------------------------
@@ -469,11 +452,7 @@ struct MainListTab: View {
         let dformatter = DateFormatter()
         dformatter.dateFormat = "EEEE"
         let dayOfWeek = dformatter.string(from: date)
-        
-        // Add functionality for DOW repetition instead of just interval repetition 
-        
-        //Factor this out into seperate functions?
-//        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+
         
         for taskFinder in items {
             if (taskFinder.isTask == true) && (Calendar.current.isDate((taskFinder.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) != true) && (taskFinder.complete == false) && (taskFinder.notFloater == true){
@@ -538,31 +517,23 @@ struct MainListTab: View {
                     newItem.notFloater = true
           
                 }
-                
             }
-            
         }
 
         do {
             try viewContext.save()
         } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
             let nsError = error as NSError
             fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
         }
     }
     
-    
-    
     // ---------------------------------------------------------------------------------------------------------------------
     // DESHUNT TASKS
     // ---------------------------------------------------------------------------------------------------------------------
 
-    
+
     private func deshuntTask(item: Item) {
-//        print("Running deshunt for item \(item.name ?? "")")
-//            print("Successful!")
         
         let returnedTaskItem = TaskItem(context: viewContext)
         
