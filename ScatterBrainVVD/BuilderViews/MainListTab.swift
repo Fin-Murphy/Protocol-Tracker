@@ -233,9 +233,6 @@ struct MainListTab: View {
     @Binding var Celebrate: Int16
     
     @Binding var SelectedDate: Date
-
-
-//    @Binding var moveCompleteHabits: Bool
     
     // ---------------------------------------------------------------------------------------------------------------------
     // STATES
@@ -324,10 +321,7 @@ struct MainListTab: View {
                         
                         List {
                             
-//                            if moveCompleteHabits == true {
-                                
                                 ForEach(items) { item in
-                                    // How in the hell do I refactor this
                                     if (Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true && item.complete == false) || (item.notFloater == false && item.complete == false) {
                                         
                                         NavigationLink {
@@ -391,216 +385,7 @@ struct MainListTab: View {
                                     
                                 }
                                 
-                            // } // End used part of ifelse
-                            
-                           
-                            
-                            
-                            /*else { //Archived version of IfElse (Causes issues)
-                                
-                                ForEach(items) { item in
-                                    
-                                    if (Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true) || (item.notFloater == false) {
-                                        
-                                        NavigationLink {
-                                            
-                                            if item.complete == true {
-                                                Text(String(item.name ?? ""))
-                                                    .font(.title)
-                                                    .fontWeight(.bold)
-                                                    .strikethrough()
-                                            } else {
-                                                Text(String(item.name ?? ""))
-                                                    .font(.title)
-                                                    .fontWeight(.bold)
-                                            }
-                                            
-                                            if item.hasStatus == true {
-                                                
-                                                
-                                                VStack {
-                                                    HStack {
-                                                        Text("Habit status:")
-                                                        
-                                                        TextField("", value: $updateItemStatus, format: .number)
-                                                            .frame(maxWidth: 100, alignment: .center)
-                                                    }.bckMod()
-                                                    
-                                                    Button {setStatus(refItem: item)} label: {
-                                                        Text("Save Habit Status")
-                                                        
-                                                    }
-                                                    .foregroundColor(.blue)
-                                                    .bckMod()
-                                                    
-                                                }
-                                                .onAppear{updateItemStatus = item.status}
-                                                .bckMod()
-                                                
-                                                
-                                            } else {}
-                                            
-                                            Spacer()
-                                            
-                                            ScrollView {
-                                                if item.isTask != true {
-                                                    
-                                                    Text(displayHabitDescription(identifier: item.name ?? ""))
-                                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                                        .padding()
-                                                        .bckMod()
-                                                    
-                                                    
-                                                } else {
-                                                    
-                                                    Text(item.descriptor ?? "")
-                                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                                        .padding()
-                                                        .bckMod()
-                                                    
-                                                }
-                                                
-                                                
-                                            }.frame(width: 350)
-                                            
-                                            Spacer()
-                                            
-                                            // ---------------------- BEGIN VALUE MODIFICATION
-                                            
-                                            if item.hasCheckbox == false {
-                                                
-                                                if item.complete == true {
-                                                    Text("☑ \(item.value)/\(item.goal) \(item.unit ?? "")")
-                                                        .font(.title)
-                                                        .padding()
-                                                        .bckMod()
-                                                    
-                                                } else {
-                                                    Text("☐ \(item.value)/\(item.goal) \(item.unit ?? "")")
-                                                        .font(.title)
-                                                        .padding()
-                                                        .bckMod()
-                                                    
-                                                    
-                                                }
-                                                
-                                                HStack{
-                                                    
-                                                    Button {
-                                                        addOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
-                                                        if item.value == item.goal {
-                                                            
-                                                        }
-                                                    }
-                                                    label: {
-                                                        Text("+ 1")
-                                                            .shadow(radius: 5)
-                                                            .bckMod()
-                                                        
-                                                    }
-                                                    Button {
-                                                        subOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
-                                                        if item.value == item.goal {
-                                                            
-                                                        }
-                                                    }
-                                                    label: {
-                                                        Text("- 1")
-                                                            .shadow(radius: 5)
-                                                            .bckMod()
-                                                        
-                                                    }
-                                                }
-                                                
-                                            } else {
-                                                
-                                                
-                                                if item.complete == true {
-                                                    Button{
-                                                        subOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
-                                                    } label: {
-                                                        Text("☑")
-                                                            .font(.title)
-                                                            .padding()
-                                                            .bckMod()
-                                                        
-                                                    }
-                                                    
-                                                } else {
-                                                    Button{
-                                                        addOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
-                                                    } label: {
-                                                        Text("☐")
-                                                            .font(.title)
-                                                            .padding()
-                                                            .bckMod()
-                                                        
-                                                    }
-                                                }
-                                            }
-                                            // ---------------------- END VALUE MODIFICATION
-                                            
-                                            
-                                            Spacer()
-                                            
-                                        } label: {
-                                            
-                                            
-                                            HStack{
-                                                
-                                                if item.isTask == true {
-                                                    Image(systemName: "t.square")
-                                                        .resizable()
-                                                        .scaledToFit()
-                                                        .frame(width: 20,height: 20)
-                                                } else {
-                                                    Image(systemName: "h.square")
-                                                        .resizable()
-                                                        .scaledToFit()
-                                                        .frame(width: 20,height: 20)
-                                                }
-                                                
-                                                if item.complete == true {
-                                                    Text(String(item.name ?? ""))
-                                                        .strikethrough()
-                                                } else {
-                                                    Text(String(item.name ?? ""))
-                                                }
-                                                Spacer()
-                                                
-                                                if item.complete == true {
-                                                    Text("☑")
-                                                } else {
-                                                    Text("☐")
-                                                }
-                                                
-                                                if item.hasCheckbox == false {
-                                                    Text("\(item.value)/\(item.goal)")
-                                                    Text("   ")
-                                                }
-                                            }
-                                        }
-                                        .swipeActions(edge: .trailing) {
-                                            Button("Complete") {
-                                                completeHabit(item: item, viewContext: viewContext, Celebrate: &Celebrate)
-                                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-                                                impactFeedback.impactOccurred()
-                                            }
-                                            .tint(.blue)
-                                            
-                                        }
-                                        .swipeActions(edge: .leading) {
-                                            Button("Delete") {
-                                                deleteEntity(withUUID: item.id ?? UUID())
-                                            }
-                                            .tint(.red)
-                                        }
-                                        
-                                        
-                                    } else {}
-                                    
-                                }
-                            }*/
+                        
                             
                         }//END LIST
                         
@@ -620,11 +405,7 @@ struct MainListTab: View {
                 
                 
             }.onAppear{
-                
                 checkDate()
-                
-                
-
             } // END ZSTACK
             
         }//END VSTACK
@@ -640,7 +421,6 @@ struct MainListTab: View {
     // ---------------------------------------------------------------------------------------------------------------------
 
 
-    
     public func checkDate() {
         if let savedDate = UserDefaults.standard.object(forKey: "DailyTaskPopulate?") as? Date {
             
