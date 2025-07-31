@@ -15,7 +15,7 @@ struct TaskBuilderView: View {
         animation: .default)
     private var taskData: FetchedResults<TaskItem>
     
-    @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
+    @Environment(\.managedObjectContext) private var viewContext
     
     @State var DisplayTaskMaker: Bool = false
     @State var DisplayTaskEditor: Bool = false

@@ -165,7 +165,6 @@ extension View {
 // SCOOT ITEM
 // ---------------------------------------------------------------------------------------------------------------------
 
-
 func scootItem(item: Item, viewContext: NSManagedObjectContext){
     
     let newItem = Item(context: viewContext)
@@ -196,27 +195,9 @@ func scootItem(item: Item, viewContext: NSManagedObjectContext){
 }
 
 
-
-
-
-
 // ---------------------------------------------------------------------------------------------------------------------
-// SET STATUS
+// DELETE ENTITY FUNCTIONS
 // ---------------------------------------------------------------------------------------------------------------------
-
-
-
-func setStatus(refItem: Item, viewContext: NSManagedObjectContext, updateItemStatus: Int16) {
-    refItem.status = updateItemStatus
-    do {
-        try viewContext.save()
-    } catch {
-        let nsError = error as NSError
-        fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-    }
-    print(refItem.status)
-}
-
 
 func deleteEntity(withUUID uuid: UUID, viewContext: NSManagedObjectContext) {
 
@@ -269,6 +250,10 @@ func deleteEntityTask(withUUID uuid: UUID, viewContext: NSManagedObjectContext) 
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// SHUNT TASK FUNCTIONS
+// ---------------------------------------------------------------------------------------------------------------------
+
 func shuntTask (taskToShunt: TaskItem, viewContext: NSManagedObjectContext) {
     
     let newItem = Item(context: viewContext)
@@ -296,7 +281,6 @@ func shuntTask (taskToShunt: TaskItem, viewContext: NSManagedObjectContext) {
     }
 }
 
-
 func shuntTodaysTasks (viewContext: NSManagedObjectContext) {
     do {
         let request: NSFetchRequest<TaskItem> = TaskItem.fetchRequest()
@@ -312,7 +296,6 @@ func shuntTodaysTasks (viewContext: NSManagedObjectContext) {
         fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
     }
 }
-
 
 func displayHabitDescription (identifier: String, viewContext: NSManagedObjectContext) -> String {
     do {
@@ -331,14 +314,15 @@ func displayHabitDescription (identifier: String, viewContext: NSManagedObjectCo
     return "No description"
 }
 
-
+// ---------------------------------------------------------------------------------------------------------------------
+// UTILITIES
+// ---------------------------------------------------------------------------------------------------------------------
 
 func daysBetween(start: Date, end: Date) -> Int {
     let calendar = Calendar.current
     let components = calendar.dateComponents([.day], from: start, to: end)
     return components.day ?? 1
 }
-
 
 extension UserDefaults {
     func setEncodable<T: Codable>(_ object: T, forKey key: String) {
@@ -361,6 +345,9 @@ extension UserDefaults {
     }
 } // END UserDefaults Encodable/Decodable extension
 
+// ---------------------------------------------------------------------------------------------------------------------
+// VALUEMOD FUNCTIONS
+// ---------------------------------------------------------------------------------------------------------------------
 
 func addOne(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout Int16) {
     
@@ -417,7 +404,6 @@ func completeHabit(item: Item, viewContext: NSManagedObjectContext, Celebrate: i
     
 }
 
-
 func subOne(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout Int16) {
     
     if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true {
@@ -442,11 +428,28 @@ func subOne(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout In
     }
 }
 
+func setStatus(refItem: Item, viewContext: NSManagedObjectContext, updateItemStatus: Int16) {
+    refItem.status = updateItemStatus
+    do {
+        try viewContext.save()
+    } catch {
+        let nsError = error as NSError
+        fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+    }
+    print(refItem.status)
+}
 
+// ---------------------------------------------------------------------------------------------------------------------
+// CELEBRATION
+// ---------------------------------------------------------------------------------------------------------------------
 
 func celebrationProcedure () {
         print("Goal for the day has been completed!")
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// INDEX PROTOCOLS
+// ---------------------------------------------------------------------------------------------------------------------
 
 func indexProtocols (viewContext: NSManagedObjectContext) {
     
@@ -479,7 +482,6 @@ func indexProtocols (viewContext: NSManagedObjectContext) {
                     
                 }
                 
-            
 
                 for ndx in habitData {
                     var inArray = false

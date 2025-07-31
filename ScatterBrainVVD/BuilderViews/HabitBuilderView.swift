@@ -15,7 +15,7 @@ struct HabitBuilderView: View {
         animation: .default)
     private var habitData: FetchedResults<HabitItem>
     
-    @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
+    @Environment(\.managedObjectContext) private var viewContext
         
     @State var DisplayHabitMaker: Bool = false
     @State var DisplayHabitEditor: Bool = false
