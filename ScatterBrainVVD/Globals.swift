@@ -326,7 +326,7 @@ func displayHabitDescription (identifier: String, viewContext: NSManagedObjectCo
         }
         
     } catch {
-        return "No description"
+        return "Failed indexing"
     }
     return "No description"
 }
