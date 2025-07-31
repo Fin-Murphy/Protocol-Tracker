@@ -6,11 +6,18 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct ProtocolListView: View {
     
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \HabitItem.name, ascending: true)],
+        animation: .default)
+    private var habitData: FetchedResults<HabitItem>
+    
+    @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
+    
     @State var listOfProtocols: [HabitProtocol] = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") ?? []
-    @State var listOfHabits: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
     @State var displayProtocolLibrary: Bool = false
     
     var body: some View {
@@ -30,37 +37,37 @@ struct ProtocolListView: View {
         }.foregroundColor(ForeColor)
         
         ZStack {
-            
+            //
             NavigationView {
                 List {
-                    
+                    //
                     ForEach(listOfProtocols) { prot in
-                        
+                        //
                         NavigationLink{
-                            
+                            //
                             VStack{
-                                
+                                //
                                 Text(prot.ProtocolName)
-                                
+                                //
                                 List{
-                                    ForEach(listOfHabits){ hab in
+                                    ForEach(habitData){ hab in
                                         
-                                        if hab.HabitProtocol == prot.ProtocolName {
-                                            Text(hab.HabitName)
+                                        if hab.whichProtocol == prot.ProtocolName {
+                                            Text(hab.name ?? "")
                                         } else {}
                                         
                                     }
                                 }
                             }
-                            
+                            //
                         } label: {
                             Text(prot.ProtocolName)
                         } // End navlinklabel
-                        
+                        //
                     } // End foreach
-                    
+                    //
                 } // End list
-                
+                //
             }// End navview
             
             if displayProtocolLibrary {
@@ -75,7 +82,7 @@ struct ProtocolListView: View {
                     NavigationView{
                         List{
                             
-                       
+                            
                             ForEach(AppDefinedProtocolLibrary){adp in
                                 
                                 NavigationLink{
@@ -94,7 +101,7 @@ struct ProtocolListView: View {
                                                 Button{incorporateHabit(refHab: cont)} label:
                                                 {Text("Add this habit")}
                                             } label: {  Text(cont.HabitName) }
-                                          
+                                            
                                         }
                                     }
                                     
@@ -107,7 +114,7 @@ struct ProtocolListView: View {
                             }
                         }//end list
                     }// end navview
-                                        
+                    
                     
                 }
                 .frame(width:300,height:700)
@@ -118,8 +125,7 @@ struct ProtocolListView: View {
                 .shadow(radius: 20)
                 
             } else {}
-                
-            
+            //
         }// End Zstack
         
         
@@ -127,13 +133,45 @@ struct ProtocolListView: View {
     
     private func incorporateProtocol(refProt: HabitProtocol){
         
-        var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
-
-        for habit in refProt.ProtocolContent {
-            habitData.append(habit)
-        }
+        //REWORK TO COREDATA
         
-        UserDefaults.standard.setEncodable(habitData, forKey: "habitList")
+        do {
+            let request: NSFetchRequest<HabitItem> = HabitItem.fetchRequest()
+            let habitData = try viewContext.fetch(request)
+            
+            for habit in refProt.ProtocolContent {
+                
+                let newHabitItem = HabitItem(context: viewContext)
+                
+                newHabitItem.id = UUID()
+                
+                newHabitItem.name = habit.HabitName
+                newHabitItem.goal = habit.HabitGoal
+                newHabitItem.unit = habit.HabitUnit
+                newHabitItem.whichProtocol = habit.HabitProtocol
+                newHabitItem.repeatValue = Int16(habit.HabitRepeatValue)
+                newHabitItem.descript = habit.HabitDescription
+                newHabitItem.startDate = Calendar.current.startOfDay(for: Date())
+                newHabitItem.reward = habit.HabitReward
+                newHabitItem.hasStatus = habit.HabitHasStatus
+                newHabitItem.hasCheckbox = habit.HabitHasCheckbox
+                
+                newHabitItem.useDow = habit.HabitUseDow
+                
+                newHabitItem.onSun = habit.HabitOnSun
+                newHabitItem.onMon = habit.HabitOnMon
+                newHabitItem.onTues = habit.HabitOnTues
+                newHabitItem.onWed = habit.HabitOnWed
+                newHabitItem.onThurs = habit.HabitOnThurs
+                newHabitItem.onFri = habit.HabitOnFri
+                newHabitItem.onSat = habit.HabitOnSat
+                
+            }
+            
+            try viewContext.save()
+            
+        } catch {}
+        
         
         indexProtocols()
         
@@ -143,20 +181,42 @@ struct ProtocolListView: View {
     
     private func incorporateHabit(refHab: Habit){
         
-        var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
-
-        habitData.append(refHab)
+        //REWORK TO COREDATA
         
-        UserDefaults.standard.setEncodable(habitData, forKey: "habitList")
+        let newHabitItem = HabitItem(context: viewContext)
+        
+        newHabitItem.id = UUID()
+        
+        newHabitItem.name = refHab.HabitName
+        newHabitItem.goal = refHab.HabitGoal
+        newHabitItem.unit = refHab.HabitUnit
+        newHabitItem.whichProtocol = refHab.HabitProtocol
+        newHabitItem.repeatValue = Int16(refHab.HabitRepeatValue)
+        newHabitItem.descript = refHab.HabitDescription
+        newHabitItem.startDate = Calendar.current.startOfDay(for: Date())
+        newHabitItem.reward = refHab.HabitReward
+        newHabitItem.hasStatus = refHab.HabitHasStatus
+        newHabitItem.hasCheckbox = refHab.HabitHasCheckbox
+        
+        newHabitItem.useDow = refHab.HabitUseDow
+        
+        newHabitItem.onSun = refHab.HabitOnSun
+        newHabitItem.onMon = refHab.HabitOnMon
+        newHabitItem.onTues = refHab.HabitOnTues
+        newHabitItem.onWed = refHab.HabitOnWed
+        newHabitItem.onThurs = refHab.HabitOnThurs
+        newHabitItem.onFri = refHab.HabitOnFri
+        newHabitItem.onSat = refHab.HabitOnSat
+        
+        do {
+            try viewContext.save()
+        } catch {}
         
         indexProtocols()
         
         listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") ?? []
         
     }
-    
-    
-    
 }
 
 #Preview {

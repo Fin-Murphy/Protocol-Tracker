@@ -217,8 +217,6 @@ struct navLinkContent: View {
     
 }
 
-
-
 struct MainListTab: View {
     
     
@@ -236,8 +234,6 @@ struct MainListTab: View {
     // STATES
     // ---------------------------------------------------------------------------------------------------------------------
 
-//    @State var habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []  // MAKE BINDING
-
     @State var updateItemStatus: Int16 = 0
 
     @State var seenWelcome: Bool = !UserDefaults.standard.bool(forKey: "seenWelcome")  // MAKE BINDING
@@ -248,7 +244,6 @@ struct MainListTab: View {
     // COREDATA
     // ---------------------------------------------------------------------------------------------------------------------
 
-    
     
     @Environment(\.managedObjectContext) public var viewContext
     
@@ -262,7 +257,6 @@ struct MainListTab: View {
         animation: .default)
     private var habitData: FetchedResults<HabitItem>
 
-    
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \TaskItem.name, ascending: true)],
         animation: .default)
