@@ -783,24 +783,29 @@ struct MainListTab: View {
     private func deshuntTask(item: Item) {
 //        print("Running deshunt for item \(item.name ?? "")")
 //            print("Successful!")
-            let returnedTask = Task(id: UUID(),
-                                    TaskName: item.name ?? "",
-                                    TaskDescription: item.descriptor ?? "",
-                                    TaskReward: item.reward,
-                                    TaskDueDate: (calendar.date(byAdding: .day, value: 1, to: Date())!),
-                                    TaskUnit: item.unit ?? "",
-                                    TaskGoal: item.goal,
-                                    TaskHasCheckbox: item.hasCheckbox,
-                                    TaskNotFloater: item.notFloater)
-            
-            if var outTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") {
-                outTaskData.append(returnedTask)
-                UserDefaults.standard.setEncodable(outTaskData, forKey: "taskList")
-            } else {
-                let taskDataInitialzier: [Task] = [returnedTask]
-                UserDefaults.standard.setEncodable(taskDataInitialzier, forKey: "taskList")
-            }
-            deleteEntity(withUUID: item.id ?? UUID(), viewContext: viewContext)
+        
+        let returnedTaskItem = TaskItem(context: viewContext)
+        
+        returnedTaskItem.id = UUID()
+        returnedTaskItem.name = item.name ?? ""
+        returnedTaskItem.descript = item.descriptor ?? ""
+        returnedTaskItem.reward = item.reward
+        returnedTaskItem.dueDate = (calendar.date(byAdding: .day, value: 1, to: Date())!)
+        returnedTaskItem.unit = item.unit ?? ""
+        returnedTaskItem.goal = item.goal
+        returnedTaskItem.hasCheckbox = item.hasCheckbox
+        returnedTaskItem.notFloater = item.notFloater
+
+        do {
+            try viewContext.save()
+        } catch {
+            // Replace this implementation with code to handle the error appropriately.
+            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+            let nsError = error as NSError
+            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        }
+
+        deleteEntity(withUUID: item.id ?? UUID(), viewContext: viewContext)
     }
 }
 

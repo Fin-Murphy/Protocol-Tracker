@@ -112,9 +112,6 @@ struct Habit: Identifiable, Codable, Hashable {
     var HabitOnThurs: Bool = false
     var HabitOnFri: Bool = false
     var HabitOnSat: Bool = false
-    
-    
-    
 
 } // END struct Task
 
@@ -367,21 +364,6 @@ extension UserDefaults {
 } // END UserDefaults Encodable/Decodable extension
 
 
-
-func rmTask(id: UUID) {
-    if var outTaskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") {
-        var iterator = 0
-        for index in outTaskData {
-            if index.id == id {
-                outTaskData.remove(at: iterator)
-            }
-            iterator += 1
-        }
-        UserDefaults.standard.setEncodable(outTaskData, forKey: "taskList")
-    }
-}
-
-
 func addOne(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout Int16) {
     
     if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true {
@@ -403,7 +385,6 @@ func addOne(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout In
     }
         
 
- 
     do {
         try viewContext.save()
     } catch {

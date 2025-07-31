@@ -91,7 +91,7 @@ struct TaskBuilderView: View {
                                             
                                             Button{
                                                 shuntTask(taskToShunt: taskNdx, viewContext: viewContext)
-//                                                taskData = UserDefaults.standard.getDecodable([Task].self, forKey: "taskList") ?? []
+
                                             } label: {
                                                 Text("Shunt Task").bckMod()
                                             }
@@ -175,17 +175,17 @@ struct TaskBuilderView: View {
                                                 }
                                             }
                                         } else {}
-//                                        
+                                        
                                     }
-//                                    
+                                    
                                 } label: {
                                     Text(taskNdx.name ?? "")
                                     
                                 }
-//                                
-//                                
-//                                
-//                                
+                                
+                                
+                                
+                                
                             }
                         }
                     }
@@ -264,23 +264,14 @@ struct TaskBuilderView: View {
                 .shadow(radius: 20)
                 
             } else {}
-            
-            
-            
         }
-        
-        
     }
-
-    
     /*    ------------------------------------------------
                   ADD TASK
      ------------------------------------------------     */
     
     private func updateTask(taskToEdit: TaskItem) {
 
-                
-                
         taskToEdit.name = TaskNameSet
         taskToEdit.goal = TaskGoalSet
         taskToEdit.unit = TaskUnitSet
@@ -300,7 +291,6 @@ struct TaskBuilderView: View {
             let nsError = error as NSError
             fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
         }
-
     }
     
     private func addTask() {

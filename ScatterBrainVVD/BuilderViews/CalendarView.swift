@@ -15,9 +15,7 @@ struct CalendarView: View {
     
     
     var body: some View {
-        
     
-
         VStack{
            
             Button {SelectedDate = Date() } label: {Text("Current Date: \(Date(), formatter: itemFormatter)") }
@@ -51,16 +49,10 @@ struct CalendarView: View {
                         }
                     }.padding()
                 }
-                
-                
             }
             .foregroundColor(ForeColor)
             // END LAZY HSTACK
         }
-        
-        
-        
-        
     }
 }
 
