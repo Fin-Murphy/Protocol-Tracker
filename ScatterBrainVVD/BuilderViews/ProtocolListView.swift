@@ -37,18 +37,18 @@ struct ProtocolListView: View {
         }.foregroundColor(ForeColor)
         
         ZStack {
-            //
+
             NavigationView {
                 List {
-                    //
+
                     ForEach(listOfProtocols) { prot in
-                        //
+
                         NavigationLink{
-                            //
+
                             VStack{
-                                //
+
                                 Text(prot.ProtocolName)
-                                //
+
                                 List{
                                     ForEach(habitData){ hab in
                                         
@@ -59,15 +59,15 @@ struct ProtocolListView: View {
                                     }
                                 }
                             }
-                            //
+
                         } label: {
                             Text(prot.ProtocolName)
                         } // End navlinklabel
-                        //
+
                     } // End foreach
-                    //
+
                 } // End list
-                //
+
             }// End navview
             
             if displayProtocolLibrary {
@@ -125,7 +125,7 @@ struct ProtocolListView: View {
                 .shadow(radius: 20)
                 
             } else {}
-            //
+
         }// End Zstack
         
         

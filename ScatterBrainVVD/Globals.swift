@@ -313,15 +313,25 @@ func shuntTodaysTasks (viewContext: NSManagedObjectContext) {
     }
 }
 
-func displayHabitDescription (identifier: String) -> String {
 
-    for index in UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? [] {
-        if index.HabitName == identifier {
-            return index.HabitDescription
+func displayHabitDescription (identifier: String, viewContext: NSManagedObjectContext) -> String {
+    do {
+        let request: NSFetchRequest<HabitItem> = HabitItem.fetchRequest()
+        let habitData = try viewContext.fetch(request)
+        
+        for index in habitData {
+            if index.name == identifier {
+                return index.descript ?? "No description"
+            }
         }
+        
+    } catch {
+        return "No description"
     }
     return "No description"
 }
+
+
 
 func daysBetween(start: Date, end: Date) -> Int {
     let calendar = Calendar.current

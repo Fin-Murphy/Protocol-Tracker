@@ -109,8 +109,8 @@ struct navLinkContent: View {
         
         ScrollView {
             if item.isTask != true {
-                if displayHabitDescription(identifier: item.name ?? "") != "" {
-                    Text(displayHabitDescription(identifier: item.name ?? ""))
+                if displayHabitDescription(identifier: item.name ?? "", viewContext: viewContext) != "" {
+                    Text(displayHabitDescription(identifier: item.name ?? "", viewContext: viewContext))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding()
                         .bckMod()
