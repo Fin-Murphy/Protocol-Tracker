@@ -16,46 +16,6 @@ import SwiftUI
 
 //------------------------------------------------------
 
-func refreshVisualData(ForeColor:  inout Color) {
-    currentScheme = getCurrentColorScheme()
-    ForeColor = currentScheme == .dark ? .white : .black
-}
-
-func getCurrentColorScheme() -> ColorScheme {
-    let traitCollection = UITraitCollection.current
-    return traitCollection.userInterfaceStyle == .dark ? .dark : .light
-}
-
-var currentScheme = getCurrentColorScheme()
-var ForeColor: Color = currentScheme == .dark ? .white : .black
-
-//let ForeColor: Color = Color.black
-
-
-class GlobalVars {
-    static let shared = GlobalVars()
-    private init() {}
-    
-    
-} // END CLASS GlobalVars
-
-extension View {
-    func hideKeyboard() {
-        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),
-                                       to: nil, from: nil, for: nil)
-    }
-}
-
-var closeButton: some View {
-    Image(systemName: "x.circle")
-        .resizable()
-        .foregroundColor(.white)
-        .scaledToFit()
-        .frame(width: 100,height: 24)
-        .bold()
-}
-
-
 
 
 
@@ -63,6 +23,9 @@ let valueRange = 1 ... 1000
 let Today: Date = Date()
 let calendar: Calendar = .current
 
+// ---------------------------------------------------------------------------------------------------------------------
+// ITEM STRUCTURES
+// ---------------------------------------------------------------------------------------------------------------------
 
 struct HabitProtocol: Identifiable, Codable {
     var id: UUID = UUID()
@@ -70,7 +33,6 @@ struct HabitProtocol: Identifiable, Codable {
     var ProtocolDescription: String
     var ProtocolContent: [Habit] = []
 }
-
 
 struct Task: Identifiable, Codable {
     
@@ -84,7 +46,6 @@ struct Task: Identifiable, Codable {
     var TaskHasCheckbox: Bool
     var TaskNotFloater: Bool = true
 }
-
 
 struct Habit: Identifiable, Codable, Hashable {
     
@@ -115,6 +76,9 @@ struct Habit: Identifiable, Codable, Hashable {
 
 } // END struct Task
 
+// ---------------------------------------------------------------------------------------------------------------------
+// MISC STRUCTURES AND FORMATTERS
+// ---------------------------------------------------------------------------------------------------------------------
 
 var forward_Calendar = valueRange.map {
     calendar.date(byAdding: .day, value: $0, to: Today)!
@@ -124,7 +88,6 @@ var backward_Calendar = valueRange.map {
     calendar.date(byAdding: .day, value: -$0, to: Today)!
 }
 
-
 let itemFormatter: DateFormatter = {
     let formatter = DateFormatter()
     formatter.dateStyle = .short
@@ -132,6 +95,18 @@ let itemFormatter: DateFormatter = {
     return formatter
 }()
 
+// ---------------------------------------------------------------------------------------------------------------------
+// VIEWS AND VIEW MODIFIERS
+// ---------------------------------------------------------------------------------------------------------------------
+
+var closeButton: some View {
+    Image(systemName: "x.circle")
+        .resizable()
+        .foregroundColor(.white)
+        .scaledToFit()
+        .frame(width: 100,height: 24)
+        .bold()
+}
 
 struct backgroundMod: ViewModifier {
     func body(content: Content) -> some View {
@@ -153,6 +128,8 @@ extension View {
 
 
 
+
+
 //------------------------------------------------------
 
 //                    FUNCTIONS
@@ -160,6 +137,23 @@ extension View {
 //------------------------------------------------------
 
 
+// ---------------------------------------------------------------------------------------------------------------------
+// COLOR SCHEME FUNCS
+// ---------------------------------------------------------------------------------------------------------------------
+
+func refreshVisualData(ForeColor:  inout Color) {
+    currentScheme = getCurrentColorScheme()
+    ForeColor = currentScheme == .dark ? .white : .black
+}
+
+func getCurrentColorScheme() -> ColorScheme {
+    let traitCollection = UITraitCollection.current
+    return traitCollection.userInterfaceStyle == .dark ? .dark : .light
+}
+
+var currentScheme = getCurrentColorScheme()
+
+var ForeColor: Color = currentScheme == .dark ? .white : .black
 
 // ---------------------------------------------------------------------------------------------------------------------
 // SCOOT ITEM
@@ -193,7 +187,6 @@ func scootItem(item: Item, viewContext: NSManagedObjectContext){
     
     
 }
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 // DELETE ENTITY FUNCTIONS
