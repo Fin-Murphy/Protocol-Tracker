@@ -219,7 +219,7 @@ func setStatus(refItem: Item, viewContext: NSManagedObjectContext, updateItemSta
 
 
 func deleteEntity(withUUID uuid: UUID, viewContext: NSManagedObjectContext) {
-    // Create a fetch request for your entity
+
     let request: NSFetchRequest<Item> = Item.fetchRequest()
     request.predicate = NSPredicate(format: "id == %@", uuid as CVarArg)
     request.fetchLimit = 1
@@ -236,7 +236,7 @@ func deleteEntity(withUUID uuid: UUID, viewContext: NSManagedObjectContext) {
 }
 
 func deleteEntityHabit(withUUID uuid: UUID, viewContext: NSManagedObjectContext) {
-    // Create a fetch request for your entity
+
     let request: NSFetchRequest<HabitItem> = HabitItem.fetchRequest()
     request.predicate = NSPredicate(format: "id == %@", uuid as CVarArg)
     request.fetchLimit = 1
@@ -253,7 +253,7 @@ func deleteEntityHabit(withUUID uuid: UUID, viewContext: NSManagedObjectContext)
 }
 
 func deleteEntityTask(withUUID uuid: UUID, viewContext: NSManagedObjectContext) {
-    // Create a fetch request for your entity
+
     let request: NSFetchRequest<TaskItem> = TaskItem.fetchRequest()
     request.predicate = NSPredicate(format: "id == %@", uuid as CVarArg)
     request.fetchLimit = 1
@@ -448,9 +448,14 @@ func celebrationProcedure () {
         print("Goal for the day has been completed!")
 }
 
-func indexProtocols () {
+func indexProtocols (viewContext: NSManagedObjectContext) {
     
-    let habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+    var habitData: [HabitItem] = []
+    
+    do {
+        let request: NSFetchRequest<HabitItem> = HabitItem.fetchRequest()
+        habitData = try viewContext.fetch(request)
+    } catch {}
 
 
         if var protocolArray: [HabitProtocol] = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") {
@@ -462,7 +467,7 @@ func indexProtocols () {
                     ndxInArray = false
                     
                     for ndx2 in habitData {
-                        if ndx.ProtocolName == ndx2.HabitProtocol {
+                        if ndx.ProtocolName == ndx2.whichProtocol {
                             ndxInArray = true
                         }
                     }
@@ -478,14 +483,14 @@ func indexProtocols () {
 
                 for ndx in habitData {
                     var inArray = false
-                    print("Executing for item ", ndx.HabitName)
+                    print("Executing for item ", ndx.name ?? "")
                     for ndx2 in protocolArray {
-                        if ndx.HabitProtocol == ndx2.ProtocolName {
+                        if ndx.whichProtocol == ndx2.ProtocolName {
                             inArray = true
                         }
                     }
                     if inArray == false {
-                        protocolArray.append(HabitProtocol(ProtocolName: ndx.HabitProtocol, ProtocolDescription: ""))
+                        protocolArray.append(HabitProtocol(ProtocolName: ndx.whichProtocol ?? "", ProtocolDescription: ""))
                     }
                 }
 

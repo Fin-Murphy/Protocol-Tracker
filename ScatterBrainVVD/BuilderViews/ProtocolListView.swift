@@ -173,7 +173,7 @@ struct ProtocolListView: View {
         } catch {}
         
         
-        indexProtocols()
+        indexProtocols(viewContext: viewContext)
         
         listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") ?? []
         
@@ -212,7 +212,7 @@ struct ProtocolListView: View {
             try viewContext.save()
         } catch {}
         
-        indexProtocols()
+        indexProtocols(viewContext: viewContext)
         
         listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") ?? []
         

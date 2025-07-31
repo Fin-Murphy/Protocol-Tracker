@@ -128,7 +128,7 @@ struct HabitBuilderView: View {
             
 //            }
             Section {
-                Button {addItem()} label: {Text("Save Habit")}
+                Button {addItem(viewContext: viewContext)} label: {Text("Save Habit")}
             }
         }
     }
@@ -294,7 +294,7 @@ struct HabitBuilderView: View {
                                                                         updateHabit(habitToEdit: habitNdx)
                                                                         //------------------------------------
                                                                         DisplayHabitEditor = false
-                                                                        indexProtocols()
+                                                                        indexProtocols(viewContext: viewContext)
 
                                                                         //crap commit
                                                                     } label: {Text("Save Habit")}
@@ -466,7 +466,7 @@ struct HabitBuilderView: View {
                                                                     updateHabit(habitToEdit: habitNdx)
                                                                     //------------------------------------
                                                                     DisplayHabitEditor = false
-                                                                    indexProtocols()
+                                                                    indexProtocols(viewContext: viewContext)
                                                                     
                                                                     //crap commit
                                                                 } label: {Text("Save Habit")}
@@ -548,7 +548,7 @@ struct HabitBuilderView: View {
                 
             } else {}
             
-        }.onAppear{indexProtocols()}
+        }.onAppear{indexProtocols(viewContext: viewContext)}
     }
         
     // ------------------------------------ Spacer
@@ -593,7 +593,7 @@ struct HabitBuilderView: View {
     
     
 
-    private func addItem() {
+    private func addItem(viewContext: NSManagedObjectContext) {
         
         let date = Date()
         
@@ -732,7 +732,7 @@ struct HabitBuilderView: View {
         HabitOnSatSet = false
         HabitOnSunSet = false
                 
-        indexProtocols()
+        indexProtocols(viewContext: viewContext)
 
     }
 
