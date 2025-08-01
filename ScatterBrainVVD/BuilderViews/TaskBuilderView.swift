@@ -21,7 +21,7 @@ struct TaskBuilderView: View {
     @State var DisplayTaskEditor: Bool = false
     
     @State var TaskNameSet: String = "Task"
-    @State var TaskDescriptionSet: String = "This is a Task"
+    @State var TaskDescriptionSet: String = ""
     @State var TaskRewardSet: Int16 = 1
     @State var TaskDueDateSet: Date = Date()
     @State var TaskUnitSet: String = "units"

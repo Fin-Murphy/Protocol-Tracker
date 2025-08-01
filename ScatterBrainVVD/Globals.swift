@@ -176,15 +176,7 @@ func scootItem(item: Item, viewContext: NSManagedObjectContext){
     
     item.name = (">> " + (item.name ?? ""))
     
-    do {
-        try viewContext.save()
-    } catch {
-        // Replace this implementation with code to handle the error appropriately.
-        // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-        let nsError = error as NSError
-        fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-    }
-    
+    saveViewContext(viewContext: viewContext)
     
 }
 
@@ -262,16 +254,9 @@ func shuntTask (taskToShunt: TaskItem, viewContext: NSManagedObjectContext) {
     newItem.hasCheckbox = taskToShunt.hasCheckbox
     newItem.notFloater = taskToShunt.notFloater
     
-    
-    do {
-        try viewContext.save()
-        deleteEntityTask(withUUID: taskToShunt.id ?? UUID(), viewContext: viewContext)
-    } catch {
-        // Replace this implementation with code to handle the error appropriately.
-        // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-        let nsError = error as NSError
-        fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-    }
+    saveViewContext(viewContext: viewContext)
+    deleteEntityTask(withUUID: taskToShunt.id ?? UUID(), viewContext: viewContext)
+
 }
 
 func shuntTodaysTasks (viewContext: NSManagedObjectContext) {
@@ -288,6 +273,9 @@ func shuntTodaysTasks (viewContext: NSManagedObjectContext) {
         let nsError = error as NSError
         fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
     }
+    
+    saveViewContext(viewContext: viewContext)
+
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -338,6 +326,18 @@ extension UserDefaults {
     }
 } // END UserDefaults Encodable/Decodable extension
 
+func saveViewContext(viewContext: NSManagedObjectContext){
+    
+    do {
+        try viewContext.save()
+    } catch {
+        let nsError = error as NSError
+        fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+    }
+    
+    
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 // VALUEMOD FUNCTIONS
 // ---------------------------------------------------------------------------------------------------------------------
@@ -362,13 +362,8 @@ func addOne(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout In
         }
     }
         
+    saveViewContext(viewContext: viewContext)
 
-    do {
-        try viewContext.save()
-    } catch {
-        let nsError = error as NSError
-        fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-    }
 }
 
 func completeHabit(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout Int16) {
@@ -387,14 +382,8 @@ func completeHabit(item: Item, viewContext: NSManagedObjectContext, Celebrate: i
         }
     }
       
-    do {
-        try viewContext.save()
-    } catch {
-        let nsError = error as NSError
-        fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-    }
-    
-    
+    saveViewContext(viewContext: viewContext)
+
 }
 
 func subOne(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout Int16) {
@@ -413,22 +402,15 @@ func subOne(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout In
         }
     }
     
-    do {
-        try viewContext.save()
-    } catch {
-        let nsError = error as NSError
-        fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-    }
+    saveViewContext(viewContext: viewContext)
+
 }
 
 func setStatus(refItem: Item, viewContext: NSManagedObjectContext, updateItemStatus: Int16) {
     refItem.status = updateItemStatus
-    do {
-        try viewContext.save()
-    } catch {
-        let nsError = error as NSError
-        fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-    }
+
+    saveViewContext(viewContext: viewContext)
+    
     print(refItem.status)
 }
 
@@ -495,4 +477,7 @@ func indexProtocols (viewContext: NSManagedObjectContext) {
             let pArray: [HabitProtocol] = []
             UserDefaults.standard.setEncodable(pArray, forKey: "protocol")
         }
+    
+        saveViewContext(viewContext: viewContext)
+
     }

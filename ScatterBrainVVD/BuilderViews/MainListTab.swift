@@ -116,11 +116,13 @@ struct navLinkContent: View {
                 }
                 
             } else {
-                
-                Text(item.descriptor ?? "")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding()
-                    .bckMod()
+                if item.descriptor != "" {
+                    Text(item.descriptor ?? "")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                        .bckMod()
+                }
+        
             }
             
             
