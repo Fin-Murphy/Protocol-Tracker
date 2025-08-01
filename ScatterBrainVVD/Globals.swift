@@ -290,6 +290,10 @@ func shuntTodaysTasks (viewContext: NSManagedObjectContext) {
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// UTILITIES
+// ---------------------------------------------------------------------------------------------------------------------
+
 func displayHabitDescription (identifier: String, viewContext: NSManagedObjectContext) -> String {
     do {
         let request: NSFetchRequest<HabitItem> = HabitItem.fetchRequest()
@@ -297,7 +301,7 @@ func displayHabitDescription (identifier: String, viewContext: NSManagedObjectCo
         
         for index in habitData {
             if index.name == identifier {
-                return index.descript ?? "No description"
+                return index.descript ?? ""
             }
         }
         
@@ -306,10 +310,6 @@ func displayHabitDescription (identifier: String, viewContext: NSManagedObjectCo
     }
     return "No description"
 }
-
-// ---------------------------------------------------------------------------------------------------------------------
-// UTILITIES
-// ---------------------------------------------------------------------------------------------------------------------
 
 func daysBetween(start: Date, end: Date) -> Int {
     let calendar = Calendar.current

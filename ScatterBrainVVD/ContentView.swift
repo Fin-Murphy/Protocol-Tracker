@@ -15,16 +15,24 @@ struct ContentView: View {
     @State var selectedTab: Tabs = .HUB
     
     @State var SelectedDate: Date = Date()
-    
-    @State var moveCompleteHabits: Bool = false
-    
-    @State var Celebrate: Int16 = 0
         
-    @State var habitData: [Habit] = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
-    
+    @State var Celebrate: Int16 = 0
+            
     @State var seenWelcome: Bool = !UserDefaults.standard.bool(forKey: "seenWelcome")
     
-    @Environment(\.managedObjectContext) public var viewContext
+    @Environment(\.managedObjectContext) private var viewContext
+        
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \HabitItem.name, ascending: true)],
+        animation: .default)
+    private var habitData: FetchedResults<HabitItem>
+
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \TaskItem.name, ascending: true)],
+        animation: .default)
+    private var taskData: FetchedResults<TaskItem>
+    
+    
 
     var body: some View {
     
@@ -73,9 +81,9 @@ struct ContentView: View {
                 MainListTab(
                     selectedTab: $selectedTab,
                     Celebrate: $Celebrate,
-                    SelectedDate: $SelectedDate//,
-//                    moveCompleteHabits: $moveCompleteHabits
+                    SelectedDate: $SelectedDate
                 )
+                .environment(\.managedObjectContext, viewContext)
                 
             }// END HUB TAB
             
@@ -88,6 +96,8 @@ struct ContentView: View {
        .onChange(of: scenePhase) {
                refreshVisualData(ForeColor: &ForeColor)
        }
+        
+        
     }
 }
 

@@ -10,16 +10,18 @@ import CoreData
 
 struct HabitBuilderView: View {
     
+    
+    
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \HabitItem.name, ascending: true)],
         animation: .default)
     private var habitData: FetchedResults<HabitItem>
+
     
     @Environment(\.managedObjectContext) private var viewContext
         
     @State var DisplayHabitMaker: Bool = false
     @State var DisplayHabitEditor: Bool = false
-    
     
     @State var HabitNameSet: String = ""
     @State var HabitGoalSet: Int16 = 1
@@ -624,7 +626,7 @@ struct HabitBuilderView: View {
 //            }
 ////            UserDefaults.standard.setEncodable(habitData, forKey: "habitList")
 //        } else {}
-        
+    
         
         let newHabitItem = HabitItem(context: viewContext)
         
@@ -737,16 +739,11 @@ struct HabitBuilderView: View {
     }
 
     private func move(from source: IndexSet, to destination: Int) {
-//        $habitData.move(fromOffsets: source, toOffset: destination)
-//        
-//        do {
-//            try viewContext.save()
-//        } catch {
-//            let nsError = error as NSError
-//            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-//        }
-//        UserDefaults.standard.setEncodable(habitData, forKey: "habitList")
-//        habitData = UserDefaults.standard.getDecodable([Habit].self, forKey: "habitList") ?? []
+        do {
+            try viewContext.save()
+        } catch {
+            
+        }
     }
 
 }

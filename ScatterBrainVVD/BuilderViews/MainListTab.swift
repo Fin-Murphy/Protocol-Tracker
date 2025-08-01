@@ -60,7 +60,7 @@ struct navLinkContent: View {
     
     @ObservedObject var item: Item
 
-    @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
+    @Environment(\.managedObjectContext) private var viewContext
 
     @State var updateItemStatus: Int16 = 0
 
@@ -144,7 +144,6 @@ struct navLinkContent: View {
                     .font(.title)
                     .padding()
                     .bckMod()
-                
             }
             
             HStack{
@@ -243,20 +242,19 @@ struct MainListTab: View {
     // ---------------------------------------------------------------------------------------------------------------------
     // COREDATA
     // ---------------------------------------------------------------------------------------------------------------------
-
     
-    @Environment(\.managedObjectContext) public var viewContext
+    @Environment(\.managedObjectContext) private var viewContext
     
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
         animation: .default)
     private var items: FetchedResults<Item>
-        
+
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \HabitItem.name, ascending: true)],
         animation: .default)
     private var habitData: FetchedResults<HabitItem>
-
+    
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \TaskItem.name, ascending: true)],
         animation: .default)
@@ -288,11 +286,6 @@ struct MainListTab: View {
             
         }.bckMod()
     }//END WELCOMEMESSAGEVIEW
-
-    
-    
-    
-    
     
     // ---------------------------------------------------------------------------------------------------------------------
     // BODY CONTENT
@@ -317,7 +310,9 @@ struct MainListTab: View {
                                         NavigationLink {
                                             
                                             
-                                            navLinkContent(forceUpdate: $forceUpdate, item: item, viewContext: _viewContext, Celebrate: Celebrate)
+                                            navLinkContent(forceUpdate: $forceUpdate, item: item, Celebrate: Celebrate)
+                                                .environment(\.managedObjectContext, viewContext)
+
                                             
                                         } label: {
                                             navLinkLabel(item: item)
@@ -349,7 +344,8 @@ struct MainListTab: View {
                                         
                                         NavigationLink {
                                             
-                                            navLinkContent(forceUpdate: $forceUpdate, item: item, viewContext: _viewContext, Celebrate: Celebrate)
+                                            navLinkContent(forceUpdate: $forceUpdate, item: item, Celebrate: Celebrate)
+                                                .environment(\.managedObjectContext, viewContext)
                                             
                                         } // End of navigation link
                                         label: {

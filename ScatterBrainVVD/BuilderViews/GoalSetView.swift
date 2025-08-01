@@ -12,9 +12,7 @@ struct GoalSetView: View {
     @State var dailyGoalSet: Int?
     @State var displayCompletedHabits: Bool = false
     var body: some View {
-      
-// 
-        
+              
         ProtocolListView()
   
     }
