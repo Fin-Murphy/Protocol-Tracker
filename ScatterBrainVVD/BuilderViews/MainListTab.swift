@@ -81,7 +81,6 @@ struct navLinkContent: View {
         
         if item.hasStatus == true {
             
-            
             VStack {
                 HStack {
                     Text("Habit status:")

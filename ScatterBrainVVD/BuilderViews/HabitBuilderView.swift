@@ -16,7 +16,6 @@ struct HabitBuilderView: View {
         sortDescriptors: [NSSortDescriptor(keyPath: \HabitItem.name, ascending: true)],
         animation: .default)
     private var habitData: FetchedResults<HabitItem>
-
     
     @Environment(\.managedObjectContext) private var viewContext
         
@@ -292,13 +291,12 @@ struct HabitBuilderView: View {
                                                                 Section {
                                                                     Button {
                                                                         //------------------------------------
-                                                                        //Keep commented out for now, possibly problematic
                                                                         updateHabit(habitToEdit: habitNdx)
                                                                         //------------------------------------
                                                                         DisplayHabitEditor = false
                                                                         indexProtocols(viewContext: viewContext)
-
-                                                                        //crap commit
+                                                                        listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol")
+                                                                        
                                                                     } label: {Text("Save Habit")}
                                                                 }
                                                             }
@@ -469,6 +467,7 @@ struct HabitBuilderView: View {
                                                                     //------------------------------------
                                                                     DisplayHabitEditor = false
                                                                     indexProtocols(viewContext: viewContext)
+                                                                    listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol")
                                                                     
                                                                     //crap commit
                                                                 } label: {Text("Save Habit")}

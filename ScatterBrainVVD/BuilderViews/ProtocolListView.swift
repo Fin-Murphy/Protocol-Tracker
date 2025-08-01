@@ -136,8 +136,6 @@ struct ProtocolListView: View {
         //REWORK TO COREDATA
         
         do {
-            let request: NSFetchRequest<HabitItem> = HabitItem.fetchRequest()
-            let habitData = try viewContext.fetch(request)
             
             for habit in refProt.ProtocolContent {
                 
