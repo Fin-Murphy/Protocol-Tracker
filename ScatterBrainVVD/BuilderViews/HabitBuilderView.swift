@@ -13,7 +13,7 @@ struct HabitBuilderView: View {
     
     
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \HabitItem.name, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \HabitItem.order, ascending: true)],
         animation: .default)
     private var habitData: FetchedResults<HabitItem>
     
@@ -738,13 +738,26 @@ struct HabitBuilderView: View {
     }
 
     private func move(from source: IndexSet, to destination: Int) {
-        do {
-            try viewContext.save()
-        } catch {
+        
+            var updates: [(HabitItem, Int32)] = []
+            var reorderedItems = Array(habitData)
             
-        }
+            reorderedItems.move(fromOffsets: source, toOffset: destination)
+            
+            for (index, item) in reorderedItems.enumerated() {
+                if item.order != Int32(index) {
+                    updates.append((item, Int32(index)))
+                }
+            }
+            
+            for (item, newOrder) in updates {
+                item.order = newOrder
+            }
+            
+        saveViewContext(viewContext: viewContext)
+            
     }
-
+        
 }
 
 //#Preview {
