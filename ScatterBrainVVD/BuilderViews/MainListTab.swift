@@ -54,6 +54,66 @@ struct navLinkLabel: View {
     }
 }
 
+struct valueModView: View {
+    
+    @ObservedObject var item: Item
+    @State var Celebrate: Int16
+    @Environment(\.managedObjectContext) private var viewContext
+
+    
+    var body: some View {
+        
+        
+        if item.complete == true {
+            Text("☑ \(item.value)/\(item.goal) \(item.unit ?? "")")
+                .font(.title)
+                .padding()
+                .bckMod()
+            
+        } else {
+            Text("☐ \(item.value)/\(item.goal) \(item.unit ?? "")")
+                .font(.title)
+                .padding()
+                .bckMod()
+        }
+        
+        HStack{
+            if item.goal > 10 {
+                Button {
+                    addValue(item: item, value: 5, viewContext: viewContext, Celebrate: &Celebrate)
+                } label: {
+                    Text("+ 5")
+                        .bckMod()
+                }
+            }
+            Button {
+                
+                addValue(item: item, value: 1, viewContext: viewContext, Celebrate: &Celebrate)
+//                    if item.value == item.goal {
+//
+//                    }
+            }
+            label: {
+                Text("+ 1")
+                    .bckMod()
+            }
+            Button {
+                subValue(item: item, value: 1, viewContext: viewContext, Celebrate: &Celebrate)
+//                    if item.value == item.goal {
+//
+//                    }
+            }
+            label: {
+                Text("- 1")
+                    .bckMod()
+            }
+        }
+        
+        
+        
+    }
+}
+
 struct navLinkContent: View {
     
     @Binding var forceUpdate: Bool
@@ -134,52 +194,9 @@ struct navLinkContent: View {
         
         if item.hasCheckbox == false {
             
-            if item.complete == true {
-                Text("☑ \(item.value)/\(item.goal) \(item.unit ?? "")")
-                    .font(.title)
-                    .padding()
-                    .bckMod()
-                
-            } else {
-                Text("☐ \(item.value)/\(item.goal) \(item.unit ?? "")")
-                    .font(.title)
-                    .padding()
-                    .bckMod()
-            }
-            
-            HStack{
-//                if item.goal > 10 {
-//                    Button {
-//                        addValue(item: item, value: 5, viewContext: viewContext, Celebrate: &Celebrate)
-//                    } label: {
-//                        Text("+ 5")
-//                            .bckMod()
-//                    }
-//                }
-                Button {
-                    
-                    addValue(item: item, value: 1, viewContext: viewContext, Celebrate: &Celebrate)
-                    forceUpdate.toggle()
-//                    if item.value == item.goal {
-//                        
-//                    }
-                }
-                label: {
-                    Text("+ 1")
-                        .bckMod()
-                }
-                Button {
-                    subValue(item: item, value: 1, viewContext: viewContext, Celebrate: &Celebrate)
-                    forceUpdate.toggle()
-//                    if item.value == item.goal {
-//                        
-//                    }
-                }
-                label: {
-                    Text("- 1")
-                        .bckMod()
-                }
-            }
+           valueModView(item: item, Celebrate: Celebrate)
+                .environment(\.managedObjectContext, viewContext)
+
             
         } else {
             
@@ -218,15 +235,11 @@ struct navLinkContent: View {
         }
         // ---------------------- END VALUE MODIFICATION
         
-        
         Spacer()
-        
     }
-    
 }
 
 struct MainListTab: View {
-    
     
     // ---------------------------------------------------------------------------------------------------------------------
     // BINDINGS
@@ -313,15 +326,14 @@ struct MainListTab: View {
                     VStack{
                         
                         List {
+                            
                                 ForEach(items) { item in
                                     if (Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true && item.complete == false) || (item.notFloater == false && item.complete == false) {
                                         
                                         NavigationLink {
                                             
-                                            
                                             navLinkContent(forceUpdate: $forceUpdate, item: item, Celebrate: Celebrate)
                                                 .environment(\.managedObjectContext, viewContext)
-
                                             
                                         } label: {
                                             navLinkLabel(item: item)
@@ -341,10 +353,7 @@ struct MainListTab: View {
                                             }
                                             .tint(.red)
                                         }
-                                        
-                                        
                                     } else {}
-                                    
                                 }
                                 
                                 ForEach(items) { item in
@@ -390,11 +399,8 @@ struct MainListTab: View {
                 }//END NAV VIEW
                 
                 if seenWelcome {
-                    
                     welcomeMessageView
-                
                 }
-                
                 
             }.onAppear{
                 checkDate()
@@ -409,7 +415,6 @@ struct MainListTab: View {
     // START PRIVATE FUNCTIONS
     
     // ---------------------------------------------------------------------------------------------------------------------
-
 
     public func checkDate() {
         if let savedDate = UserDefaults.standard.object(forKey: "DailyTaskPopulate?") as? Date {
@@ -442,17 +447,14 @@ struct MainListTab: View {
         }
     }
     
-    
     private func populateTasks() {
-        
-        
+
         let date = Date()
         
         let dformatter = DateFormatter()
         dformatter.dateFormat = "EEEE"
         let dayOfWeek = dformatter.string(from: date)
 
-        
         for taskFinder in items {
             if (taskFinder.isTask == true) && (Calendar.current.isDate((taskFinder.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) != true) && (taskFinder.complete == false) && (taskFinder.notFloater == true){
                     deshuntTask(item: taskFinder)
