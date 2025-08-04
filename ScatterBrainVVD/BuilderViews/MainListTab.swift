@@ -59,7 +59,6 @@ struct valueModView: View {
     @ObservedObject var item: Item
     @State var Celebrate: Int16
     @Environment(\.managedObjectContext) private var viewContext
-
     
     var body: some View {
         
@@ -80,6 +79,14 @@ struct valueModView: View {
         HStack{
             if item.goal > 10 {
                 Button {
+                    addValue(item: item, value: 10, viewContext: viewContext, Celebrate: &Celebrate)
+                } label: {
+                    Text("+ 10")
+                        .bckMod()
+                }
+            }
+            if item.goal > 5 {
+                Button {
                     addValue(item: item, value: 5, viewContext: viewContext, Celebrate: &Celebrate)
                 } label: {
                     Text("+ 5")
@@ -97,20 +104,35 @@ struct valueModView: View {
                 Text("+ 1")
                     .bckMod()
             }
+            
             Button {
                 subValue(item: item, value: 1, viewContext: viewContext, Celebrate: &Celebrate)
 //                    if item.value == item.goal {
 //
 //                    }
-            }
-            label: {
+            } label: {
                 Text("- 1")
                     .bckMod()
             }
-        }
-        
-        
-        
+            
+            if item.goal > 5 {
+                Button {
+                    subValue(item: item, value: 5, viewContext: viewContext, Celebrate: &Celebrate)
+                } label: {
+                    Text("- 5")
+                        .bckMod()
+                }
+            }
+            if item.goal > 10 {
+                Button {
+                    subValue(item: item, value: 10, viewContext: viewContext, Celebrate: &Celebrate)
+                } label: {
+                    Text("- 10")
+                        .bckMod()
+                }
+            }
+            
+        } // END HSTACK
     }
 }
 
