@@ -60,7 +60,7 @@ struct ContentView: View {
                                     
                 HabitBuilderView()
                     .environment(\.managedObjectContext, viewContext)
-                    
+
 /* *******************************************************
             GOALS TAB
 ****************************************************** */
@@ -68,11 +68,11 @@ struct ContentView: View {
                 
                 TaskBuilderView()
                     .environment(\.managedObjectContext, viewContext)
-                
+
 /* *******************************************************
             MAIN TASK TAB
 ****************************************************** */
-                
+
             } else if selectedTab == .HUB {
             
                 MainListTab(
@@ -88,7 +88,7 @@ struct ContentView: View {
                         
             TabBar(selectedTab: $selectedTab)
        }
-        
+
        .onAppear{refreshVisualData(ForeColor: &ForeColor)}
        .onChange(of: scenePhase) {
                refreshVisualData(ForeColor: &ForeColor)
@@ -99,3 +99,8 @@ struct ContentView: View {
 #Preview {
     ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }
+
+
+
+
+

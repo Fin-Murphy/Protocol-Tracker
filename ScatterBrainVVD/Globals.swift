@@ -344,30 +344,6 @@ func saveViewContext(viewContext: NSManagedObjectContext){
 // VALUEMOD FUNCTIONS
 // ---------------------------------------------------------------------------------------------------------------------
 
-func addOne(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout Int16) {
-    
-    if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true {
-
-        item.value = item.value + 1
-        
-        if item.value >= item.goal {
-            if item.complete == false {
-                Celebrate += item.reward
-                item.notFloater = true
-            }
-            item.complete = true
-            
-        }
-        
-        if Celebrate >= UserDefaults.standard.integer(forKey: "dailyGoal") {
-            celebrationProcedure()
-        }
-    }
-        
-    saveViewContext(viewContext: viewContext)
-
-}
-
 func addValue(item: Item, value: Int16, viewContext: NSManagedObjectContext, Celebrate: inout Int16){
     if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true {
 
@@ -404,26 +380,6 @@ func completeHabit(item: Item, viewContext: NSManagedObjectContext, Celebrate: i
         }
     }
       
-    saveViewContext(viewContext: viewContext)
-
-}
-
-func subOne(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout Int16) {
-    
-    if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true {
-        
-        if item.value > 0 {
-            item.value = item.value - 1
-        }
-        
-        if item.value < item.goal {
-            if item.complete == true {
-                Celebrate -= item.reward
-            }
-            item.complete = false
-        }
-    }
-    
     saveViewContext(viewContext: viewContext)
 
 }
