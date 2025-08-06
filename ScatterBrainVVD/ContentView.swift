@@ -32,8 +32,6 @@ struct ContentView: View {
 //        animation: .default)
 //    private var taskData: FetchedResults<TaskItem>
     
-    
-
     var body: some View {
     
        VStack{
@@ -46,7 +44,6 @@ struct ContentView: View {
                
                CalendarView(SelectedDate: $SelectedDate, selectedTab: $selectedTab)
                 
-               
 /* *******************************************************
                        BOOK TAB
 ****************************************************** */
@@ -96,8 +93,6 @@ struct ContentView: View {
        .onChange(of: scenePhase) {
                refreshVisualData(ForeColor: &ForeColor)
        }
-        
-        
     }
 }
 

@@ -368,6 +368,26 @@ func addOne(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout In
 
 }
 
+func addValue(item: Item, value: Int16, viewContext: NSManagedObjectContext, Celebrate: inout Int16){
+    if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true {
+
+        item.value = item.value + value
+        
+        if item.value >= item.goal {
+            if item.complete == false {
+                Celebrate += item.reward
+                item.notFloater = true
+            }
+            item.complete = true
+        }
+        
+        if Celebrate >= UserDefaults.standard.integer(forKey: "dailyGoal") {
+            celebrationProcedure()
+        }
+    }
+    saveViewContext(viewContext: viewContext)
+}
+
 func completeHabit(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout Int16) {
     
     if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true {
