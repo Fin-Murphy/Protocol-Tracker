@@ -428,6 +428,27 @@ func subOne(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout In
 
 }
 
+func subValue(item: Item, value: Int16, viewContext: NSManagedObjectContext, Celebrate: inout Int16) {
+    
+    if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true {
+        
+        if item.value > 0 {
+            item.value = item.value - value
+        }
+        
+        if item.value < item.goal {
+            if item.complete == true {
+                Celebrate -= item.reward
+            }
+            item.complete = false
+        }
+    }
+
+    saveViewContext(viewContext: viewContext)
+
+}
+
+
 func setStatus(refItem: Item, viewContext: NSManagedObjectContext, updateItemStatus: Int16) {
     refItem.status = updateItemStatus
 

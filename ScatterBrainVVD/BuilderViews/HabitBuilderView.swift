@@ -10,8 +10,6 @@ import CoreData
 
 struct HabitBuilderView: View {
     
-    
-    
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \HabitItem.order, ascending: true)],
         animation: .default)

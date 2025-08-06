@@ -148,24 +148,32 @@ struct navLinkContent: View {
             }
             
             HStack{
-                
+//                if item.goal > 10 {
+//                    Button {
+//                        addValue(item: item, value: 5, viewContext: viewContext, Celebrate: &Celebrate)
+//                    } label: {
+//                        Text("+ 5")
+//                            .bckMod()
+//                    }
+//                }
                 Button {
-                    addOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
+                    
+                    addValue(item: item, value: 1, viewContext: viewContext, Celebrate: &Celebrate)
                     forceUpdate.toggle()
-                    if item.value == item.goal {
-                        
-                    }
+//                    if item.value == item.goal {
+//                        
+//                    }
                 }
                 label: {
                     Text("+ 1")
                         .bckMod()
                 }
                 Button {
-                    subOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
+                    subValue(item: item, value: 1, viewContext: viewContext, Celebrate: &Celebrate)
                     forceUpdate.toggle()
-                    if item.value == item.goal {
-                        
-                    }
+//                    if item.value == item.goal {
+//                        
+//                    }
                 }
                 label: {
                     Text("- 1")
@@ -178,7 +186,7 @@ struct navLinkContent: View {
             
             if item.complete == true {
                 Button{
-                    subOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
+                    subValue(item: item, value: 1, viewContext: viewContext, Celebrate: &Celebrate)
                     forceUpdate.toggle()
                 } label: {
                     Text("☑")
@@ -189,7 +197,7 @@ struct navLinkContent: View {
                 
             } else {
                 Button{
-                    addOne(item: item, viewContext: viewContext, Celebrate: &Celebrate)
+                    addValue(item: item, value: 1, viewContext: viewContext, Celebrate: &Celebrate)
                     forceUpdate.toggle()
                 } label: {
                     Text("☐")
