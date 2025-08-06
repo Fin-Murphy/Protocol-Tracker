@@ -22,15 +22,15 @@ struct ContentView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
         
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \HabitItem.name, ascending: true)],
-        animation: .default)
-    private var habitData: FetchedResults<HabitItem>
-
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \TaskItem.name, ascending: true)],
-        animation: .default)
-    private var taskData: FetchedResults<TaskItem>
+//    @FetchRequest(
+//        sortDescriptors: [NSSortDescriptor(keyPath: \HabitItem.order, ascending: true)],
+//        animation: .default)
+//    private var habitData: FetchedResults<HabitItem>
+//
+//    @FetchRequest(
+//        sortDescriptors: [NSSortDescriptor(keyPath: \TaskItem.name, ascending: true)],
+//        animation: .default)
+//    private var taskData: FetchedResults<TaskItem>
     
     
 

@@ -154,6 +154,8 @@ struct ProtocolListView: View {
                 newHabitItem.hasStatus = habit.HabitHasStatus
                 newHabitItem.hasCheckbox = habit.HabitHasCheckbox
                 
+                newHabitItem.order = habit.HabitOrdering
+                
                 newHabitItem.useDow = habit.HabitUseDow
                 
                 newHabitItem.onSun = habit.HabitOnSun
@@ -195,6 +197,8 @@ struct ProtocolListView: View {
         newHabitItem.reward = refHab.HabitReward
         newHabitItem.hasStatus = refHab.HabitHasStatus
         newHabitItem.hasCheckbox = refHab.HabitHasCheckbox
+        
+        newHabitItem.order = refHab.HabitOrdering
         
         newHabitItem.useDow = refHab.HabitUseDow
         

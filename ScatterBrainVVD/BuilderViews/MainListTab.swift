@@ -252,7 +252,7 @@ struct MainListTab: View {
     private var items: FetchedResults<Item>
 
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \HabitItem.name, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \HabitItem.order, ascending: true)],
         animation: .default)
     private var habitData: FetchedResults<HabitItem>
     
