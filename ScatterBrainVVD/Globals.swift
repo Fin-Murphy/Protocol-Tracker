@@ -360,7 +360,17 @@ func addValue(item: Item, value: Int16, viewContext: NSManagedObjectContext, Cel
         if Celebrate >= UserDefaults.standard.integer(forKey: "dailyGoal") {
             celebrationProcedure()
         }
+    } else {
+        item.value = item.value + value
+        if item.value >= item.goal {
+            if item.complete == false {
+                item.complete = true
+            }
+        }
     }
+    
+    
+    
     saveViewContext(viewContext: viewContext)
 }
 
@@ -377,6 +387,12 @@ func completeHabit(item: Item, viewContext: NSManagedObjectContext, Celebrate: i
         
         if Celebrate >= UserDefaults.standard.integer(forKey: "dailyGoal") {
             celebrationProcedure()
+        }
+    } else {
+        if item.complete == false {
+            item.value = item.goal
+            item.complete = true
+            item.notFloater = true
         }
     }
       
@@ -398,12 +414,18 @@ func subValue(item: Item, value: Int16, viewContext: NSManagedObjectContext, Cel
             }
             item.complete = false
         }
+    } else {
+        item.value = item.value - value
+        if item.value < item.goal {
+            if item.complete == true {
+                item.complete = false
+            }
+        }
     }
 
     saveViewContext(viewContext: viewContext)
 
 }
-
 
 func setStatus(refItem: Item, viewContext: NSManagedObjectContext, updateItemStatus: Int16) {
     refItem.status = updateItemStatus
