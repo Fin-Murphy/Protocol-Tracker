@@ -16,16 +16,35 @@ struct navLinkLabel: View {
         
         HStack{
             
+            if item.complete == true {
+                                
+                Image(systemName: "xmark")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 8,height: 8)
+                
+            } else {
+                
+                Text("•")
+                
+            }
+            
             if item.isTask == true {
+                                
                 Image(systemName: "t.square")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 20,height: 20)
+                
             } else {
+                
+//                Text("•")
+
                 Image(systemName: "h.square")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 20,height: 20)
+                
             }
             
             if item.complete == true {

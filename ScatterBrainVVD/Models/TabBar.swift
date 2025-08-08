@@ -74,9 +74,7 @@ struct TabBar: View {
             
             }
             
-            
             //-----------------------------------------------
-
             
             if selectedTab == .HUB {
                 
@@ -105,7 +103,7 @@ struct TabBar: View {
                     Button {
                         selectedTab = .Goals
                     } label: {
-                        SymbolButton(bIcon: "checklist.checked", bTxt: "Tasks")
+                        SymbolButton(bIcon: "checklist.checked", bTxt: "Log")
                     }.foregroundColor(ForeColor)
                 
             } else {

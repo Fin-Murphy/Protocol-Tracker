@@ -497,6 +497,7 @@ struct HabitBuilderView: View {
                                                         }
                                                     } else {}
                                                 }// end zstack
+                                                .onAppear {DisplayHabitEditor = false}
                                             } label: {
                                                 HStack {
                                                     //-----------------------------------------------------
@@ -758,5 +759,5 @@ struct HabitBuilderView: View {
 }
 
 //#Preview {
-//    HabitBuilderView(selectedTab: .HUB)
+//    HabitBuilderView()
 //}

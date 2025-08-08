@@ -176,7 +176,7 @@ func scootItem(item: Item, viewContext: NSManagedObjectContext){
     newItem.hasCheckbox = item.hasCheckbox
     newItem.notFloater = true
     
-    item.name = (">> " + (item.name ?? ""))
+    item.name = ("> " + (item.name ?? ""))
     
     saveViewContext(viewContext: viewContext)
     
@@ -397,7 +397,6 @@ func completeHabit(item: Item, viewContext: NSManagedObjectContext, Celebrate: i
     }
       
     saveViewContext(viewContext: viewContext)
-
 }
 
 func subValue(item: Item, value: Int16, viewContext: NSManagedObjectContext, Celebrate: inout Int16) {
