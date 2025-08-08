@@ -168,16 +168,16 @@ struct HabitBuilderView: View {
                             List {
                                 if displayByProtocol == true {
                                     ForEach(listOfProtocols!) { index in
-//
+
                                         Text(index.ProtocolName)
                                             .font(.title2)
                                             .fontWeight(.bold)
                                             .padding(.top)
-//
+
                                         ForEach(habitData) { habitNdx in
-//
+
                                             if habitNdx.whichProtocol == index.ProtocolName && habitNdx.isSubtask == false {
-//
+
                                                 NavigationLink{
                                                     ZStack{
                                                         VStack {
@@ -227,7 +227,7 @@ struct HabitBuilderView: View {
                                                                 Text("Remove this habit")
                                                             }
                                                         }
-//
+
                                                         if DisplayHabitEditor == true {
 
                                                             Form {
@@ -264,9 +264,7 @@ struct HabitBuilderView: View {
                                                                 Section(header: Text("Habit Protocol:")) {
                                                                     TextField("", text: $HabitProtocolSet)
                                                                 }
-
-
-
+                                                                
                                                                 Section(header: Text("Habit Details")) {
                                                                     TextEditor(text: $HabitDescriptionSet)
                                                                         .frame(minHeight: 100)
@@ -341,8 +339,7 @@ struct HabitBuilderView: View {
                                             } else {}
                                         }.onMove(perform: move)
                                     }
-                                    
-                                    
+                        
                                 } else {
                                     
                                     ForEach(habitData) { habitNdx in
@@ -511,13 +508,8 @@ struct HabitBuilderView: View {
                                             }
                                         } else {}
                                     }.onMove(perform: move)
-                                    
                                 } // END ELSE (DISPLAY BY PROTOCOL)
-                        
                             }
-//                            .toolbar {
-//                                EditButton()
-//                            }
                         }
                     
                     
@@ -586,10 +578,7 @@ struct HabitBuilderView: View {
             let nsError = error as NSError
             fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
         }
-        
-        
     }
-    
     
 
     private func addItem(viewContext: NSManagedObjectContext) {
@@ -623,7 +612,6 @@ struct HabitBuilderView: View {
 //            }
 ////            UserDefaults.standard.setEncodable(habitData, forKey: "habitList")
 //        } else {}
-    
         
         let newHabitItem = HabitItem(context: viewContext)
         
@@ -755,7 +743,6 @@ struct HabitBuilderView: View {
         saveViewContext(viewContext: viewContext)
             
     }
-        
 }
 
 //#Preview {

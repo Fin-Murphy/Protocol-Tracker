@@ -115,7 +115,6 @@ struct ProtocolListView: View {
                         }//end list
                     }// end navview
                     
-                    
                 }
                 .frame(width:300,height:700)
                 .cornerRadius(10)
