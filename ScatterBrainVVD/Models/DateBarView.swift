@@ -28,8 +28,8 @@ struct DateBarView: View {
                     .fontWeight(.bold)
                     .font(.title2)
                 
-                
-                Text(" - (\(Celebrate)/\(UserDefaults.standard.integer(forKey: "dailyGoal")) Points)")
+//                Text(" - (\(Celebrate)/\(UserDefaults.standard.integer(forKey: "dailyGoal")) Points)")
+                Text(" - (\(Celebrate) Points)")
                     .fontWeight(.bold)
                     .font(.title2)
                 

@@ -473,8 +473,6 @@ struct MainListTab: View {
                 UserDefaults.standard.set(0, forKey: "TodayScore")
                 saveViewContext(viewContext: viewContext)
                 
-                
-                
                 populateTasks()
                 UserDefaults.standard.set(Date(), forKey: "DailyTaskPopulate?")
                 Celebrate = 0
