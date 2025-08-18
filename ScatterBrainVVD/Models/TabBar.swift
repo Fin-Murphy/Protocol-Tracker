@@ -35,7 +35,7 @@ struct TabBar: View {
                         selectedTab = .Calendar
                     }
                     label: {
-                        SymbolButton(bIcon: "calendar.badge.plus", bTxt: "Calendar")
+                        SymbolButton(bIcon: "gearshape.fill", bTxt: "Settings")
                     }.foregroundColor(ForeColor)
 
             } else {
@@ -44,7 +44,7 @@ struct TabBar: View {
                         selectedTab = .Calendar
                     }
                     label: {
-                        SymbolButton(bIcon: "calendar", bTxt: "")
+                        SymbolButton(bIcon: "gearshape", bTxt: "")
                     }.foregroundColor(ForeColor)
 
             }
@@ -127,7 +127,7 @@ struct TabBar: View {
                     Button  {
                         selectedTab = .Settings
                     } label: {
-                        SymbolButton(bIcon: "gearshape.fill", bTxt: "Settings")
+                        SymbolButton(bIcon: "p.square.fill", bTxt: "Protocols")
                     }.foregroundColor(ForeColor)
 
             } else {
@@ -135,7 +135,7 @@ struct TabBar: View {
                     Button  {
                         selectedTab = .Settings
                     } label: {
-                        SymbolButton(bIcon: "gearshape", bTxt: "")
+                        SymbolButton(bIcon: "p.square", bTxt: "")
                     }.foregroundColor(ForeColor)
 
             }

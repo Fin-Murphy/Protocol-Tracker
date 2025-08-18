@@ -32,8 +32,10 @@ struct ContentView: View {
     
            if selectedTab == .Calendar {
                
-               CalendarView(SelectedDate: $SelectedDate, selectedTab: $selectedTab)
+//               CalendarView(SelectedDate: $SelectedDate, selectedTab: $selectedTab)
                 
+               
+               SettingsView()
 /* *******************************************************
                        BOOK TAB
 ****************************************************** */
