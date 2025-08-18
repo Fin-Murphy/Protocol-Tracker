@@ -73,7 +73,7 @@ struct navLinkLabel: View {
 struct valueModView: View {
     
     @ObservedObject var item: Item
-    @State var Celebrate: Int16
+    @Binding var Celebrate: Int16
     @Environment(\.managedObjectContext) private var viewContext
     
     var body: some View {
@@ -162,8 +162,8 @@ struct navLinkContent: View {
 
     @State var updateItemStatus: Int16 = 0
 
-    @State var Celebrate: Int16
-    
+    @Binding var Celebrate: Int16
+
     var body: some View {
         
         if item.complete == true {
@@ -232,7 +232,7 @@ struct navLinkContent: View {
         
         if item.hasCheckbox == false {
             
-           valueModView(item: item, Celebrate: Celebrate)
+            valueModView(item: item, Celebrate: $Celebrate)
                 .environment(\.managedObjectContext, viewContext)
 
             
@@ -355,7 +355,7 @@ struct MainListTab: View {
          
         VStack{
             
-            DateBarView(SelectedDate: $SelectedDate/*, Celebrate: $Celebrate*/)
+            DateBarView(SelectedDate: $SelectedDate, Celebrate: $Celebrate)
             
             ZStack{
                 
@@ -370,7 +370,7 @@ struct MainListTab: View {
                                         
                                         NavigationLink {
                                             
-                                            navLinkContent(forceUpdate: $forceUpdate, item: item, Celebrate: Celebrate)
+                                            navLinkContent(forceUpdate: $forceUpdate, item: item, Celebrate: $Celebrate)
                                                 .environment(\.managedObjectContext, viewContext)
                                             
                                         } label: {
@@ -400,7 +400,7 @@ struct MainListTab: View {
                                         
                                         NavigationLink {
                                             
-                                            navLinkContent(forceUpdate: $forceUpdate, item: item, Celebrate: Celebrate)
+                                            navLinkContent(forceUpdate: $forceUpdate, item: item, Celebrate: $Celebrate)
                                                 .environment(\.managedObjectContext, viewContext)
                                             
                                         } // End of navigation link
@@ -442,6 +442,7 @@ struct MainListTab: View {
                 
             }.onAppear{
                 checkDate()
+                Celebrate = Int16(UserDefaults.standard.integer(forKey:"TodayScore"))
             } // END ZSTACK
             
         }//END VSTACK

@@ -350,7 +350,7 @@ func addValue(item: Item, value: Int16, viewContext: NSManagedObjectContext, Cel
                 TodayScore += Int(item.reward)
                 UserDefaults.standard.set(TodayScore, forKey: "TodayScore")
                 
-//                Celebrate += item.reward
+                Celebrate = Int16(TodayScore)
                 item.notFloater = true
             }
             item.complete = true
@@ -385,6 +385,8 @@ func completeHabit(item: Item, viewContext: NSManagedObjectContext, Celebrate: i
             TodayScore += Int(item.reward)
             UserDefaults.standard.set(TodayScore, forKey: "TodayScore")
             
+            Celebrate = Int16(TodayScore)
+            
             item.notFloater = true
         }
         
@@ -416,7 +418,8 @@ func subValue(item: Item, value: Int16, viewContext: NSManagedObjectContext, Cel
                 var TodayScore = UserDefaults.standard.integer(forKey: "TodayScore")
                 TodayScore -= Int(item.reward)
                 UserDefaults.standard.set(TodayScore, forKey: "TodayScore")
-    
+                
+                Celebrate = Int16(TodayScore)
                 
             }
             item.complete = false
@@ -429,9 +432,7 @@ func subValue(item: Item, value: Int16, viewContext: NSManagedObjectContext, Cel
             }
         }
     }
-
     saveViewContext(viewContext: viewContext)
-
 }
 
 func setStatus(refItem: Item, viewContext: NSManagedObjectContext, updateItemStatus: Int16) {

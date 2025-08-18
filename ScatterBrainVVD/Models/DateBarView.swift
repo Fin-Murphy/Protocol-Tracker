@@ -10,11 +10,8 @@ import SwiftUI
 struct DateBarView: View {
     
     @Binding var SelectedDate: Date
-//    @Binding var Celebrate: Int16
-    
-     @State var Celebrate = UserDefaults.standard.integer(forKey:"TodayScore")
-    
-    
+    @Binding var Celebrate: Int16
+        
     var body: some View {
         VStack{
             HStack{
@@ -49,6 +46,9 @@ struct DateBarView: View {
             }
             .colorScheme(.light)
             .foregroundColor(ForeColor)
+//            .onAppear {
+//                Celebrate = Int16(UserDefaults.standard.integer(forKey:"TodayScore"))
+//            }
 
             
         }

@@ -16,7 +16,7 @@ struct ContentView: View {
     
     @State var SelectedDate: Date = Date()
         
-    @State var Celebrate: Int16 = 0
+    @State var Celebrate: Int16 = Int16(UserDefaults.standard.integer(forKey: "TodayScore"))
             
     @State var seenWelcome: Bool = !UserDefaults.standard.bool(forKey: "seenWelcome")
     
