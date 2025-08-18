@@ -10,49 +10,48 @@ import SwiftUI
 struct DateBarView: View {
     
     @Binding var SelectedDate: Date
-    @Binding var Celebrate: Int16
+//    @Binding var Celebrate: Int16
+    
+     @State var Celebrate = UserDefaults.standard.integer(forKey:"TodayScore")
     
     
     var body: some View {
-        
-        HStack{
-            
-            Button {
-                SelectedDate = calendar.date(byAdding: .day, value: -1, to: SelectedDate)!
-            } label: {
-                Text("<<")
-                    .fontWeight(.bold)
-                    .font(.title2)
-            }
-                                
-            Text("\(SelectedDate, formatter: itemFormatter)")
-                .fontWeight(.bold)
-                .font(.title2)
-            
-//            Text("(\(Celebrate)/\(UserDefaults.standard.integer(forKey: "dailyGoal")) Points)")
-//                .fontWeight(.bold)
-//                .font(.title2)
-            
-            Button {
-                SelectedDate = calendar.date(byAdding: .day, value: 1, to: SelectedDate)!
+        VStack{
+            HStack{
                 
-            } label: {
-                Text(">>")
+                Button {
+                    SelectedDate = calendar.date(byAdding: .day, value: -1, to: SelectedDate)!
+                } label: {
+                    Text("<<")
+                        .fontWeight(.bold)
+                        .font(.title2)
+                }
+                
+                Text("\(SelectedDate, formatter: itemFormatter)")
                     .fontWeight(.bold)
                     .font(.title2)
-                                    }
+                
+                
+                Text(" - (\(Celebrate)/\(UserDefaults.standard.integer(forKey: "dailyGoal")) Points)")
+                    .fontWeight(.bold)
+                    .font(.title2)
+                
+        
+                
+                Button {
+                    SelectedDate = calendar.date(byAdding: .day, value: 1, to: SelectedDate)!
+                    
+                } label: {
+                    Text(">>")
+                        .fontWeight(.bold)
+                        .font(.title2)
+                }
+            }
+            .colorScheme(.light)
+            .foregroundColor(ForeColor)
+
+            
         }
-        .colorScheme(.light)
-        .foregroundColor(ForeColor)
-//        .background(Rectangle()
-//                .foregroundColor(BackColor))
-        
-        
-        
-        
     }
 }
-//
-//#Preview {
-//    DateBarView()
-//}
+

@@ -67,9 +67,6 @@ struct navLinkLabel: View {
                 Text("   ")
             }
         }
-        
-        
-        
     }
 }
 
@@ -358,7 +355,7 @@ struct MainListTab: View {
          
         VStack{
             
-            DateBarView(SelectedDate: $SelectedDate, Celebrate: $Celebrate)
+            DateBarView(SelectedDate: $SelectedDate/*, Celebrate: $Celebrate*/)
             
             ZStack{
                 
@@ -602,3 +599,6 @@ struct MainListTab: View {
     }
 }
 
+//#Preview {
+//    MainListTab(selectedTab: .HUB, Celebrate: 0, SelectedDate: Date())
+//}

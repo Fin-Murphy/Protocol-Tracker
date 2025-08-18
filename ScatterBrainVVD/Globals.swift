@@ -9,13 +9,9 @@ import Foundation
 import CoreData
 import SwiftUI
 
-
- //------------------------------------------------------
-
-//                    DATA STRUCTURES
-
 //------------------------------------------------------
-
+//                    DATA STRUCTURES
+//------------------------------------------------------
 
 let valueRange = 1 ... 1000
 let Today: Date = Date()

@@ -21,16 +21,6 @@ struct ContentView: View {
     @State var seenWelcome: Bool = !UserDefaults.standard.bool(forKey: "seenWelcome")
     
     @Environment(\.managedObjectContext) private var viewContext
-        
-//    @FetchRequest(
-//        sortDescriptors: [NSSortDescriptor(keyPath: \HabitItem.order, ascending: true)],
-//        animation: .default)
-//    private var habitData: FetchedResults<HabitItem>
-//
-//    @FetchRequest(
-//        sortDescriptors: [NSSortDescriptor(keyPath: \TaskItem.name, ascending: true)],
-//        animation: .default)
-//    private var taskData: FetchedResults<TaskItem>
     
     var body: some View {
     
@@ -99,8 +89,3 @@ struct ContentView: View {
 #Preview {
     ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }
-
-
-
-
-
