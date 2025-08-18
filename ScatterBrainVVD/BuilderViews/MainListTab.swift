@@ -320,6 +320,11 @@ struct MainListTab: View {
         animation: .default)
     private var taskData: FetchedResults<TaskItem>
     
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \DayData.day, ascending: true)],
+        animation: .default)
+    private var dayData: FetchedResults<DayData>
+    
     // ---------------------------------------------------------------------------------------------------------------------
     // WELCOME MESSAGE
     // ---------------------------------------------------------------------------------------------------------------------
@@ -461,6 +466,15 @@ struct MainListTab: View {
             let comparison = calendar.compare(Date(), to: savedDate, toGranularity: .day)
 
             if comparison == .orderedDescending {
+                
+                let newDaySave = DayData(context: viewContext)
+                newDaySave.day = savedDate
+                newDaySave.score = Int16(UserDefaults.standard.integer(forKey: "TodayScore"))
+                UserDefaults.standard.set(0, forKey: "TodayScore")
+                saveViewContext(viewContext: viewContext)
+                
+                
+                
                 populateTasks()
                 UserDefaults.standard.set(Date(), forKey: "DailyTaskPopulate?")
                 Celebrate = 0
