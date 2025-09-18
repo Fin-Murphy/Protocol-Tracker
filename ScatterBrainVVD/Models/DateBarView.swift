@@ -33,7 +33,6 @@ struct DateBarView: View {
                     .fontWeight(.bold)
                     .font(.title2)
                 
-        
                 
                 Button {
                     SelectedDate = calendar.date(byAdding: .day, value: 1, to: SelectedDate)!
