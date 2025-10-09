@@ -125,7 +125,9 @@ struct HabitBuilderView: View {
                 }
                 Toggle("Include status update", isOn: $HabitHasStatusSet)
             
-//            }
+//            } // END SUBTASKER BRACKET
+            
+            
             Section {
                 Button {addItem(viewContext: viewContext)} label: {Text("Save Habit")}
             }

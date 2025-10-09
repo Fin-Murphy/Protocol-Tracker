@@ -8,6 +8,7 @@
 import Foundation
 import CoreData
 import SwiftUI
+import CoreHaptics
 
 //------------------------------------------------------
 //                    DATA STRUCTURES
@@ -261,10 +262,11 @@ func shuntTodaysTasks (viewContext: NSManagedObjectContext) {
         let taskData = try viewContext.fetch(request)
         
         for index in taskData {
-            if (Calendar.current.isDate((index.dueDate ?? Date()), equalTo: Date(), toGranularity: .day) == true) && (index.notFloater == true) {
+            if (Calendar.current.isDate((index.dueDate ?? Date()), equalTo: Date(), toGranularity: .day) == true) /*&& (index.notFloater == true)*/ {
                 shuntTask(taskToShunt: index, viewContext: viewContext)
             }
         }
+        
     } catch {
         let nsError = error as NSError
         fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
@@ -450,6 +452,36 @@ func setStatus(refItem: Item, viewContext: NSManagedObjectContext, updateItemSta
 func celebrationProcedure () {
         print("Goal for the day has been completed!")
 }
+
+var hapticEngine: CHHapticEngine?
+
+func setupHapticEngine() {
+    do {
+        hapticEngine = try CHHapticEngine()
+        try hapticEngine?.start()
+    } catch {
+        print("Error creating or starting haptic engine: \(error)")
+    }
+}
+
+func playCustomHaptic() {
+    guard let engine = hapticEngine else { return }
+
+    // Create a strong, sharp impact event
+    let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0)
+    let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: 1.0)
+    let event = CHHapticEvent(eventType: .hapticTransient, parameters: [intensity, sharpness], relativeTime: 0)
+
+    // Create a pattern from the event
+    do {
+        let pattern = try CHHapticPattern(events: [event], parameters: [])
+        let player = try engine.makePlayer(with: pattern)
+        try player.start(atTime: CHHapticTimeImmediate)
+    } catch {
+        print("Error playing haptic pattern: \(error)")
+    }
+}
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 // INDEX PROTOCOLS

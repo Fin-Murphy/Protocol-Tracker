@@ -126,14 +126,12 @@ struct TaskBuilderView: View {
                                                         }
                                                     }
                                                     
-                                                    Toggle("Schedule task", isOn: $TaskIsntFloatingSet)
-                                                    if TaskIsntFloatingSet == true {
-                                                        Section("Task Date") {
-                                                            DatePicker("Select Date",
-                                                                       selection: $TaskDueDateSet,
-                                                                       displayedComponents: .date)
-                                                            .datePickerStyle(.compact)
-                                                        }
+                                                    Toggle("Task doesn't Persistant", isOn: $TaskIsntFloatingSet)
+                                                    Section("TaskStart Date") {
+                                                        DatePicker("Select Date",
+                                                                   selection: $TaskDueDateSet,
+                                                                   displayedComponents: .date)
+                                                        .datePickerStyle(.compact)
                                                     }
                                                     
                                                     
@@ -227,15 +225,14 @@ struct TaskBuilderView: View {
                         }
                         
                         
-                        Toggle("Schedule task", isOn: $TaskIsntFloatingSet)
-                        if TaskIsntFloatingSet == true {
-                            Section("Task Date") {
-                                DatePicker("Select Date",
-                                           selection: $TaskDueDateSet,
-                                           displayedComponents: .date)
-                                .datePickerStyle(.compact)
-                            }
+                        Toggle("Task doesn't Persistant", isOn: $TaskIsntFloatingSet)
+                        Section("Task Date") {
+                            DatePicker("Select Date",
+                                       selection: $TaskDueDateSet,
+                                       displayedComponents: .date)
+                            .datePickerStyle(.compact)
                         }
+                        
                         
                         
                         Section(header: Text("Task Details")) {

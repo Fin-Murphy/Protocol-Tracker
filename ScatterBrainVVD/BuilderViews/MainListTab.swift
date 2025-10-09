@@ -378,14 +378,17 @@ struct MainListTab: View {
                                             navLinkContent(forceUpdate: $forceUpdate, item: item, Celebrate: $Celebrate)
                                                 .environment(\.managedObjectContext, viewContext)
                                             
+                                            
                                         } label: {
                                             navLinkLabel(item: item)
                                         }
                                         .swipeActions(edge: .trailing) {
                                             Button("Complete") {
                                                 completeHabit(item: item, viewContext: viewContext, Celebrate: &Celebrate)
-                                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-                                                impactFeedback.impactOccurred()
+//                                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+//                                                impactFeedback.impactOccurred()
+                                                
+                                                playCustomHaptic()
                                             }
                                             .tint(.blue)
                                             
@@ -416,8 +419,9 @@ struct MainListTab: View {
                                         .swipeActions(edge: .trailing) {
                                             Button("Complete") {
                                                 completeHabit(item: item, viewContext: viewContext, Celebrate: &Celebrate)
-                                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-                                                impactFeedback.impactOccurred()
+//                                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+//                                                impactFeedback.impactOccurred()
+                                                playCustomHaptic()
                                             }
                                             .tint(.blue)
                                             
