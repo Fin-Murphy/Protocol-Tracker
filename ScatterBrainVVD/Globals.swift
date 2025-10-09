@@ -42,6 +42,8 @@ struct Task: Identifiable, Codable {
     var TaskNotFloater: Bool = true
 }
 
+
+
 struct Habit: Identifiable, Codable, Hashable {
     
     var id: UUID = UUID()
@@ -71,6 +73,8 @@ struct Habit: Identifiable, Codable, Hashable {
     var HabitOnFri: Bool = false
     var HabitOnSat: Bool = false
 
+    
+    
 } // END struct Task
 
 // ---------------------------------------------------------------------------------------------------------------------

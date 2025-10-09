@@ -7,6 +7,34 @@
 
 import SwiftUI
 
+struct CustomDatePicker: View {
+    @Binding var SelectedDate: Date
+    @State private var showingPicker = false
+    
+    var body: some View {
+        Button(action: { showingPicker.toggle() }) {
+            Text(SelectedDate, formatter: itemFormatter)
+                .foregroundColor(ForeColor)
+                .fontWeight(.bold)
+                .font(.title2)
+            
+            
+        }
+        .sheet(isPresented: $showingPicker) {
+            VStack {
+                DatePicker("", selection: $SelectedDate)
+                    .datePickerStyle(.graphical)
+                    .padding()
+                
+                Button("Done") {
+                    showingPicker = false
+                }
+                .padding()
+            }
+        }
+    }
+}
+
 struct DateBarView: View {
     
     @Binding var SelectedDate: Date
@@ -24,11 +52,20 @@ struct DateBarView: View {
                         .font(.title2)
                 }
                 
-                Text("\(SelectedDate, formatter: itemFormatter)")
-                    .fontWeight(.bold)
-                    .font(.title2)
+//                DatePicker("\(SelectedDate, formatter: itemFormatter)",
+//                           selection: $SelectedDate,
+//                           displayedComponents: .date)
+//                .foregroundColor(ForeColor)
+//                .datePickerStyle(.compact)
                 
-                Text(" - (\(Celebrate)/\(UserDefaults.standard.integer(forKey: "dailyGoal")) Points)")
+                CustomDatePicker(SelectedDate: $SelectedDate)
+                
+                
+//                Text("\(SelectedDate, formatter: itemFormatter)")
+//                    .fontWeight(.bold)
+//                    .font(.title2)
+                
+                Text("- (\(Celebrate)/\(UserDefaults.standard.integer(forKey: "dailyGoal")) Points)")
 //                Text(" - (\(Celebrate) Points)")
                     .fontWeight(.bold)
                     .font(.title2)
