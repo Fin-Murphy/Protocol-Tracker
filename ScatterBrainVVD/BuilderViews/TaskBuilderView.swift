@@ -126,7 +126,7 @@ struct TaskBuilderView: View {
                                                         }
                                                     }
                                                     
-                                                    Toggle("Task doesn't Persistant", isOn: $TaskIsntFloatingSet)
+                                                    Toggle("Task doesn't Persist", isOn: $TaskIsntFloatingSet)
                                                     Section("TaskStart Date") {
                                                         DatePicker("Select Date",
                                                                    selection: $TaskDueDateSet,
@@ -225,7 +225,7 @@ struct TaskBuilderView: View {
                         }
                         
                         
-                        Toggle("Task doesn't Persistant", isOn: $TaskIsntFloatingSet)
+                        Toggle("Task doesn't Persist", isOn: $TaskIsntFloatingSet)
                         Section("Task Date") {
                             DatePicker("Select Date",
                                        selection: $TaskDueDateSet,
