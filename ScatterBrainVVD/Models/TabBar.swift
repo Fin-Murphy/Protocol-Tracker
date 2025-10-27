@@ -38,7 +38,7 @@ struct TabBar: View {
                         SymbolButton(bIcon: "gearshape.fill", bTxt: "Settings")
                     }.foregroundColor(ForeColor)
 
-            } else {
+            } else { // shit commit
 
                     Button {
                         selectedTab = .Calendar
