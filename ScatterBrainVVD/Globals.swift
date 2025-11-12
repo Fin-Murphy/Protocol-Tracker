@@ -129,8 +129,6 @@ extension View {
 
 
 
-
-
 //------------------------------------------------------
 
 //                    FUNCTIONS
@@ -163,7 +161,7 @@ var ForeColor: Color = currentScheme == .dark ? .white : .black
 func scootItem(item: Item, viewContext: NSManagedObjectContext){
     
     let newItem = Item(context: viewContext)
-    newItem.timestamp = (calendar.date(byAdding: .day, value: 1, to: Date())!)
+    newItem.timestamp = (calendar.date(byAdding: .day, value: 1, to: item.timestamp ?? Date())!)
     newItem.name = item.name
     newItem.goal = item.goal
     newItem.unit = item.unit
@@ -455,6 +453,8 @@ func setStatus(refItem: Item, viewContext: NSManagedObjectContext, updateItemSta
 
 func celebrationProcedure () {
         print("Goal for the day has been completed!")
+    
+    
 }
 
 var hapticEngine: CHHapticEngine?
