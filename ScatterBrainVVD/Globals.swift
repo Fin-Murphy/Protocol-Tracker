@@ -151,7 +151,7 @@ func getCurrentColorScheme() -> ColorScheme {
 }
 
 var currentScheme = getCurrentColorScheme()
-//doodoo commit
+
 var ForeColor: Color = currentScheme == .dark ? .white : .black
 
 // ---------------------------------------------------------------------------------------------------------------------
