@@ -153,7 +153,7 @@ func getCurrentColorScheme() -> ColorScheme {
 var currentScheme = getCurrentColorScheme()
 
 var ForeColor: Color = currentScheme == .dark ? .white : .black
-
+//do
 // ---------------------------------------------------------------------------------------------------------------------
 // SCOOT ITEM
 // ---------------------------------------------------------------------------------------------------------------------
