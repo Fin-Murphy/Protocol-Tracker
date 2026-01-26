@@ -9,10 +9,8 @@ import Foundation
 import CoreData
 import SwiftUI
 import CoreHaptics
+import Supabase
 
-//------------------------------------------------------
-//                    DATA STRUCTURES
-//------------------------------------------------------
 
 let valueRange = 1 ... 1000
 let Today: Date = Date()
@@ -22,12 +20,33 @@ let calendar: Calendar = .current
 // ITEM STRUCTURES
 // ---------------------------------------------------------------------------------------------------------------------
 
+
+
+let supabase = SupabaseClient(
+  supabaseURL: URL(string: "https://xbqsnnmvxntavytdmmzp.supabase.co")!,
+  supabaseKey: "sb_publishable_WHd5tp89cEdNp6zAybNH8A_Kui0z3t0"
+)
+
+
+
 struct HabitProtocol: Identifiable, Codable {
     var id: UUID = UUID()
     var ProtocolName: String
     var ProtocolDescription: String
     var ProtocolContent: [Habit] = []
 }
+
+// tomas was here 12/28/25
+
+
+//struct DayData: Identifiable {
+//    
+//    let id: UUID = UUID()
+//    let day: Date
+//    var score: Int16 = 0
+//    
+//}
+
 
 struct Task: Identifiable, Codable {
     
@@ -41,7 +60,6 @@ struct Task: Identifiable, Codable {
     var TaskHasCheckbox: Bool
     var TaskNotFloater: Bool = true
 }
-
 
 
 struct Habit: Identifiable, Codable, Hashable {
@@ -74,8 +92,14 @@ struct Habit: Identifiable, Codable, Hashable {
     var HabitOnSat: Bool = false
 
     
-    
 } // END struct Task
+
+// ---------------------------------------------------------------------------------------------------------------------
+// API INFO
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 // MISC STRUCTURES AND FORMATTERS
@@ -95,6 +119,7 @@ let itemFormatter: DateFormatter = {
     formatter.timeStyle = .none
     return formatter
 }()
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 // VIEWS AND VIEW MODIFIERS
@@ -153,7 +178,6 @@ func getCurrentColorScheme() -> ColorScheme {
 var currentScheme = getCurrentColorScheme()
 
 var ForeColor: Color = currentScheme == .dark ? .white : .black
-//do
 // ---------------------------------------------------------------------------------------------------------------------
 // SCOOT ITEM
 // ---------------------------------------------------------------------------------------------------------------------

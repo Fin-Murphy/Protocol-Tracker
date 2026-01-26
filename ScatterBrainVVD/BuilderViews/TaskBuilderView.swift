@@ -54,17 +54,17 @@ struct TaskBuilderView: View {
                     
                     
                 }.foregroundColor(ForeColor)
-//                
+
                 if taskData.isEmpty == false {
-//                
+
                     NavigationView {
                         List{
                             ForEach(taskData) { taskNdx in
-//                                
+                                
                                 NavigationLink{
-//                                    
+                                    
                                     ZStack {
-//                                        
+                                        
                                         VStack{
                                             
                                             List {
@@ -180,10 +180,6 @@ struct TaskBuilderView: View {
                                     Text(taskNdx.name ?? "")
                                     
                                 }
-                                
-                                
-                                
-                                
                             }
                         }
                     }

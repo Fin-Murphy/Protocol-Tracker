@@ -6,6 +6,15 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		30665E4A2F28047E009CE105 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 30665E492F28047E009CE105 /* Auth */; };
+		30665E4C2F28047E009CE105 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 30665E4B2F28047E009CE105 /* Functions */; };
+		30665E4E2F28047E009CE105 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 30665E4D2F28047E009CE105 /* PostgREST */; };
+		30665E502F28047E009CE105 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 30665E4F2F28047E009CE105 /* Realtime */; };
+		30665E522F28047E009CE105 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 30665E512F28047E009CE105 /* Storage */; };
+		30665E542F28047E009CE105 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 30665E532F28047E009CE105 /* Supabase */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		301448562E065D8000757310 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +61,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30665E4E2F28047E009CE105 /* PostgREST in Frameworks */,
+				30665E4C2F28047E009CE105 /* Functions in Frameworks */,
+				30665E542F28047E009CE105 /* Supabase in Frameworks */,
+				30665E4A2F28047E009CE105 /* Auth in Frameworks */,
+				30665E522F28047E009CE105 /* Storage in Frameworks */,
+				30665E502F28047E009CE105 /* Realtime in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +127,12 @@
 			);
 			name = ScatterBrainVVD;
 			packageProductDependencies = (
+				30665E492F28047E009CE105 /* Auth */,
+				30665E4B2F28047E009CE105 /* Functions */,
+				30665E4D2F28047E009CE105 /* PostgREST */,
+				30665E4F2F28047E009CE105 /* Realtime */,
+				30665E512F28047E009CE105 /* Storage */,
+				30665E532F28047E009CE105 /* Supabase */,
 			);
 			productName = ScatterBrainVVD;
 			productReference = 301448422E065D7F00757310 /* ScatterBrainVVD.app */;
@@ -195,6 +216,9 @@
 			);
 			mainGroup = 301448392E065D7F00757310;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				30665E482F28047E009CE105 /* XCLocalSwiftPackageReference "../supabase-swift-main" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 301448432E065D7F00757310 /* Products */;
 			projectDirPath = "";
@@ -591,6 +615,40 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		30665E482F28047E009CE105 /* XCLocalSwiftPackageReference "../supabase-swift-main" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../supabase-swift-main";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		30665E492F28047E009CE105 /* Auth */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Auth;
+		};
+		30665E4B2F28047E009CE105 /* Functions */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Functions;
+		};
+		30665E4D2F28047E009CE105 /* PostgREST */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PostgREST;
+		};
+		30665E4F2F28047E009CE105 /* Realtime */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Realtime;
+		};
+		30665E512F28047E009CE105 /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Storage;
+		};
+		30665E532F28047E009CE105 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3014483A2E065D7F00757310 /* Project object */;
 }
