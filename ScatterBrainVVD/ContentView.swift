@@ -77,8 +77,8 @@ struct ContentView: View {
             }// END HUB TAB
             
             Spacer()
-                        
-            TabBar(selectedTab: $selectedTab)
+
+           TabBar(selectedTab: $selectedTab)
        }
 
        .onAppear{refreshVisualData(ForeColor: &ForeColor)}

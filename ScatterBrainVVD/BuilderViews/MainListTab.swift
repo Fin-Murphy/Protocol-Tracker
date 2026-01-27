@@ -205,6 +205,7 @@ struct navLinkContent: View {
         Spacer()
         
         ScrollView {
+            
             if item.isTask != true {
                 if displayHabitDescription(identifier: item.name ?? "", viewContext: viewContext) != "" {
                     Text(displayHabitDescription(identifier: item.name ?? "", viewContext: viewContext))
@@ -320,10 +321,14 @@ struct MainListTab: View {
         animation: .default)
     private var taskData: FetchedResults<TaskItem>
     
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \DayData.day, ascending: true)],
-        animation: .default)
-    private var dayData: FetchedResults<DayData>
+    //Day Data currently not being used ( Need to
+    
+//    @FetchRequest(
+//        sortDescriptors: [NSSortDescriptor(keyPath: \DayData.day, ascending: true)],
+//        animation: .default)
+//    private var dayData: FetchedResults<DayData>
+    
+    
     
     // ---------------------------------------------------------------------------------------------------------------------
     // WELCOME MESSAGE
