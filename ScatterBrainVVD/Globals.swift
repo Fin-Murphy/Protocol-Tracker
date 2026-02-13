@@ -9,7 +9,9 @@ import Foundation
 import CoreData
 import SwiftUI
 import CoreHaptics
-import Supabase
+//import Supabase
+
+import UserNotifications // IMPORT FOR NOTIFICATION SERVICES
 
 
 let valueRange = 1 ... 1000
@@ -17,15 +19,47 @@ let Today: Date = Date()
 let calendar: Calendar = .current
 
 // ---------------------------------------------------------------------------------------------------------------------
+// ALERT SERVICE
+// ---------------------------------------------------------------------------------------------------------------------
+
+class HabitNotificationManager {
+    static let shared = HabitNotificationManager()
+    
+    func scheduleSmartReminder(at hour: Int, minute: Int) {
+        let content = UNMutableNotificationContent()
+        content.title = "Habit Check-In"
+        content.body = "You have habits waiting for you today"
+        content.sound = .default
+        
+        var dateComponents = DateComponents()
+        dateComponents.hour = hour
+        dateComponents.minute = minute
+        
+        let trigger = UNCalendarNotificationTrigger(
+            dateMatching: dateComponents,
+            repeats: true
+        )
+        
+        let request = UNNotificationRequest(
+            identifier: "daily-habit-reminder",
+            content: content,
+            trigger: trigger
+        )
+        
+        UNUserNotificationCenter.current().add(request)
+    }
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------------
 // ITEM STRUCTURES
 // ---------------------------------------------------------------------------------------------------------------------
 
 
-
-let supabase = SupabaseClient(
-  supabaseURL: URL(string: "https://xbqsnnmvxntavytdmmzp.supabase.co")!,
-  supabaseKey: "sb_publishable_WHd5tp89cEdNp6zAybNH8A_Kui0z3t0"
-)
+//let supabase = SupabaseClient(
+//  supabaseURL: URL(string: "https://xbqsnnmvxntavytdmmzp.supabase.co")!,
+//  supabaseKey: "sb_publishable_WHd5tp89cEdNp6zAybNH8A_Kui0z3t0"
+//)
 
 
 

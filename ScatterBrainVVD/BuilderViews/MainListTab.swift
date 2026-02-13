@@ -300,6 +300,10 @@ struct MainListTab: View {
     
     @State var forceUpdate: Bool = false
     
+    //ADDITION! ! ! ! ! ! !
+    
+    @State var notifManager = HabitNotificationManager() // Add a clock for sending user notifications 
+    
     // ---------------------------------------------------------------------------------------------------------------------
     // COREDATA
     // ---------------------------------------------------------------------------------------------------------------------
