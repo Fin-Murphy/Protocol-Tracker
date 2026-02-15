@@ -454,16 +454,14 @@ struct MainListTab: View {
                     welcomeMessageView
                 }
                 
-            }.onAppear{
-                
+            }.onAppear{ // END DEPTH STACK
                 
                 UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
                     
                     if granted {
-
-                        let notifManager = HabitNotificationManager.shared
                         
-                        notifManager.scheduleSmartReminder(at: 12, minute: 59)
+                        generateNotifications(viewContext: viewContext)
+//                        HabitNotificationManager.shared.scheduleSmartReminder(at: 13, minute: 17) TEST CODE
                         
                     } else {
                         print("Farg!")
@@ -479,9 +477,7 @@ struct MainListTab: View {
     } // END VIEWABLE CONTENT
     
     // ---------------------------------------------------------------------------------------------------------------------
-    
     // START PRIVATE FUNCTIONS
-    
     // ---------------------------------------------------------------------------------------------------------------------
 
     public func checkDate() {
@@ -509,11 +505,13 @@ struct MainListTab: View {
         }
     }
     
-
+    
+    
     // ---------------------------------------------------------------------------------------------------------------------
-    // POPULATE TASKS
+    // TEST TASKS FOR SILLYNESS
     // ---------------------------------------------------------------------------------------------------------------------
 
+    
     private func testTasksForSillyness() {
         for taskFinder in items {
             if taskFinder.notFloater == false {
@@ -522,6 +520,11 @@ struct MainListTab: View {
         }
     }
     
+    // ---------------------------------------------------------------------------------------------------------------------
+    // POPULATE TASKS
+    // ---------------------------------------------------------------------------------------------------------------------
+
+
     private func populateTasks() {
 
         let date = Date()

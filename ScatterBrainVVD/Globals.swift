@@ -25,10 +25,10 @@ let calendar: Calendar = .current
 class HabitNotificationManager {
     static let shared = HabitNotificationManager()
     
-    func scheduleSmartReminder(at hour: Int, minute: Int) {
+    func scheduleSmartReminder(at hour: Int, minute: Int, title: String, body: String) {
         let content = UNMutableNotificationContent()
         content.title = "Habit Check-In"
-        content.body = "You have habits waiting for you today"
+        content.body = body
         content.sound = .default
         
         var dateComponents = DateComponents()
@@ -49,6 +49,42 @@ class HabitNotificationManager {
         UNUserNotificationCenter.current().add(request)
     }
 }
+
+
+func generateNotifications (viewContext: NSManagedObjectContext) {
+    
+    
+    do {
+        UNUserNotificationCenter.current().removeAllPendingNotificationRequests() // Removes all leftover notifications
+        
+        
+        let request: NSFetchRequest<Item> = Item.fetchRequest() // Pulling in the item data from the calendar (REMEMBER TO FIX THIS LOGIC FLOW!)
+        let itemData = try viewContext.fetch(request)
+        
+        var notifBody: String = ""
+        
+        for index in itemData {
+            
+            if ((Calendar.current.isDate((index.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true) && index.complete == false){ //If the item matches today...
+                
+                notifBody += "\(index.name ?? "") skib \n"
+                
+            }
+        }
+        
+        print(notifBody)
+        
+    } catch {
+        let nsError = error as NSError
+        fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+    }
+    
+    saveViewContext(viewContext: viewContext)
+
+}
+
+
+  //HabitNotificationManager.shared.scheduleSmartReminder(at: 13, minute: 17
 
 
 // ---------------------------------------------------------------------------------------------------------------------
