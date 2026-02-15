@@ -302,7 +302,7 @@ struct MainListTab: View {
     
     //ADDITION! ! ! ! ! ! !
     
-    @State var notifManager = HabitNotificationManager() // Add a clock for sending user notifications 
+    @State var notifManager = HabitNotificationManager() // Add a clock for sending user notifications
     
     // ---------------------------------------------------------------------------------------------------------------------
     // COREDATA
