@@ -300,10 +300,6 @@ struct MainListTab: View {
     
     @State var forceUpdate: Bool = false
     
-    //ADDITION! ! ! ! ! ! !
-    
-    @State var notifManager = HabitNotificationManager() // Add a clock for sending user notifications
-    
     // ---------------------------------------------------------------------------------------------------------------------
     // COREDATA
     // ---------------------------------------------------------------------------------------------------------------------
@@ -459,6 +455,21 @@ struct MainListTab: View {
                 }
                 
             }.onAppear{
+                
+                
+                UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+                    
+                    if granted {
+
+                        let notifManager = HabitNotificationManager.shared
+                        
+                        notifManager.scheduleSmartReminder(at: 12, minute: 59)
+                        
+                    } else {
+                        print("Farg!")
+                    }
+                }
+                
                 checkDate()
                 Celebrate = Int16(UserDefaults.standard.integer(forKey:"TodayScore"))
             } // END ZSTACK
