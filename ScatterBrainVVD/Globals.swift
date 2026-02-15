@@ -27,7 +27,7 @@ class HabitNotificationManager {
     
     func scheduleSmartReminder(at hour: Int, minute: Int, title: String, body: String) {
         let content = UNMutableNotificationContent()
-        content.title = "Habit Check-In"
+        content.title = "Incomplete Task!"
         content.body = body
         content.sound = .default
         
@@ -57,22 +57,38 @@ func generateNotifications (viewContext: NSManagedObjectContext) {
     do {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests() // Removes all leftover notifications
         
-        
         let request: NSFetchRequest<Item> = Item.fetchRequest() // Pulling in the item data from the calendar (REMEMBER TO FIX THIS LOGIC FLOW!)
         let itemData = try viewContext.fetch(request)
         
         var notifBody: String = ""
+        let NotifFreq: Int = UserDefaults.standard.integer(forKey: "notifFreq")
+        
+        var hour = calendar.component(.hour, from: Today)
+        var min = calendar.component(.minute, from: Today)
+
+        let manager = HabitNotificationManager.shared
         
         for index in itemData {
             
             if ((Calendar.current.isDate((index.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true) && index.complete == false){ //If the item matches today...
-                
-                notifBody += "\(index.name ?? "") skib \n"
-                
+                notifBody += "\(index.name ?? "") \(index.value)/\(index.goal) \n"
             }
         }
         
         print(notifBody)
+        
+//        hour += 1
+//        while hour < 24 {
+//            manager.scheduleSmartReminder(at: hour, minute: 0, title: "f", body: notifBody)
+//            hour += NotifFreq
+//        }
+        
+        while min < 60 {
+            manager.scheduleSmartReminder(at: hour, minute: min, title: "f", body: notifBody)
+            min += NotifFreq
+        }
+
+
         
     } catch {
         let nsError = error as NSError
@@ -82,9 +98,6 @@ func generateNotifications (viewContext: NSManagedObjectContext) {
     saveViewContext(viewContext: viewContext)
 
 }
-
-
-  //HabitNotificationManager.shared.scheduleSmartReminder(at: 13, minute: 17
 
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -442,6 +455,7 @@ func addValue(item: Item, value: Int16, viewContext: NSManagedObjectContext, Cel
                 TodayScore += Int(item.reward)
                 UserDefaults.standard.set(TodayScore, forKey: "TodayScore")
                 
+                generateNotifications(viewContext: viewContext)
                 Celebrate = Int16(TodayScore)
                 item.notFloater = true
             }
@@ -466,6 +480,8 @@ func addValue(item: Item, value: Int16, viewContext: NSManagedObjectContext, Cel
 }
 
 func completeHabit(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout Int16) {
+    
+    generateNotifications(viewContext: viewContext)
     
     if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true {
 
@@ -511,6 +527,7 @@ func subValue(item: Item, value: Int16, viewContext: NSManagedObjectContext, Cel
                 TodayScore -= Int(item.reward)
                 UserDefaults.standard.set(TodayScore, forKey: "TodayScore")
                 
+                generateNotifications(viewContext: viewContext)
                 Celebrate = Int16(TodayScore)
                 
             }

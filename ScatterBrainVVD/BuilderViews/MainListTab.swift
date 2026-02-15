@@ -455,14 +455,16 @@ struct MainListTab: View {
                 }
                 
             }.onAppear{ // END DEPTH STACK
+                                
+                var NotifFreq: Int = UserDefaults.standard.integer(forKey: "notifFreq")
+                if NotifFreq < 1 {
+                    NotifFreq = 1
+                }
                 
                 UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
                     
                     if granted {
-                        
-                        generateNotifications(viewContext: viewContext)
-//                        HabitNotificationManager.shared.scheduleSmartReminder(at: 13, minute: 17) TEST CODE
-                        
+                                                
                     } else {
                         print("Farg!")
                     }
@@ -494,6 +496,9 @@ struct MainListTab: View {
                 saveViewContext(viewContext: viewContext)
                 
                 populateTasks()
+                
+                generateNotifications(viewContext: viewContext)
+                
                 UserDefaults.standard.set(Date(), forKey: "DailyTaskPopulate?")
                 Celebrate = 0
                 SelectedDate = Date()
