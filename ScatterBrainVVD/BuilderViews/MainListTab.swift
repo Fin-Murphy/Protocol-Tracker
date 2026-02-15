@@ -443,7 +443,7 @@ struct MainListTab: View {
                         }//END LIST
                         
                         .onAppear{
-                            testTasksForSillyness() 
+                            testTasksForSillyness()
                         }
        
                     }//END VSTACK
@@ -456,10 +456,8 @@ struct MainListTab: View {
                 
             }.onAppear{ // END DEPTH STACK
                                 
-                var NotifFreq: Int = UserDefaults.standard.integer(forKey: "notifFreq")
-                if NotifFreq < 1 {
-                    NotifFreq = 1
-                }
+//                generateNotifications(viewContext: viewContext) // MOVED TO ContentView() for HIGHER LEVEL OPERATION
+
                 
                 UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
                     
@@ -472,6 +470,7 @@ struct MainListTab: View {
                 
                 checkDate()
                 Celebrate = Int16(UserDefaults.standard.integer(forKey:"TodayScore"))
+                
             } // END ZSTACK
             
         }//END VSTACK
@@ -497,7 +496,7 @@ struct MainListTab: View {
                 
                 populateTasks()
                 
-                generateNotifications(viewContext: viewContext)
+                generateNotifications(viewContext: viewContext) // NEW ADDITION!! ! ! ! ! ! ! ! ! ! ! ! !
                 
                 UserDefaults.standard.set(Date(), forKey: "DailyTaskPopulate?")
                 Celebrate = 0
