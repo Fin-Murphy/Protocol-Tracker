@@ -9,7 +9,7 @@ import SwiftUI
 import CoreData
 
 struct ContentView: View {
-
+//just to get that green square
     @Environment(\.scenePhase) private var scenePhase
     
     @State var selectedTab: Tabs = .HUB
