@@ -6,15 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		308C6C512F4CEBFF00991EBA /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 308C6C502F4CEBFF00991EBA /* Auth */; };
-		308C6C532F4CEBFF00991EBA /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 308C6C522F4CEBFF00991EBA /* Functions */; };
-		308C6C552F4CEBFF00991EBA /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 308C6C542F4CEBFF00991EBA /* PostgREST */; };
-		308C6C572F4CEBFF00991EBA /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 308C6C562F4CEBFF00991EBA /* Realtime */; };
-		308C6C592F4CEBFF00991EBA /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 308C6C582F4CEBFF00991EBA /* Storage */; };
-		308C6C5B2F4CEBFF00991EBA /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 308C6C5A2F4CEBFF00991EBA /* Supabase */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		301448562E065D8000757310 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -61,12 +52,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				308C6C552F4CEBFF00991EBA /* PostgREST in Frameworks */,
-				308C6C532F4CEBFF00991EBA /* Functions in Frameworks */,
-				308C6C5B2F4CEBFF00991EBA /* Supabase in Frameworks */,
-				308C6C512F4CEBFF00991EBA /* Auth in Frameworks */,
-				308C6C592F4CEBFF00991EBA /* Storage in Frameworks */,
-				308C6C572F4CEBFF00991EBA /* Realtime in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -127,12 +112,6 @@
 			);
 			name = ScatterBrainVVD;
 			packageProductDependencies = (
-				308C6C502F4CEBFF00991EBA /* Auth */,
-				308C6C522F4CEBFF00991EBA /* Functions */,
-				308C6C542F4CEBFF00991EBA /* PostgREST */,
-				308C6C562F4CEBFF00991EBA /* Realtime */,
-				308C6C582F4CEBFF00991EBA /* Storage */,
-				308C6C5A2F4CEBFF00991EBA /* Supabase */,
 			);
 			productName = ScatterBrainVVD;
 			productReference = 301448422E065D7F00757310 /* ScatterBrainVVD.app */;
@@ -217,8 +196,6 @@
 			mainGroup = 301448392E065D7F00757310;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				308C6C4E2F4CEB8500991EBA /* XCRemoteSwiftPackageReference "supabase-swift" */,
-				308C6C4F2F4CEBFF00991EBA /* XCLocalSwiftPackageReference "../supabase-swift-main" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 301448432E065D7F00757310 /* Products */;
@@ -616,51 +593,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCLocalSwiftPackageReference section */
-		308C6C4F2F4CEBFF00991EBA /* XCLocalSwiftPackageReference "../supabase-swift-main" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = "../supabase-swift-main";
-		};
-/* End XCLocalSwiftPackageReference section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		308C6C4E2F4CEB8500991EBA /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/supabase/supabase-swift";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.5.1;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		308C6C502F4CEBFF00991EBA /* Auth */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Auth;
-		};
-		308C6C522F4CEBFF00991EBA /* Functions */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Functions;
-		};
-		308C6C542F4CEBFF00991EBA /* PostgREST */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PostgREST;
-		};
-		308C6C562F4CEBFF00991EBA /* Realtime */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Realtime;
-		};
-		308C6C582F4CEBFF00991EBA /* Storage */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Storage;
-		};
-		308C6C5A2F4CEBFF00991EBA /* Supabase */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Supabase;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3014483A2E065D7F00757310 /* Project object */;
 }

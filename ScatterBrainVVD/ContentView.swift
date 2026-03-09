@@ -1,3 +1,4 @@
+//Hello, my name is Ollama!
 //
 //  ContentView.swift
 //  ScatterBrainVVD
