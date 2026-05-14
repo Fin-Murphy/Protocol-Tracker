@@ -4,12 +4,16 @@ Protocol Tracker allows the user to completely automate the timing and tracking 
 This application attempts to combine bullet journalling and Emacs Org Mode functionalities for maximum ease of use when deciding what to do each day. Forget the hassle of manual to-do lists, and keeping up with calendars — Protocol Tracker allows you to "set it and forget it".
 
 ---
+<img width="456" height="837" alt="fff" src="https://github.com/user-attachments/assets/41a801e5-8608-40f1-8308-26bf3209c5e4" />
+
 
 ## Overview
 
 Protocol Tracker is a native iOS application that unifies recurring habits and one-off tasks into a single, automatically populated daily checklist. Rather than asking the user to re-author their to-do list every morning, Protocol Tracker derives the day's agenda from a library of user-defined "protocols" — bundles of habits with their own repeat cadences — plus any non-recurring tasks that come due that day.
 
 The user defines what they want to do *once*; the app handles *when* it shows up, *how* it's tracked, and *what* counts as complete from then on.
+
+
 
 ## The Problem Being Solved
 
@@ -31,4 +35,11 @@ The app ships with an `AppDefinedProtocolLibrary` of curated routines — curren
 
 ## A sorry end
 
-I was originally planning on fully building out this application, but the skills I gained getting to this stage did turn out to be useful and now I'm working on a similar application that achieves all of the goals that this one had but on a much larger scale. See Reverb_Public in my repository list for the new and improved goal app. 
+I was originally planning on fully building out this application, but the skills I gained getting to this stage did turn out to be useful and now I'm working on a similar application that achieves all of the goals that this one had but on a much larger scale. See Reverb_Public in my repository list for the new and improved goal app.
+
+
+<img width="1178" height="2560" alt="IMG_8598-scaled" src="https://github.com/user-attachments/assets/5317caa6-9780-4194-9259-8f3eca73594a" />
+<img width="749" height="236" alt="Screenshot 2026-05-12 at 2 19 37 PM" src="https://github.com/user-attachments/assets/f915c18d-9b71-456c-918a-9f1b6d82e181" />
+<img width="1178" height="2560" alt="IMG_8599-scaled" src="https://github.com/user-attachments/assets/f429a8fe-25dc-4bd8-acd9-37b901a5e85a" />
+<img width="633" height="715" alt="ddd" src="https://github.com/user-attachments/assets/ac330ab7-1d8d-48e5-a43d-e4a97ebf63e2" />
+
