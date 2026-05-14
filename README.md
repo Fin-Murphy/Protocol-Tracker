@@ -39,9 +39,8 @@ I was originally planning on fully building out this application, but the skills
 
 
 
-im1            |  im2 |im3
 :-------------------------:|:-------------------------:|:-------------------------:
-<img width="1178" height="2560" alt="IMG_8598-scaled" src="https://github.com/user-attachments/assets/5317caa6-9780-4194-9259-8f3eca73594a" /> | <img width="1178" height="2560" alt="IMG_8599-scaled" src="https://github.com/user-attachments/assets/f429a8fe-25dc-4bd8-acd9-37b901a5e85a" /> | <img width="633" height="715" alt="ddd" src="https://github.com/user-attachments/assets/ac330ab7-1d8d-48e5-a43d-e4a97ebf63e2" />
+<img width="1178" height="2560" alt="IMG_8598-scaled" src="https://github.com/user-attachments/assets/5317caa6-9780-4194-9259-8f3eca73594a" /> | <img width="1178" height="2560" alt="IMG_8599-scaled" src="https://github.com/user-attachments/assets/f429a8fe-25dc-4bd8-acd9-37b901a5e85a" /> | <img width="400" height="770" alt="Screenshot 2026-05-13 at 8 22 02 PM" src="https://github.com/user-attachments/assets/dc5942a9-dbd4-447a-a34a-9c233234e381" />
 
 
 
