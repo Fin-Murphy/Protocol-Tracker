@@ -38,8 +38,10 @@ The app ships with an `AppDefinedProtocolLibrary` of curated routines — curren
 I was originally planning on fully building out this application, but the skills I gained getting to this stage did turn out to be useful and now I'm working on a similar application that achieves all of the goals that this one had but on a much larger scale. See Reverb_Public in my repository list for the new and improved goal app.
 
 
-<img width="1178" height="2560" alt="IMG_8598-scaled" src="https://github.com/user-attachments/assets/5317caa6-9780-4194-9259-8f3eca73594a" />
-<img width="749" height="236" alt="Screenshot 2026-05-12 at 2 19 37 PM" src="https://github.com/user-attachments/assets/f915c18d-9b71-456c-918a-9f1b6d82e181" />
-<img width="1178" height="2560" alt="IMG_8599-scaled" src="https://github.com/user-attachments/assets/f429a8fe-25dc-4bd8-acd9-37b901a5e85a" />
-<img width="633" height="715" alt="ddd" src="https://github.com/user-attachments/assets/ac330ab7-1d8d-48e5-a43d-e4a97ebf63e2" />
+
+im1            |  im2 |im3
+:-------------------------:|:-------------------------:|:-------------------------:
+<img width="1178" height="2560" alt="IMG_8598-scaled" src="https://github.com/user-attachments/assets/5317caa6-9780-4194-9259-8f3eca73594a" /> | <img width="1178" height="2560" alt="IMG_8599-scaled" src="https://github.com/user-attachments/assets/f429a8fe-25dc-4bd8-acd9-37b901a5e85a" /> | <img width="633" height="715" alt="ddd" src="https://github.com/user-attachments/assets/ac330ab7-1d8d-48e5-a43d-e4a97ebf63e2" />
+
+
 
