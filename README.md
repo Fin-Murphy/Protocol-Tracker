@@ -4,6 +4,8 @@ https://finnian-murphy.me/protocol_tracker_privacy_policy
 
 https://finnian-murphy.me/protocol_tracker_support_page
 
+I built this whole app by hand, like its the 2010s or something. 
+
 
 One of the greatest causes of unnecessary mental strain every day is decision fatigue. In a primarily knowledge-work society like ours, few can afford to waste precious cognitive power on the chore of figuring out what they have to do every day, which is why I designed and built Protocol Tracker.
 Protocol Tracker allows the user to completely automate the timing and tracking of both repeating habits and unique tasks, and combines them in a sleek interface that eliminates the need for sprawling task spreadsheets or manually writing down your habits and to-dos every day by hand. It consolidates all initiatives into an easy-to-read list every day that you can follow and check off as you complete them.
