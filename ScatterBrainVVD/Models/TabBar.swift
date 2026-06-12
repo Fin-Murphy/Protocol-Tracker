@@ -127,7 +127,7 @@ struct TabBar: View {
                     Button  {
                         selectedTab = .Settings
                     } label: {
-                        SymbolButton(bIcon: "p.square.fill", bTxt: "Protocols")
+                        SymbolButton(bIcon: "chart.xyaxis.line", bTxt: "Graphs")
                     }.foregroundColor(ForeColor)
 
             } else {
@@ -135,7 +135,7 @@ struct TabBar: View {
                     Button  {
                         selectedTab = .Settings
                     } label: {
-                        SymbolButton(bIcon: "p.square", bTxt: "")
+                        SymbolButton(bIcon: "chart.xyaxis.line", bTxt: "")
                     }.foregroundColor(ForeColor)
 
             }

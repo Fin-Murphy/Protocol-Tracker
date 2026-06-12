@@ -19,6 +19,7 @@ struct HabitBuilderView: View {
         
     @State var DisplayHabitMaker: Bool = false
     @State var DisplayHabitEditor: Bool = false
+    @State var displayProtocolLibrary: Bool = false
     
     @State var HabitNameSet: String = ""
     @State var HabitGoalSet: Int16 = 1
@@ -145,11 +146,19 @@ struct HabitBuilderView: View {
             VStack{
                 
                 HStack{
+                    Button {
+                        displayProtocolLibrary = true
+                    } label: {
+                        Image(systemName: "chevron.down")
+                            .font(.title2)
+                            .padding(.bottom)
+                    }
+
                     Text("Habits")
                         .fontWeight(.bold)
                         .font(.title)
                         .padding(.bottom)
-                    
+
                     Button {
                         DisplayHabitMaker = true
                     } label: {
@@ -517,7 +526,15 @@ struct HabitBuilderView: View {
                     
                     } else {Text("No Habits")}
 //                } // END PROT LIST CONDITIONAL
-                
+
+                Button {
+                    generateTestHabitData(viewContext: viewContext)
+                } label: {
+                    Text("generate test habits")
+                }
+                .foregroundColor(ForeColor)
+                .padding(.bottom)
+
             }
             
             if DisplayHabitMaker == true {
@@ -540,7 +557,13 @@ struct HabitBuilderView: View {
                 .shadow(radius: 20)
                 
             } else {}
-            
+
+            if displayProtocolLibrary == true {
+                ProtocolLibraryModal(isPresented: $displayProtocolLibrary, onIncorporate: {
+                    listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol")
+                })
+            } else {}
+
         }.onAppear{indexProtocols(viewContext: viewContext)}
     }
         

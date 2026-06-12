@@ -610,6 +610,55 @@ func playCustomHaptic() {
 
 
 // ---------------------------------------------------------------------------------------------------------------------
+// GENERATE TEST HABIT DATA
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Backfills the past 14 days (excluding today, so the daily checklist isn't disturbed) with one
+// randomized Item per existing HabitItem, for previewing graphs and testing future features.
+func generateTestHabitData (viewContext: NSManagedObjectContext) {
+
+    do {
+        let request: NSFetchRequest<HabitItem> = HabitItem.fetchRequest()
+        let habitData = try viewContext.fetch(request)
+
+        let todayStart = Calendar.current.startOfDay(for: Date())
+
+        for dayOffset in 1...14 {
+            let day = Calendar.current.date(byAdding: .day, value: -dayOffset, to: todayStart) ?? todayStart
+
+            for index in habitData {
+                let newItem = Item(context: viewContext)
+                newItem.timestamp = day
+                newItem.name = index.name
+                newItem.goal = index.goal
+                newItem.unit = index.unit
+                newItem.whichProtocol = index.whichProtocol
+                newItem.reward = index.reward
+                newItem.id = UUID()
+                newItem.hasStatus = index.hasStatus
+                newItem.hasCheckbox = index.hasCheckbox
+                newItem.isTask = false
+                newItem.notFloater = true
+
+                if index.hasCheckbox {
+                    newItem.complete = Bool.random()
+                } else {
+                    newItem.value = Int16.random(in: 0...max(index.goal, 1))
+                    newItem.complete = newItem.value >= index.goal
+                }
+            }
+        }
+
+    } catch {
+        print("Failed fetching habits for test data: \(error)")
+        return
+    }
+
+    saveViewContext(viewContext: viewContext)
+
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 // INDEX PROTOCOLS
 // ---------------------------------------------------------------------------------------------------------------------
 

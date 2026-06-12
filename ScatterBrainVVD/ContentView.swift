@@ -42,8 +42,9 @@ struct ContentView: View {
 ****************************************************** */
                 
             } else if selectedTab == .Settings {
-                                    
-                GoalSetView()
+
+                GraphTabView()
+                    .environment(\.managedObjectContext, viewContext)
              
 /* *******************************************************
              MONEY TAB
