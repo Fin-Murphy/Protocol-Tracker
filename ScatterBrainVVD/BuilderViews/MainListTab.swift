@@ -365,7 +365,7 @@ struct MainListTab: View {
          
         VStack{
             
-            DateBarView(SelectedDate: $SelectedDate, Celebrate: $Celebrate)
+            DateBarView(SelectedDate: $SelectedDate)
             
             ZStack{
                 
@@ -469,7 +469,7 @@ struct MainListTab: View {
                 }
                 
                 checkDate()
-                Celebrate = Int16(UserDefaults.standard.integer(forKey:"TodayScore"))
+                Celebrate = scoreFor(date: Date(), viewContext: viewContext)
                 
             } // END ZSTACK
             
@@ -487,13 +487,9 @@ struct MainListTab: View {
             let comparison = calendar.compare(Date(), to: savedDate, toGranularity: .day)
 
             if comparison == .orderedDescending {
-                
-                let newDaySave = DayData(context: viewContext)
-                newDaySave.day = savedDate
-                newDaySave.score = Int16(UserDefaults.standard.integer(forKey: "TodayScore"))
-                UserDefaults.standard.set(0, forKey: "TodayScore")
-                saveViewContext(viewContext: viewContext)
-                
+
+                // Each day's score already lives in its own DayData record (written live as
+                // habits are completed), so the rollover just needs to refresh the checklist.
                 populateTasks()
                 
                 generateNotifications(viewContext: viewContext) // NEW ADDITION!! ! ! ! ! ! ! ! ! ! ! ! !

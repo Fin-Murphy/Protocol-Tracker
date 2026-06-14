@@ -121,23 +121,32 @@ addValue() / subValue() updates Item.value
         ↓
 When value >= goal:
     → completeHabit() called
-    → Add reward points to TodayScore
+    → Add reward points to today's DayData.score
     → Mark Item.complete = true
 ```
 
 ### 4. Scoring Flow
+
+Each calendar day owns a persistent `DayData` record holding that day's point total, so
+the per-day score survives indefinitely and the date-bar chevrons can read back the score
+for any past day.
 
 ```
 User completes habit (value >= goal)
         ↓
 completeHabit() function:
     - Item.complete = true
-    - TodayScore += Item.reward (UserDefaults)
+    - dayData(for: today).score += Item.reward (Core Data)
+      (DayData row is created lazily on the first point of the day)
+    - Celebrate binding = today's score
         ↓
-Check: TodayScore >= dailyGoal?
+Check: Celebrate >= dailyGoal?
         ↓
 YES: Trigger celebrationProcedure()
      (haptic feedback)
+
+DateBarView reads scoreFor(SelectedDate) to display the
+chosen day's total; today's record updates the view live.
 ```
 
 ### 5. Notification Flow
@@ -176,6 +185,8 @@ Items marked notFloater persist across days
 | `shuntTodaysTasks()` | Convert due tasks to today's items |
 | `addValue()` / `subValue()` | Increment/decrement item progress |
 | `completeHabit()` | Mark habit complete, add reward points |
+| `dayData(for:)` | Get-or-create a day's DayData score record |
+| `scoreFor(date:)` | Read-only lookup of a day's stored score |
 | `scootItem()` | Move incomplete item to tomorrow |
 | `shuntTask()` | Convert task to today's item |
 | `deleteEntity*()` | Delete items by UUID |
@@ -190,7 +201,6 @@ Items marked notFloater persist across days
 
 | Key | Type | Purpose |
 |-----|------|---------|
-| `TodayScore` | Int | Current day's accumulated points |
 | `dailyGoal` | Int | Target points per day |
 | `notifFreq` | Int | Notification frequency in hours |
 | `seenWelcome` | Bool | First launch flag |

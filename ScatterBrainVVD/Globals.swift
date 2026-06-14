@@ -455,6 +455,42 @@ func saveViewContext(viewContext: NSManagedObjectContext){
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+// DAILY SCORE STORAGE
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Returns the DayData object holding the score for the given calendar day, creating an
+// empty one (score 0) if none exists yet. Mutating scorers call this so every day that
+// earns points owns a persistent record the calendar chevrons can read back later.
+func dayData(for date: Date, viewContext: NSManagedObjectContext) -> DayData {
+    let request: NSFetchRequest<DayData> = DayData.fetchRequest()
+    let start = calendar.startOfDay(for: date)
+    let end = calendar.date(byAdding: .day, value: 1, to: start)!
+    request.predicate = NSPredicate(format: "day >= %@ AND day < %@", start as NSDate, end as NSDate)
+    request.fetchLimit = 1
+
+    if let existing = try? viewContext.fetch(request).first {
+        return existing
+    }
+
+    let newDay = DayData(context: viewContext)
+    newDay.day = start
+    newDay.score = 0
+    return newDay
+}
+
+// Read-only lookup of a day's stored score; returns 0 for days that never earned points
+// (and never creates a record, so merely viewing a day doesn't litter empty DayData rows).
+func scoreFor(date: Date, viewContext: NSManagedObjectContext) -> Int16 {
+    let request: NSFetchRequest<DayData> = DayData.fetchRequest()
+    let start = calendar.startOfDay(for: date)
+    let end = calendar.date(byAdding: .day, value: 1, to: start)!
+    request.predicate = NSPredicate(format: "day >= %@ AND day < %@", start as NSDate, end as NSDate)
+    request.fetchLimit = 1
+
+    return (try? viewContext.fetch(request).first?.score) ?? 0
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 // VALUEMOD FUNCTIONS
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -465,12 +501,11 @@ func addValue(item: Item, value: Int16, viewContext: NSManagedObjectContext, Cel
         
         if item.value >= item.goal {
             if item.complete == false {
-                
-                var TodayScore = UserDefaults.standard.integer(forKey: "TodayScore")
-                TodayScore += Int(item.reward)
-                UserDefaults.standard.set(TodayScore, forKey: "TodayScore")
-                
-                Celebrate = Int16(TodayScore)
+
+                let today = dayData(for: Date(), viewContext: viewContext)
+                today.score += item.reward
+
+                Celebrate = today.score
                 item.notFloater = true
             }
             item.complete = true
@@ -502,13 +537,12 @@ func completeHabit(item: Item, viewContext: NSManagedObjectContext, Celebrate: i
         if item.complete == false {
             item.value = item.goal
             item.complete = true
-            
-            var TodayScore = UserDefaults.standard.integer(forKey: "TodayScore")
-            TodayScore += Int(item.reward)
-            UserDefaults.standard.set(TodayScore, forKey: "TodayScore")
-            
-            Celebrate = Int16(TodayScore)
-            
+
+            let today = dayData(for: Date(), viewContext: viewContext)
+            today.score += item.reward
+
+            Celebrate = today.score
+
             item.notFloater = true
         }
         
@@ -538,13 +572,12 @@ func subValue(item: Item, value: Int16, viewContext: NSManagedObjectContext, Cel
         
         if item.value < item.goal {
             if item.complete == true {
-                
-                var TodayScore = UserDefaults.standard.integer(forKey: "TodayScore")
-                TodayScore -= Int(item.reward)
-                UserDefaults.standard.set(TodayScore, forKey: "TodayScore")
-                
-                Celebrate = Int16(TodayScore)
-                
+
+                let today = dayData(for: Date(), viewContext: viewContext)
+                today.score -= item.reward
+
+                Celebrate = today.score
+
             }
             item.complete = false
         }

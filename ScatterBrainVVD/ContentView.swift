@@ -17,7 +17,9 @@ struct ContentView: View {
     
     @State var SelectedDate: Date = Date()
         
-    @State var Celebrate: Int16 = Int16(UserDefaults.standard.integer(forKey: "TodayScore"))
+    // Seeded from today's stored DayData score in MainListTab.onAppear; the celebration
+    // check still rides on this binding.
+    @State var Celebrate: Int16 = 0
             
     @State var seenWelcome: Bool = !UserDefaults.standard.bool(forKey: "seenWelcome")
     

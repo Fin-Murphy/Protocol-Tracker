@@ -36,10 +36,21 @@ struct CustomDatePicker: View {
 }
 
 struct DateBarView: View {
-    
+
     @Binding var SelectedDate: Date
-    @Binding var Celebrate: Int16
-        
+
+    // All stored daily scores; we pick out the one matching SelectedDate so chevroning
+    // through the calendar shows that day's point total. Today's record updates live as
+    // habits are completed, so this re-renders automatically.
+    @FetchRequest(sortDescriptors: [])
+    private var dayScores: FetchedResults<DayData>
+
+    private var displayedScore: Int16 {
+        dayScores.first(where: {
+            calendar.isDate($0.day ?? Date.distantPast, inSameDayAs: SelectedDate)
+        })?.score ?? 0
+    }
+
     var body: some View {
         VStack{
             HStack{
@@ -65,8 +76,8 @@ struct DateBarView: View {
 //                    .fontWeight(.bold)
 //                    .font(.title2)
                 
-                Text("- (\(Celebrate)/\(UserDefaults.standard.integer(forKey: "dailyGoal")) Points)")
-//                Text(" - (\(Celebrate) Points)")
+                Text("- (\(displayedScore)/\(UserDefaults.standard.integer(forKey: "dailyGoal")) Points)")
+//                Text(" - (\(displayedScore) Points)")
                     .fontWeight(.bold)
                     .font(.title2)
                 
