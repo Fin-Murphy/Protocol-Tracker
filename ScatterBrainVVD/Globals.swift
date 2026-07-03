@@ -594,12 +594,12 @@ func subValue(item: Item, value: Int16, viewContext: NSManagedObjectContext, Cel
 
 }
 
-func setStatus(refItem: Item, viewContext: NSManagedObjectContext, updateItemStatus: Int16) {
-    refItem.status = updateItemStatus
+func setStatus(refItem: Item, viewContext: NSManagedObjectContext, updateItemStatus: String) {
+    refItem.statusText = updateItemStatus
 
     saveViewContext(viewContext: viewContext)
-    
-    print(refItem.status)
+
+    print(refItem.statusText ?? "")
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

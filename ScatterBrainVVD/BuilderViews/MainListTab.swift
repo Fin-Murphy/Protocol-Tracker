@@ -160,7 +160,7 @@ struct navLinkContent: View {
 
     @Environment(\.managedObjectContext) private var viewContext
 
-    @State var updateItemStatus: Int16 = 0
+    @State var updateItemStatus: String = ""
 
     @Binding var Celebrate: Int16
 
@@ -182,21 +182,17 @@ struct navLinkContent: View {
             VStack {
                 HStack {
                     Text("Habit status:")
-                    
-                    TextField("", value: $updateItemStatus, format: .number)
+
+                    TextField("", text: $updateItemStatus)
                         .frame(maxWidth: 100, alignment: .center)
+                        .onChange(of: updateItemStatus) {
+                            setStatus(refItem: item, viewContext: viewContext, updateItemStatus: updateItemStatus)
+                        }
                 }
                 .bckMod()
-                
-                Button {setStatus(refItem: item, viewContext: viewContext, updateItemStatus: updateItemStatus)} label: {
-                    Text("Save Habit Status")
-                    
-                }
-                .foregroundColor(.blue)
-                .bckMod()
-                
+
             }
-            .onAppear{updateItemStatus = item.status}
+            .onAppear{updateItemStatus = item.statusText ?? ""}
             .bckMod()
             
             

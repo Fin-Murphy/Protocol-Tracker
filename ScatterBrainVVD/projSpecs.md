@@ -32,7 +32,7 @@ Item (Daily task/habit instance)
 ├── hasCheckbox: Boolean
 ├── isTask: Boolean
 ├── notFloater: Boolean
-├── status: Int16
+├── statusText: String
 └── descriptor: String
 
 HabitItem (Template for recurring habits)
