@@ -80,11 +80,13 @@ func generateNotifications (viewContext: NSManagedObjectContext) {
         
         print(notifBody)
         
-        hour += 1
-        while hour < 24 {
-            manager.scheduleSmartReminder(at: hour, minute: 0, title: "f", body: notifBody)
-            print("Scheduling notification for \(hour)")
-            hour += NotifFreq
+        if notifBody != "" {
+            hour += 1
+            while hour < 24 {
+                manager.scheduleSmartReminder(at: hour, minute: 0, title: "f", body: notifBody)
+                print("Scheduling notification for \(hour)")
+                hour += NotifFreq
+            }
         }
         
 //        min += 1 // Test block
