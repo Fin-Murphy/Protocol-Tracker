@@ -33,6 +33,7 @@ Item (Daily task/habit instance)
 ├── isTask: Boolean
 ├── notFloater: Boolean
 ├── statusText: String
+├── timeRegion: String (Morning/Noon/Afternoon/Evening, nil = any time)
 └── descriptor: String
 
 HabitItem (Template for recurring habits)
@@ -53,6 +54,7 @@ HabitItem (Template for recurring habits)
 ├── order: Int32
 ├── useDow: Boolean (day of week)
 ├── onSun through onSat: Booleans (day selection)
+├── timeRegion: String (Morning/Noon/Afternoon/Evening, nil = any time)
 └── (not persisted in Core Data - recreated daily)
 
 TaskItem (One-off tasks)
@@ -158,9 +160,13 @@ generateNotifications() called
         ↓
 HabitNotificationManager schedules reminders
         ↓
-For each incomplete Item:
-    - Schedule notification at hourly intervals
-    - Based on notifFreq setting (UserDefaults)
+For each remaining hour of the day (stepped by notifFreq):
+    - Build a body from today's incomplete Items whose
+      timeRegion matches that hour's region, plus Items
+      with no timeRegion (included in every sendout)
+    - Regions: Morning 12am-12pm, Noon 12:01pm-3pm,
+      Afternoon 3:01pm-7pm, Evening 7:01pm-11:59pm
+    - Skip hours whose body would be empty
 ```
 
 ### 6. Moving Tasks Flow

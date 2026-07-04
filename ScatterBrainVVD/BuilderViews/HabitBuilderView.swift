@@ -34,6 +34,7 @@ struct HabitBuilderView: View {
     @State var HabitIsSubtaskSet: Bool = false
     @State var HabitHasSubTaskSet: Bool = false
     @State var HabitSuperTaskSet: UUID? = nil
+    @State var HabitTimeRegionSet: String = "None"
     
     @State var HabitUseDOWSet: Bool = false
     // -------------------------------------- DOW REP VALS
@@ -120,6 +121,13 @@ struct HabitBuilderView: View {
                                selection: $HabitStartDateSet,
                                displayedComponents: .date)
                     .datePickerStyle(.compact)
+                }
+                Section(header: Text("Time of day (narrows reminder notifications):")) {
+                    Picker("Time of day", selection: $HabitTimeRegionSet) {
+                        ForEach(timeRegionOptions, id: \.self) { region in
+                            Text(region)
+                        }
+                    }
                 }
                 Section(header: Text("Habit Reward (Points for completion)")) {
                     TextField("", value: $HabitRewardSet, format: .number)
@@ -290,6 +298,13 @@ struct HabitBuilderView: View {
                                                                                displayedComponents: .date)
                                                                     .datePickerStyle(.compact)
                                                                 }
+                                                                Section(header: Text("Time of day (narrows reminder notifications):")) {
+                                                                    Picker("Time of day", selection: $HabitTimeRegionSet) {
+                                                                        ForEach(timeRegionOptions, id: \.self) { region in
+                                                                            Text(region)
+                                                                        }
+                                                                    }
+                                                                }
                                                                 Section(header: Text("Habit Reward (Points for completion)")) {
                                                                     TextField("", value: $HabitRewardSet, format: .number)
                                                                 }
@@ -321,6 +336,7 @@ struct HabitBuilderView: View {
                                                         HabitRewardSet = habitNdx.reward
                                                         HabitHasCheckboxSet = habitNdx.hasCheckbox
                                                         HabitHasStatusSet = habitNdx.hasStatus
+                                                        HabitTimeRegionSet = habitNdx.timeRegion ?? "None"
 //
                                                         HabitUseDOWSet = habitNdx.useDow
 //
@@ -460,6 +476,13 @@ struct HabitBuilderView: View {
                                                                            displayedComponents: .date)
                                                                 .datePickerStyle(.compact)
                                                             }
+                                                            Section(header: Text("Time of day (narrows reminder notifications):")) {
+                                                                Picker("Time of day", selection: $HabitTimeRegionSet) {
+                                                                    ForEach(timeRegionOptions, id: \.self) { region in
+                                                                        Text(region)
+                                                                    }
+                                                                }
+                                                            }
                                                             Section(header: Text("Habit Reward (Points for completion)")) {
                                                                 TextField("", value: $HabitRewardSet, format: .number)
                                                             }
@@ -491,7 +514,8 @@ struct HabitBuilderView: View {
                                                             HabitRewardSet = habitNdx.reward
                                                             HabitHasCheckboxSet = habitNdx.hasCheckbox
                                                             HabitHasStatusSet = habitNdx.hasStatus
-//                                                            
+                                                            HabitTimeRegionSet = habitNdx.timeRegion ?? "None"
+//
                                                             HabitUseDOWSet = habitNdx.useDow
 //                                                            
                                                             HabitOnSunSet = habitNdx.onSun
@@ -581,7 +605,8 @@ struct HabitBuilderView: View {
         habitToEdit.reward = HabitRewardSet
         habitToEdit.hasStatus = HabitHasStatusSet
         habitToEdit.hasCheckbox = HabitHasCheckboxSet
-                
+        habitToEdit.timeRegion = HabitTimeRegionSet == "None" ? nil : HabitTimeRegionSet
+
         habitToEdit.useDow = HabitUseDOWSet
                 
         habitToEdit.onSun = HabitOnSunSet
@@ -652,7 +677,8 @@ struct HabitBuilderView: View {
         newHabitItem.reward = HabitRewardSet
         newHabitItem.hasStatus = HabitHasStatusSet
         newHabitItem.hasCheckbox = HabitHasCheckboxSet
-                
+        newHabitItem.timeRegion = HabitTimeRegionSet == "None" ? nil : HabitTimeRegionSet
+
         newHabitItem.useDow = HabitUseDOWSet
                 
         newHabitItem.onSun = HabitOnSunSet
@@ -690,6 +716,7 @@ struct HabitBuilderView: View {
                 newItem.hasStatus = newHabitItem.hasStatus
                 newItem.hasCheckbox = newHabitItem.hasCheckbox
                 newItem.notFloater = true
+                newItem.timeRegion = newHabitItem.timeRegion
 
             }
 
@@ -716,6 +743,7 @@ struct HabitBuilderView: View {
                 newItem.hasStatus = newHabitItem.hasStatus
                 newItem.hasCheckbox = newHabitItem.hasCheckbox
                 newItem.notFloater = true
+                newItem.timeRegion = newHabitItem.timeRegion
       
             }
             
@@ -735,6 +763,7 @@ struct HabitBuilderView: View {
         HabitIsSubtaskSet = false
         HabitSuperTaskSet = nil
         HabitHasSubTaskSet = false
+        HabitTimeRegionSet = "None"
         
         HabitOnMonSet = false
         HabitOnTuesSet = false

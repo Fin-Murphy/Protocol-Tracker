@@ -564,6 +564,7 @@ struct MainListTab: View {
                     newItem.hasStatus = index.hasStatus
                     newItem.hasCheckbox = index.hasCheckbox
                     newItem.notFloater = true
+                    newItem.timeRegion = index.timeRegion
 
                 }
 
@@ -590,6 +591,7 @@ struct MainListTab: View {
                     newItem.hasStatus = index.hasStatus
                     newItem.hasCheckbox = index.hasCheckbox
                     newItem.notFloater = true
+                    newItem.timeRegion = index.timeRegion
           
                 }
             }

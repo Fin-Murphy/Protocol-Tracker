@@ -22,6 +22,19 @@ let calendar: Calendar = .current
 // ALERT SERVICE
 // ---------------------------------------------------------------------------------------------------------------------
 
+let timeRegionOptions = ["None", "Morning", "Noon", "Afternoon", "Evening"]
+
+// Notifications only fire on the hour, so hour granularity is exact:
+// Morning 12am-12pm, Noon 12:01pm-3pm, Afternoon 3:01pm-7pm, Evening 7:01pm-11:59pm.
+func timeRegion(forHour hour: Int) -> String {
+    switch hour {
+    case 0...12: return "Morning"
+    case 13...15: return "Noon"
+    case 16...19: return "Afternoon"
+    default: return "Evening"
+    }
+}
+
 class HabitNotificationManager {
     static let shared = HabitNotificationManager()
     
@@ -67,26 +80,36 @@ func generateNotifications (viewContext: NSManagedObjectContext) {
         if NotifFreq < 1 {
             NotifFreq = 1
         }
-        
+
         var hour = calendar.component(.hour, from: Today)
 //        var min = calendar.component(.minute, from: Today)
 
-        
+
+        var todaysItems: [Item] = []
+
         for index in itemData {
             if ((Calendar.current.isDate((index.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true) && index.complete == false){ //If the item matches today...
-                notifBody += "\(index.name ?? "") (\(index.value)/\(index.goal))\n"
+                todaysItems.append(index)
             }
         }
-        
-        print(notifBody)
-        
-        if notifBody != "" {
-            hour += 1
-            while hour < 24 {
+
+        hour += 1
+        while hour < 24 {
+
+            notifBody = ""
+
+            for index in todaysItems { // Items with no time region go in every sendout; the rest only in their region's hours
+                if (index.timeRegion ?? "") == "" || index.timeRegion == "None" || index.timeRegion == timeRegion(forHour: hour) {
+                    notifBody += "\(index.name ?? "") (\(index.value)/\(index.goal))\n"
+                }
+            }
+
+            if notifBody != "" {
                 manager.scheduleSmartReminder(at: hour, minute: 0, title: "f", body: notifBody)
                 print("Scheduling notification for \(hour)")
-                hour += NotifFreq
             }
+
+            hour += NotifFreq
         }
         
 //        min += 1 // Test block
@@ -178,7 +201,9 @@ struct Habit: Identifiable, Codable, Hashable {
     var HabitIsSubtask: Bool = false
     var HabitHasSubtask: Bool = false
     var HabitSuperTask: UUID?
-    
+
+    var HabitTimeRegion: String? = nil
+
     var HabitOrdering: Int32
     
     var HabitUseDow: Bool = false
@@ -290,7 +315,8 @@ func scootItem(item: Item, viewContext: NSManagedObjectContext){
     newItem.hasStatus = item.hasStatus
     newItem.hasCheckbox = item.hasCheckbox
     newItem.notFloater = true
-    
+    newItem.timeRegion = item.timeRegion
+
     item.name = ("> " + (item.name ?? ""))
     
     saveViewContext(viewContext: viewContext)
@@ -674,6 +700,7 @@ func generateTestHabitData (viewContext: NSManagedObjectContext) {
                 newItem.hasCheckbox = index.hasCheckbox
                 newItem.isTask = false
                 newItem.notFloater = true
+                newItem.timeRegion = index.timeRegion
 
                 if index.hasCheckbox {
                     newItem.complete = Bool.random()

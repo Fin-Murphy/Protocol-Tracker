@@ -95,6 +95,7 @@ struct ProtocolLibraryModal: View {
                 newHabitItem.reward = habit.HabitReward
                 newHabitItem.hasStatus = habit.HabitHasStatus
                 newHabitItem.hasCheckbox = habit.HabitHasCheckbox
+                newHabitItem.timeRegion = habit.HabitTimeRegion
 
                 newHabitItem.order = habit.HabitOrdering
 
@@ -139,6 +140,7 @@ struct ProtocolLibraryModal: View {
         newHabitItem.reward = refHab.HabitReward
         newHabitItem.hasStatus = refHab.HabitHasStatus
         newHabitItem.hasCheckbox = refHab.HabitHasCheckbox
+        newHabitItem.timeRegion = refHab.HabitTimeRegion
 
         newHabitItem.order = refHab.HabitOrdering
 
