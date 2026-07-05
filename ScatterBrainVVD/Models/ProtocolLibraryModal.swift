@@ -69,6 +69,10 @@ struct ProtocolLibraryModal: View {
         .background(Rectangle()
             .foregroundColor(.black))
         .cornerRadius(20)
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(Color.gray, lineWidth: 1)
+        )
         .shadow(radius: 20)
 
     } // end body
