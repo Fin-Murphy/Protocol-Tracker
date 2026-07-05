@@ -8,9 +8,27 @@
 import SwiftUI
 
 struct SettingsView: View {
-    
+
+    @Binding var selectedTab: Tabs
+
     @State var DailyGoalSet: Int = UserDefaults.standard.integer(forKey: "dailyGoal")
     @State var NotifFreq: Int = UserDefaults.standard.integer(forKey: "notifFreq")
+
+    @AppStorage("hideTabSettings") var hideTabSettings: Bool = false
+    @AppStorage("hideTabHabits") var hideTabHabits: Bool = false
+    @AppStorage("hideTabHub") var hideTabHub: Bool = false
+    @AppStorage("hideTabLog") var hideTabLog: Bool = false
+    @AppStorage("hideTabGraphs") var hideTabGraphs: Bool = false
+    @AppStorage("hideTabProtocolList") var hideTabProtocolList: Bool = true
+    @AppStorage("hideTabTest") var hideTabTest: Bool = true
+
+    let maxActiveTabs = 6
+
+    var activeTabCount: Int {
+        [hideTabSettings, hideTabHabits, hideTabHub, hideTabLog,
+         hideTabGraphs, hideTabProtocolList, hideTabTest]
+            .filter { !$0 }.count
+    }
 
     var body: some View {
         
@@ -53,14 +71,58 @@ struct SettingsView: View {
                 }
                 
             }.bckMod()
-            
+
+            VStack{
+                Text("Tabs")
+                TabToggleRow(name: "Settings", tab: .Calendar, hidden: $hideTabSettings, canHide: false, canEnable: true, selectedTab: $selectedTab)
+                TabToggleRow(name: "Habits", tab: .Protocols, hidden: $hideTabHabits, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
+                TabToggleRow(name: "Hub", tab: .HUB, hidden: $hideTabHub, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
+                TabToggleRow(name: "Log", tab: .Goals, hidden: $hideTabLog, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
+                TabToggleRow(name: "Graphs", tab: .Settings, hidden: $hideTabGraphs, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
+                TabToggleRow(name: "Protocols", tab: .ProtocolList, hidden: $hideTabProtocolList, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
+                TabToggleRow(name: "Test", tab: .Test, hidden: $hideTabTest, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
+            }.bckMod()
+
             Spacer()
         }
-        
-        
+
+
+    }
+}
+
+// One row in the Tabs section: tapping the name always navigates there,
+// even when the checkbox has removed the tab from the tab bar.
+struct TabToggleRow: View {
+
+    let name: String
+    let tab: Tabs
+    @Binding var hidden: Bool
+    // The Settings tab can't be hidden — this pane is the only place
+    // to turn tabs back on.
+    var canHide: Bool = true
+    // False once maxActiveTabs are already showing; blocks checking, not unchecking.
+    let canEnable: Bool
+    @Binding var selectedTab: Tabs
+
+    var body: some View {
+        HStack{
+            Button {
+                selectedTab = tab
+            } label: {
+                Text(name)
+            }
+            Spacer()
+            Button {
+                hidden.toggle()
+            } label: {
+                Image(systemName: hidden ? "square" : "checkmark.square")
+            }
+            .disabled(hidden ? !canEnable : !canHide)
+        }
+        .foregroundColor(ForeColor)
     }
 }
 
 #Preview {
-    SettingsView()
+    SettingsView(selectedTab: .constant(.Calendar))
 }

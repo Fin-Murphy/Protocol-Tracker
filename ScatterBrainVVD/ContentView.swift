@@ -38,7 +38,7 @@ struct ContentView: View {
 //               CalendarView(SelectedDate: $SelectedDate, selectedTab: $selectedTab)
                 
                
-               SettingsView()
+               SettingsView(selectedTab: $selectedTab)
 /* *******************************************************
                        BOOK TAB
 ****************************************************** */
@@ -70,15 +70,34 @@ struct ContentView: View {
 ****************************************************** */
 
             } else if selectedTab == .HUB {
-            
+
                 MainListTab(
                     selectedTab: $selectedTab,
                     Celebrate: $Celebrate,
                     SelectedDate: $SelectedDate
                 )
                 .environment(\.managedObjectContext, viewContext)
-                
+
             }// END HUB TAB
+
+/* *******************************************************
+            PROTOCOL LIST TAB
+****************************************************** */
+
+            else if selectedTab == .ProtocolList {
+
+                ProtocolListView()
+                    .environment(\.managedObjectContext, viewContext)
+
+/* *******************************************************
+            TEST TAB
+****************************************************** */
+
+            } else if selectedTab == .Test {
+
+                TestView()
+
+            }
             
             Spacer()
 
