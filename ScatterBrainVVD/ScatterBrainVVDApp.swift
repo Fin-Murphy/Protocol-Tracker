@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct ScatterBrainVVDApp: App {
@@ -15,6 +16,7 @@ struct ScatterBrainVVDApp: App {
         WindowGroup {
             ContentView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .modelContainer(for: habItem.self)
         }
     }
 }

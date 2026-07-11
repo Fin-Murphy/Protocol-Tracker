@@ -34,15 +34,17 @@ class dow {
 @Model
 class habItem { // Wow, thats a lot of data fields! Time to use sum inheritance
     
-    init(goal: Int, hasCheckbox: Bool, hasStatus: Bool, hasSubtask: Bool, id: UUID, isSubtask: Bool, name: String, order: Int, repeatValue: Int, reward: Int, startDate: Date, superTask: UUID? = nil, timeRegion: String, unit: String, useDow: Bool, whichProtocol: String) {
-        
+    init(descript: String, goal: Int, hasCheckbox: Bool, hasStatus: Bool, hasSubtask: Bool, id: UUID, isSubtask: Bool, name: String, order: Int, repeatValue: Int, reward: Int, startDate: Date, superTask: UUID? = nil, timeRegion: String, unit: String, useDow: Bool, whichProtocol: String) {
+
         self.dow = .init(onSun: false, onMon: false, onTues: false, onWed: false, onThurs: false, onFri: false, onSat: false)
-        
+
+        self.descript = descript
         self.goal = goal
         self.hasCheckbox = hasCheckbox
         self.hasStatus = hasStatus
         self.hasSubtask = hasSubtask
         self.id = id
+        self.isSubtask = isSubtask
         self.name = name
         self.order = order
         self.repeatValue = repeatValue
@@ -55,12 +57,14 @@ class habItem { // Wow, thats a lot of data fields! Time to use sum inheritance
     }
     
     var dow: dow
-    
+
+    var descript: String = ""
     var goal: Int = 1
     var hasCheckbox: Bool = false
     var hasStatus: Bool = false
     var hasSubtask: Bool = false
     var id: UUID = UUID()
+    var isSubtask: Bool = false
     var name: String = "Habit"
 
     var order: Int = 0
@@ -72,6 +76,3 @@ class habItem { // Wow, thats a lot of data fields! Time to use sum inheritance
     var useDow: Bool = false
     var whichProtocol: String = "Daily"
 }
-
-
-
