@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreData
+import SwiftData
 
 struct HabitBuilderView: View {
     
@@ -24,7 +25,7 @@ struct HabitBuilderView: View {
     @State var HabitNameSet: String = ""
     @State var HabitGoalSet: Int16 = 1
     @State var HabitProtocolSet: String = "Daily"
-    @State var HabitUnitSet: String = "units"
+    @State var HabitUnitSet: String = "Units"
     @State var HabitRepetitionSet: Int16 = 1
     @State var HabitDescriptionSet: String = ""
     @State var HabitHasStatusSet: Bool = false
