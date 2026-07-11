@@ -39,7 +39,6 @@ struct TabBar: View {
             Spacer()
             //-----------------------------------------------
             
-            if !hideTabSettings {
             if selectedTab == .Calendar {
 
                     Button {
@@ -59,7 +58,6 @@ struct TabBar: View {
                     }.foregroundColor(ForeColor)
 
             }
-            }
             
             //-----------------------------------------------
             //Spacer()
@@ -68,7 +66,6 @@ struct TabBar: View {
         
             //-----------------------------------------------
             
-            if !hideTabHabits {
             if selectedTab == .Protocols {
 
                     Button {
@@ -86,11 +83,9 @@ struct TabBar: View {
                     }.foregroundColor(ForeColor)
 
             }
-            }
             
             //-----------------------------------------------
             
-            if !hideTabHub {
             if selectedTab == .HUB {
 
                     Button {
@@ -107,7 +102,6 @@ struct TabBar: View {
                     SymbolButton(bIcon: "h.square", bTxt: "")
                 }.foregroundColor(ForeColor)
 
-            }
             }
                 
             //-----------------------------------------------
@@ -181,29 +175,6 @@ struct TabBar: View {
 
             }
             }
-
-            //-----------------------------------------------
-
-            if !hideTabTest {
-            if selectedTab == .Test {
-
-                    Button {
-                        selectedTab = .Test
-                    } label: {
-                        SymbolButton(bIcon: "t.square.fill", bTxt: "Test")
-                    }.foregroundColor(ForeColor)
-
-            } else {
-
-                    Button {
-                        selectedTab = .Test
-                    } label: {
-                        SymbolButton(bIcon: "t.square", bTxt: "")
-                    }.foregroundColor(ForeColor)
-
-            }
-            }
-
 
 
             //-----------------------------------------------

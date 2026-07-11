@@ -74,13 +74,12 @@ struct SettingsView: View {
 
             VStack{
                 Text("Tabs")
-                TabToggleRow(name: "Settings", tab: .Calendar, hidden: $hideTabSettings, canHide: false, canEnable: true, selectedTab: $selectedTab)
-                TabToggleRow(name: "Habits", tab: .Protocols, hidden: $hideTabHabits, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
-                TabToggleRow(name: "Hub", tab: .HUB, hidden: $hideTabHub, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
-                TabToggleRow(name: "Log", tab: .Goals, hidden: $hideTabLog, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
+//                TabToggleRow(name: "Settings", tab: .Calendar, hidden: $hideTabSettings, canHide: false, canEnable: true, selectedTab: $selectedTab)
+//                TabToggleRow(name: "Habits", tab: .Protocols, hidden: $hideTabHabits, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
+//                TabToggleRow(name: "Hub", tab: .HUB, hidden: $hideTabHub, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
+                TabToggleRow(name: "Tasks", tab: .Goals, hidden: $hideTabLog, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
                 TabToggleRow(name: "Graphs", tab: .Settings, hidden: $hideTabGraphs, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
                 TabToggleRow(name: "Protocols", tab: .ProtocolList, hidden: $hideTabProtocolList, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
-                TabToggleRow(name: "Test", tab: .Test, hidden: $hideTabTest, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
             }.bckMod()
 
             Spacer()
