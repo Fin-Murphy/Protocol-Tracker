@@ -8,11 +8,11 @@ Protocol Tracker (Xcode project name: **ScatterBrainVVD**) is a native SwiftUI i
 
 The app is no longer under active feature development (superseded by the author's Reverb project), but the codebase remains the reference implementation.
 
-A detailed data-flow document lives at `ScatterBrainVVD/projSpecs.md` — read it for the Core Data entity schemas, UserDefaults keys, and the six main data flows (habit creation, daily population, progress tracking, scoring, notifications, task moving).
+A detailed data-flow document lives at `ScatterBrainVVD/projSpecs.md` — read it for the SwiftData model schemas, UserDefaults keys, and the six main data flows (habit creation, daily population, progress tracking, scoring, notifications, task moving).
 
 ## Build & Test Commands
 
-There is no package manager, linter, or CI — this is a plain Xcode project with no external dependencies (Supabase integration exists but is fully commented out in `Supabase.swift` and `Globals.swift`).
+There is no package manager, linter, or CI — this is a plain Xcode project with no external dependencies (a leftover Supabase client stub remains commented out in `Globals.swift`).
 
 ```sh
 # Build for iOS Simulator
@@ -33,15 +33,16 @@ Deployment target is iOS 18.5; the only scheme is `ScatterBrainVVD`.
 
 ## Architecture
 
-### Storage: two layers, three entity types
+### Storage: two layers, four model types
 
-- **Core Data** (`Persistence.swift`, model in `ScatterBrainVVD.xcdatamodeld`) holds the three entities. Understanding their relationship is the key to the whole app:
-  - `HabitItem` — the *template* for a recurring habit (repeat interval or day-of-week flags, start date, reward points).
-  - `TaskItem` — a one-off task with a due date, waiting to come due.
-  - `Item` — a concrete *instance* on a specific day's checklist. Habits spawn Items daily; TaskItems are converted ("shunted") into Items when their due date arrives and the TaskItem is deleted.
-- **UserDefaults** holds scoring (`TodayScore`, `dailyGoal`), settings (`notifFreq`), the last-population date (`DailyTaskPopulate?`), and the JSON-encoded `[HabitProtocol]` array under key `protocol` (via the `setEncodable`/`getDecodable` extension in `Globals.swift`).
+- **SwiftData** (models in `BuilderViews/Datum.swift`, container attached in `ScatterBrainVVDApp.swift`) holds the persistent models. Understanding their relationship is the key to the whole app:
+  - `habItem` — the *template* for a recurring habit (repeat interval or day-of-week flags via the related `dow` model, start date, reward points).
+  - `taskItem` — a one-off task with a due date, waiting to come due.
+  - `listItem` — a concrete *instance* on a specific day's checklist. Habits spawn listItems daily (via the `listItem(from:timestamp:)` convenience init); taskItems are converted ("shunted") into listItems when their due date arrives and the taskItem is deleted.
+  - `dayScore` — one record per calendar day holding that day's accumulated points.
+- **UserDefaults** holds the daily goal (`dailyGoal`), settings (`notifFreq`), the last-population date (`DailyTaskPopulate?`), and the JSON-encoded `[HabitProtocol]` array under key `protocol` (via the `setEncodable`/`getDecodable` extension in `Globals.swift`).
 
-There are parallel Codable structs (`Habit`, `Task`, `HabitProtocol` in `Globals.swift`) that mirror the Core Data entities — `Habit`/`Task` are used by the bundled protocol library and builders, while `HabitProtocol` is what gets persisted to UserDefaults. Field changes generally must be kept in sync across the struct, the Core Data entity, and `projSpecs.md`.
+There are parallel Codable structs (`Habit`, `Task`, `HabitProtocol` in `Globals.swift`) that mirror the SwiftData models — `Habit`/`Task` are used by the bundled protocol library and builders, while `HabitProtocol` is what gets persisted to UserDefaults. Field changes generally must be kept in sync across the struct, the SwiftData model, and `projSpecs.md`.
 
 ### The daily population cycle
 
@@ -49,7 +50,7 @@ There are parallel Codable structs (`Habit`, `Task`, `HabitProtocol` in `Globals
 
 ### Shared logic lives in Globals.swift
 
-By deliberate convention, nearly all business logic is in free functions in `Globals.swift` rather than in views: progress mutation (`addValue`/`subValue`/`completeHabit` — these also update `TodayScore` and trigger the celebration check), entity deletion (`deleteEntity*` by UUID), task shunting, notification scheduling (`generateNotifications` rebuilds all pending notifications from scratch on every mutation), and `indexProtocols()` (reconciles the UserDefaults protocol array against the habits actually in Core Data). Views call these and pass `viewContext` explicitly.
+By deliberate convention, nearly all business logic is in free functions in `Globals.swift` rather than in views: progress mutation (`addValue`/`subValue`/`completeHabit` — these also update the day's `dayScore` and trigger the celebration check), entity deletion (`deleteEntity`/`deleteEntityTask` by UUID), task shunting, notification scheduling (`generateNotifications` rebuilds all pending notifications from scratch on every mutation), and `indexProtocols()` (reconciles the UserDefaults protocol array against the habits actually in SwiftData). Views call these and pass `modelContext` explicitly.
 
 ### Views
 

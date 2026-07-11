@@ -4,7 +4,7 @@
 //
 
 import SwiftUI
-import CoreData
+import SwiftData
 
 // The popup browser for the built-in protocol library (AppDefinedProtocolLibrary),
 // extracted from ProtocolListView so it can be presented from other pages too.
@@ -15,7 +15,7 @@ struct ProtocolLibraryModal: View {
     // Called after a protocol/habit is incorporated so the parent can refresh its protocol list
     var onIncorporate: () -> Void = {}
 
-    @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
+    @Environment(\.modelContext) private var modelContext
 
     var body: some View {
 
@@ -79,90 +79,44 @@ struct ProtocolLibraryModal: View {
 
     private func incorporateProtocol(refProt: HabitProtocol){
 
-        //REWORK TO COREDATA
-
-        do {
-
-            for habit in refProt.ProtocolContent {
-
-                let newHabitItem = HabitItem(context: viewContext)
-
-                newHabitItem.id = UUID()
-
-                newHabitItem.name = habit.HabitName
-                newHabitItem.goal = habit.HabitGoal
-                newHabitItem.unit = habit.HabitUnit
-                newHabitItem.whichProtocol = habit.HabitProtocol
-                newHabitItem.repeatValue = Int16(habit.HabitRepeatValue)
-                newHabitItem.descript = habit.HabitDescription
-                newHabitItem.startDate = Calendar.current.startOfDay(for: Date())
-                newHabitItem.reward = habit.HabitReward
-                newHabitItem.hasStatus = habit.HabitHasStatus
-                newHabitItem.hasCheckbox = habit.HabitHasCheckbox
-                newHabitItem.timeRegion = habit.HabitTimeRegion
-
-                newHabitItem.order = habit.HabitOrdering
-
-                newHabitItem.useDow = habit.HabitUseDow
-
-                newHabitItem.onSun = habit.HabitOnSun
-                newHabitItem.onMon = habit.HabitOnMon
-                newHabitItem.onTues = habit.HabitOnTues
-                newHabitItem.onWed = habit.HabitOnWed
-                newHabitItem.onThurs = habit.HabitOnThurs
-                newHabitItem.onFri = habit.HabitOnFri
-                newHabitItem.onSat = habit.HabitOnSat
-
-            }
-
-            try viewContext.save()
-
-        } catch {}
-
-
-        indexProtocols(viewContext: viewContext)
-
-        onIncorporate()
+        for habit in refProt.ProtocolContent {
+            incorporateHabit(refHab: habit)
+        }
 
     }
 
     private func incorporateHabit(refHab: Habit){
 
-        //REWORK TO COREDATA
+        let newHabitItem = habItem(descript: refHab.HabitDescription,
+                                   goal: Int(refHab.HabitGoal),
+                                   hasCheckbox: refHab.HabitHasCheckbox,
+                                   hasStatus: refHab.HabitHasStatus,
+                                   hasSubtask: refHab.HabitHasSubtask,
+                                   id: UUID(),
+                                   isSubtask: refHab.HabitIsSubtask,
+                                   name: refHab.HabitName,
+                                   order: Int(refHab.HabitOrdering),
+                                   repeatValue: refHab.HabitRepeatValue,
+                                   reward: Int(refHab.HabitReward),
+                                   startDate: Calendar.current.startOfDay(for: Date()),
+                                   superTask: refHab.HabitSuperTask,
+                                   timeRegion: refHab.HabitTimeRegion ?? "None",
+                                   unit: refHab.HabitUnit,
+                                   useDow: refHab.HabitUseDow,
+                                   whichProtocol: refHab.HabitProtocol)
 
-        let newHabitItem = HabitItem(context: viewContext)
+        newHabitItem.dow = dow(onSun: refHab.HabitOnSun,
+                               onMon: refHab.HabitOnMon,
+                               onTues: refHab.HabitOnTues,
+                               onWed: refHab.HabitOnWed,
+                               onThurs: refHab.HabitOnThurs,
+                               onFri: refHab.HabitOnFri,
+                               onSat: refHab.HabitOnSat)
 
-        newHabitItem.id = UUID()
+        modelContext.insert(newHabitItem)
+        try? modelContext.save()
 
-        newHabitItem.name = refHab.HabitName
-        newHabitItem.goal = refHab.HabitGoal
-        newHabitItem.unit = refHab.HabitUnit
-        newHabitItem.whichProtocol = refHab.HabitProtocol
-        newHabitItem.repeatValue = Int16(refHab.HabitRepeatValue)
-        newHabitItem.descript = refHab.HabitDescription
-        newHabitItem.startDate = Calendar.current.startOfDay(for: Date())
-        newHabitItem.reward = refHab.HabitReward
-        newHabitItem.hasStatus = refHab.HabitHasStatus
-        newHabitItem.hasCheckbox = refHab.HabitHasCheckbox
-        newHabitItem.timeRegion = refHab.HabitTimeRegion
-
-        newHabitItem.order = refHab.HabitOrdering
-
-        newHabitItem.useDow = refHab.HabitUseDow
-
-        newHabitItem.onSun = refHab.HabitOnSun
-        newHabitItem.onMon = refHab.HabitOnMon
-        newHabitItem.onTues = refHab.HabitOnTues
-        newHabitItem.onWed = refHab.HabitOnWed
-        newHabitItem.onThurs = refHab.HabitOnThurs
-        newHabitItem.onFri = refHab.HabitOnFri
-        newHabitItem.onSat = refHab.HabitOnSat
-
-        do {
-            try viewContext.save()
-        } catch {}
-
-        indexProtocols(viewContext: viewContext)
+        indexProtocols(modelContext: modelContext)
 
         onIncorporate()
 

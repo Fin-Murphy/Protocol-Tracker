@@ -6,16 +6,14 @@
 //
 
 import SwiftUI
-import CoreData
+import SwiftData
 
 struct TaskBuilderView: View {
-    
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \TaskItem.name, ascending: true)],
-        animation: .default)
-    private var taskData: FetchedResults<TaskItem>
-    
-    @Environment(\.managedObjectContext) private var viewContext
+
+    @Query(sort: \taskItem.name, animation: .default)
+    private var taskData: [taskItem]
+
+    @Environment(\.modelContext) private var modelContext
     
     @State var DisplayTaskMaker: Bool = false
     @State var DisplayTaskEditor: Bool = false
@@ -68,11 +66,11 @@ struct TaskBuilderView: View {
                                         VStack{
                                             
                                             List {
-                                                Text(taskNdx.name ?? "")
+                                                Text(taskNdx.name)
                                                     .font(.title)
                                                     .padding()
-                                                Text("Item goal: \(taskNdx.goal) \(taskNdx.unit ?? "")" )
-                                                Text("Item due date: \(taskNdx.dueDate ?? Date(), formatter: itemFormatter)")
+                                                Text("Item goal: \(taskNdx.goal) \(taskNdx.unit)" )
+                                                Text("Item due date: \(taskNdx.dueDate, formatter: itemFormatter)")
                                                 Section {
                                                     Text("Item Description: \n")
                                                         .font(.title2)
@@ -90,14 +88,14 @@ struct TaskBuilderView: View {
                                             }
                                             
                                             Button{
-                                                shuntTask(taskToShunt: taskNdx, viewContext: viewContext)
+                                                shuntTask(taskToShunt: taskNdx, modelContext: modelContext)
 
                                             } label: {
                                                 Text("Shunt Task").bckMod()
                                             }
-                                            
+
                                             Button{
-                                                deleteEntityTask(withUUID: taskNdx.id ?? UUID(), viewContext: viewContext)
+                                                deleteEntityTask(withUUID: taskNdx.id, modelContext: modelContext)
                                             } label: {
                                                 Text("Remove this task").bckMod()
                                             }
@@ -160,16 +158,16 @@ struct TaskBuilderView: View {
                                                     
                                                     
                                                 }.onAppear{
-                                                    
-                                                    TaskNameSet = taskNdx.name ?? ""
-                                                    TaskDescriptionSet = taskNdx.descript ?? ""
-                                                    TaskRewardSet = taskNdx.reward
-                                                    TaskDueDateSet = taskNdx.dueDate ?? Date()
-                                                    TaskUnitSet = taskNdx.unit ?? ""
-                                                    TaskGoalSet = taskNdx.goal
+
+                                                    TaskNameSet = taskNdx.name
+                                                    TaskDescriptionSet = taskNdx.descript
+                                                    TaskRewardSet = Int16(taskNdx.reward)
+                                                    TaskDueDateSet = taskNdx.dueDate
+                                                    TaskUnitSet = taskNdx.unit
+                                                    TaskGoalSet = Int16(taskNdx.goal)
                                                     TaskHasCheckboxSet = taskNdx.hasCheckbox
                                                     TaskIsntFloatingSet = taskNdx.notFloater
-                                                    
+
                                                 }
                                             }
                                         } else {}
@@ -177,8 +175,8 @@ struct TaskBuilderView: View {
                                     }
                                     
                                 } label: {
-                                    Text(taskNdx.name ?? "")
-                                    
+                                    Text(taskNdx.name)
+
                                 }
                             }
                         }
@@ -263,56 +261,44 @@ struct TaskBuilderView: View {
                   ADD TASK
      ------------------------------------------------     */
     
-    private func updateTask(taskToEdit: TaskItem) {
+    private func updateTask(taskToEdit: taskItem) {
 
         taskToEdit.name = TaskNameSet
-        taskToEdit.goal = TaskGoalSet
+        taskToEdit.goal = Int(TaskGoalSet)
         taskToEdit.unit = TaskUnitSet
         taskToEdit.descript = TaskDescriptionSet
         taskToEdit.dueDate = TaskDueDateSet
-        taskToEdit.reward = TaskRewardSet
+        taskToEdit.reward = Int(TaskRewardSet)
         taskToEdit.hasCheckbox = TaskHasCheckboxSet
-                
+
         if taskToEdit.hasCheckbox == true {
             taskToEdit.goal = 1
             taskToEdit.unit = "units"
         }
-        
-        do {
-            try viewContext.save()
-        } catch {
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-        }
+
+        saveContext(modelContext: modelContext)
     }
-    
+
     private func addTask() {
-        
+
         if TaskHasCheckboxSet == true {
             TaskGoalSet = 1
         }
-        
-        let newTaskItem = TaskItem(context: viewContext)
-        
-        newTaskItem.id = UUID()
-        
-        newTaskItem.name = TaskNameSet
-        newTaskItem.goal = TaskGoalSet
-        newTaskItem.unit = TaskUnitSet
-        newTaskItem.descript = TaskDescriptionSet
-        newTaskItem.reward = TaskRewardSet
-        newTaskItem.dueDate = TaskDueDateSet
-        newTaskItem.hasCheckbox = TaskHasCheckboxSet
-        newTaskItem.notFloater = TaskIsntFloatingSet
 
-        do {
-            try viewContext.save()
-        } catch {
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-        }
-        
-        
+        let newTaskItem = taskItem(descript: TaskDescriptionSet,
+                                   dueDate: TaskDueDateSet,
+                                   goal: Int(TaskGoalSet),
+                                   hasCheckbox: TaskHasCheckboxSet,
+                                   id: UUID(),
+                                   name: TaskNameSet,
+                                   notFloater: TaskIsntFloatingSet,
+                                   reward: Int(TaskRewardSet),
+                                   unit: TaskUnitSet)
+
+        modelContext.insert(newTaskItem)
+        saveContext(modelContext: modelContext)
+
+
         DisplayTaskMaker = false
         TaskNameSet = "Task"
         TaskDescriptionSet = ""
@@ -323,8 +309,8 @@ struct TaskBuilderView: View {
         TaskHasCheckboxSet = true
         TaskIsntFloatingSet = true
         
-        shuntTodaysTasks(viewContext: viewContext)
-     
+        shuntTodaysTasks(modelContext: modelContext)
+
     }
 
 

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct CustomDatePicker: View {
     @Binding var SelectedDate: Date
@@ -42,12 +43,12 @@ struct DateBarView: View {
     // All stored daily scores; we pick out the one matching SelectedDate so chevroning
     // through the calendar shows that day's point total. Today's record updates live as
     // habits are completed, so this re-renders automatically.
-    @FetchRequest(sortDescriptors: [])
-    private var dayScores: FetchedResults<DayData>
+    @Query
+    private var dayScores: [dayScore]
 
-    private var displayedScore: Int16 {
+    private var displayedScore: Int {
         dayScores.first(where: {
-            calendar.isDate($0.day ?? Date.distantPast, inSameDayAs: SelectedDate)
+            calendar.isDate($0.day, inSameDayAs: SelectedDate)
         })?.score ?? 0
     }
 

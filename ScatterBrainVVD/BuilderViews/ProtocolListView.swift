@@ -6,16 +6,12 @@
 //
 
 import SwiftUI
-import CoreData
+import SwiftData
 
 struct ProtocolListView: View {
-    
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \HabitItem.name, ascending: true)],
-        animation: .default)
-    private var habitData: FetchedResults<HabitItem>
-    
-    @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
+
+    @Query(sort: \habItem.name, animation: .default)
+    private var habitData: [habItem]
     
     @State var listOfProtocols: [HabitProtocol] = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") ?? []
     @State var displayProtocolLibrary: Bool = false
@@ -53,7 +49,7 @@ struct ProtocolListView: View {
                                     ForEach(habitData){ hab in
                                         
                                         if hab.whichProtocol == prot.ProtocolName {
-                                            Text(hab.name ?? "")
+                                            Text(hab.name)
                                         } else {}
                                         
                                     }

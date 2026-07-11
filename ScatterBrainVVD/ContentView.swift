@@ -7,23 +7,23 @@
 //  
 
 import SwiftUI
-import CoreData
+import SwiftData
 
 struct ContentView: View {
 //just to get that green square
     @Environment(\.scenePhase) private var scenePhase
-    
+
     @State var selectedTab: Tabs = .HUB
-    
+
     @State var SelectedDate: Date = Date()
-        
-    // Seeded from today's stored DayData score in MainListTab.onAppear; the celebration
+
+    // Seeded from today's stored dayScore in MainListTab.onAppear; the celebration
     // check still rides on this binding.
-    @State var Celebrate: Int16 = 0
-            
+    @State var Celebrate: Int = 0
+
     @State var seenWelcome: Bool = !UserDefaults.standard.bool(forKey: "seenWelcome")
-    
-    @Environment(\.managedObjectContext) private var viewContext
+
+    @Environment(\.modelContext) private var modelContext
     
     var body: some View {
     
@@ -46,8 +46,7 @@ struct ContentView: View {
             } else if selectedTab == .Settings {
 
                 GraphTabView()
-                    .environment(\.managedObjectContext, viewContext)
-             
+
 /* *******************************************************
              MONEY TAB
 ******************************************************** */
@@ -55,7 +54,6 @@ struct ContentView: View {
             else if selectedTab == .Protocols {
                                     
                 HabitBuilderView()
-                    .environment(\.managedObjectContext, viewContext)
 
 /* *******************************************************
             GOALS TAB
@@ -63,7 +61,6 @@ struct ContentView: View {
             } else if selectedTab == .Goals {
                 
                 TaskBuilderView()
-                    .environment(\.managedObjectContext, viewContext)
 
 /* *******************************************************
             MAIN TASK TAB
@@ -76,7 +73,6 @@ struct ContentView: View {
                     Celebrate: $Celebrate,
                     SelectedDate: $SelectedDate
                 )
-                .environment(\.managedObjectContext, viewContext)
 
             }// END HUB TAB
 
@@ -87,7 +83,6 @@ struct ContentView: View {
             else if selectedTab == .ProtocolList {
 
                 ProtocolListView()
-                    .environment(\.managedObjectContext, viewContext)
 
 /* *******************************************************
             TEST TAB
@@ -105,7 +100,7 @@ struct ContentView: View {
        }
 
        .onAppear{
-           generateNotifications(viewContext: viewContext)
+           generateNotifications(modelContext: modelContext)
            refreshVisualData(ForeColor: &ForeColor)
        }
        .onChange(of: scenePhase) {
@@ -115,5 +110,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+    ContentView().modelContainer(for: [habItem.self, listItem.self, taskItem.self, dayScore.self], inMemory: true)
 }

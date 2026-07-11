@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import CoreData
+import SwiftData
 import SwiftUI
 import CoreHaptics
 
@@ -63,18 +63,17 @@ class HabitNotificationManager {
 }
 
 
-func generateNotifications (viewContext: NSManagedObjectContext) {
-    
-    
+func generateNotifications (modelContext: ModelContext) {
+
+
     do {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests() // Removes all leftover notifications
-        
-        let request: NSFetchRequest<Item> = Item.fetchRequest() // Pulling in the item data from the calendar (REMEMBER TO FIX THIS LOGIC FLOW!)
-        let itemData = try viewContext.fetch(request)
+
+        let itemData = try modelContext.fetch(FetchDescriptor<listItem>()) // Pulling in the item data from the calendar (REMEMBER TO FIX THIS LOGIC FLOW!)
         let manager = HabitNotificationManager.shared
-        
+
         var notifBody: String = ""
-        
+
         var NotifFreq: Int = UserDefaults.standard.integer(forKey: "notifFreq")
         if NotifFreq < 1 {
             NotifFreq = 1
@@ -84,10 +83,10 @@ func generateNotifications (viewContext: NSManagedObjectContext) {
 //        var min = calendar.component(.minute, from: Today)
 
 
-        var todaysItems: [Item] = []
+        var todaysItems: [listItem] = []
 
         for index in itemData {
-            if ((Calendar.current.isDate((index.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true) && index.complete == false){ //If the item matches today...
+            if ((Calendar.current.isDate(index.timestamp, equalTo: Date(), toGranularity: .day) == true) && index.complete == false){ //If the item matches today...
                 todaysItems.append(index)
             }
         }
@@ -98,8 +97,8 @@ func generateNotifications (viewContext: NSManagedObjectContext) {
             notifBody = ""
 
             for index in todaysItems { // Items with no time region go in every sendout; the rest only in their region's hours
-                if (index.timeRegion ?? "") == "" || index.timeRegion == "None" || index.timeRegion == timeRegion(forHour: hour) {
-                    notifBody += "\(index.name ?? "") (\(index.value)/\(index.goal))\n"
+                if index.timeRegion == "" || index.timeRegion == "None" || index.timeRegion == timeRegion(forHour: hour) {
+                    notifBody += "\(index.name) (\(index.value)/\(index.goal))\n"
                 }
             }
 
@@ -110,7 +109,7 @@ func generateNotifications (viewContext: NSManagedObjectContext) {
 
             hour += NotifFreq
         }
-        
+
 //        min += 1 // Test block
 //        while min < 60 {
 //            manager.scheduleSmartReminder(at: hour, minute: min, title: "f", body: notifBody)
@@ -133,8 +132,6 @@ func generateNotifications (viewContext: NSManagedObjectContext) {
         let nsError = error as NSError
         fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
     }
-    
-    saveViewContext(viewContext: viewContext)
 
 }
 
@@ -159,15 +156,6 @@ struct HabitProtocol: Identifiable, Codable {
 }
 
 // tomas was here 12/28/25
-
-
-//struct DayData: Identifiable {
-//    
-//    let id: UUID = UUID()
-//    let day: Date
-//    var score: Int16 = 0
-//    
-//}
 
 
 struct Task: Identifiable, Codable {
@@ -300,77 +288,62 @@ var ForeColor: Color = currentScheme == .dark ? .white : .black
 // SCOOT ITEM
 // ---------------------------------------------------------------------------------------------------------------------
 
-func scootItem(item: Item, viewContext: NSManagedObjectContext){
-    
-    let newItem = Item(context: viewContext)
-    newItem.timestamp = (calendar.date(byAdding: .day, value: 1, to: item.timestamp ?? Date())!)
-    newItem.name = item.name
-    newItem.goal = item.goal
-    newItem.unit = item.unit
-    newItem.whichProtocol = item.whichProtocol
-    newItem.complete = false
-    newItem.reward = item.reward
-    newItem.id = UUID()
-    newItem.hasStatus = item.hasStatus
-    newItem.hasCheckbox = item.hasCheckbox
-    newItem.notFloater = true
-    newItem.timeRegion = item.timeRegion
+func scootItem(item: listItem, modelContext: ModelContext){
 
-    item.name = ("> " + (item.name ?? ""))
-    
-    saveViewContext(viewContext: viewContext)
-    
+    let newItem = listItem(complete: false,
+                           descriptor: item.descriptor,
+                           goal: item.goal,
+                           hasCheckbox: item.hasCheckbox,
+                           hasStatus: item.hasStatus,
+                           id: UUID(),
+                           isTask: item.isTask,
+                           name: item.name,
+                           notFloater: true,
+                           reward: item.reward,
+                           statusText: "",
+                           timeRegion: item.timeRegion,
+                           timestamp: (calendar.date(byAdding: .day, value: 1, to: item.timestamp)!),
+                           unit: item.unit,
+                           value: 0,
+                           whichProtocol: item.whichProtocol)
+    modelContext.insert(newItem)
+
+    item.name = ("> " + item.name)
+
+    saveContext(modelContext: modelContext)
+
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // DELETE ENTITY FUNCTIONS
 // ---------------------------------------------------------------------------------------------------------------------
 
-func deleteEntity(withUUID uuid: UUID, viewContext: NSManagedObjectContext) {
+func deleteEntity(withUUID uuid: UUID, modelContext: ModelContext) {
 
-    let request: NSFetchRequest<Item> = Item.fetchRequest()
-    request.predicate = NSPredicate(format: "id == %@", uuid as CVarArg)
+    var request = FetchDescriptor<listItem>(predicate: #Predicate { $0.id == uuid })
     request.fetchLimit = 1
-    
+
     do {
-        let results = try viewContext.fetch(request)
+        let results = try modelContext.fetch(request)
         if let entityToDelete = results.first {
-            viewContext.delete(entityToDelete)
-            try viewContext.save()
+            modelContext.delete(entityToDelete)
+            try modelContext.save()
         }
     } catch {
         print("Error deleting entity: \(error)")
     }
 }
 
-func deleteEntityHabit(withUUID uuid: UUID, viewContext: NSManagedObjectContext) {
+func deleteEntityTask(withUUID uuid: UUID, modelContext: ModelContext) {
 
-    let request: NSFetchRequest<HabitItem> = HabitItem.fetchRequest()
-    request.predicate = NSPredicate(format: "id == %@", uuid as CVarArg)
+    var request = FetchDescriptor<taskItem>(predicate: #Predicate { $0.id == uuid })
     request.fetchLimit = 1
-    
-    do {
-        let results = try viewContext.fetch(request)
-        if let entityToDelete = results.first {
-            viewContext.delete(entityToDelete)
-            try viewContext.save()
-        }
-    } catch {
-        print("Error deleting entity: \(error)")
-    }
-}
 
-func deleteEntityTask(withUUID uuid: UUID, viewContext: NSManagedObjectContext) {
-
-    let request: NSFetchRequest<TaskItem> = TaskItem.fetchRequest()
-    request.predicate = NSPredicate(format: "id == %@", uuid as CVarArg)
-    request.fetchLimit = 1
-    
     do {
-        let results = try viewContext.fetch(request)
+        let results = try modelContext.fetch(request)
         if let entityToDelete = results.first {
-            viewContext.delete(entityToDelete)
-            try viewContext.save()
+            modelContext.delete(entityToDelete)
+            try modelContext.save()
         }
     } catch {
         print("Error deleting entity: \(error)")
@@ -381,43 +354,46 @@ func deleteEntityTask(withUUID uuid: UUID, viewContext: NSManagedObjectContext) 
 // SHUNT TASK FUNCTIONS
 // ---------------------------------------------------------------------------------------------------------------------
 
-func shuntTask (taskToShunt: TaskItem, viewContext: NSManagedObjectContext) {
-    
-    let newItem = Item(context: viewContext)
-    newItem.timestamp = Date()
-    newItem.name = taskToShunt.name
-    newItem.goal = taskToShunt.goal
-    newItem.unit = taskToShunt.unit
-    newItem.complete = false
-    newItem.reward = taskToShunt.reward
-    newItem.isTask = true
-    newItem.id = UUID()
-    newItem.descriptor = taskToShunt.descript
-    newItem.hasCheckbox = taskToShunt.hasCheckbox
-    newItem.notFloater = taskToShunt.notFloater
-    
-    saveViewContext(viewContext: viewContext)
-    deleteEntityTask(withUUID: taskToShunt.id ?? UUID(), viewContext: viewContext)
+func shuntTask (taskToShunt: taskItem, modelContext: ModelContext) {
+
+    let newItem = listItem(complete: false,
+                           descriptor: taskToShunt.descript,
+                           goal: taskToShunt.goal,
+                           hasCheckbox: taskToShunt.hasCheckbox,
+                           hasStatus: false,
+                           id: UUID(),
+                           isTask: true,
+                           name: taskToShunt.name,
+                           notFloater: taskToShunt.notFloater,
+                           reward: taskToShunt.reward,
+                           statusText: "",
+                           timeRegion: "None",
+                           timestamp: Date(),
+                           unit: taskToShunt.unit,
+                           value: 0,
+                           whichProtocol: "Daily")
+    modelContext.insert(newItem)
+
+    modelContext.delete(taskToShunt)
+    saveContext(modelContext: modelContext)
 
 }
 
-func shuntTodaysTasks (viewContext: NSManagedObjectContext) {
+func shuntTodaysTasks (modelContext: ModelContext) {
     do {
-        let request: NSFetchRequest<TaskItem> = TaskItem.fetchRequest()
-        let taskData = try viewContext.fetch(request)
-        
+        let start = calendar.startOfDay(for: Date())
+        let end = calendar.date(byAdding: .day, value: 1, to: start)!
+        let request = FetchDescriptor<taskItem>(predicate: #Predicate { $0.dueDate >= start && $0.dueDate < end })
+        let taskData = try modelContext.fetch(request)
+
         for index in taskData {
-            if (Calendar.current.isDate((index.dueDate ?? Date()), equalTo: Date(), toGranularity: .day) == true) /*&& (index.notFloater == true)*/ {
-                shuntTask(taskToShunt: index, viewContext: viewContext)
-            }
+            shuntTask(taskToShunt: index, modelContext: modelContext)
         }
-        
+
     } catch {
         let nsError = error as NSError
         fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
     }
-    
-    saveViewContext(viewContext: viewContext)
 
 }
 
@@ -425,17 +401,16 @@ func shuntTodaysTasks (viewContext: NSManagedObjectContext) {
 // UTILITIES
 // ---------------------------------------------------------------------------------------------------------------------
 
-func displayHabitDescription (identifier: String, viewContext: NSManagedObjectContext) -> String {
+func displayHabitDescription (identifier: String, modelContext: ModelContext) -> String {
     do {
-        let request: NSFetchRequest<HabitItem> = HabitItem.fetchRequest()
-        let habitData = try viewContext.fetch(request)
-        
+        let habitData = try modelContext.fetch(FetchDescriptor<habItem>())
+
         for index in habitData {
             if index.name == identifier {
-                return index.descript ?? ""
+                return index.descript
             }
         }
-        
+
     } catch {
         return "Failed indexing"
     }
@@ -469,67 +444,64 @@ extension UserDefaults {
     }
 } // END UserDefaults Encodable/Decodable extension
 
-func saveViewContext(viewContext: NSManagedObjectContext){
-    
+func saveContext(modelContext: ModelContext){
+
     do {
-        try viewContext.save()
+        try modelContext.save()
     } catch {
         let nsError = error as NSError
         fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
     }
-    
-    
+
+
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // DAILY SCORE STORAGE
 // ---------------------------------------------------------------------------------------------------------------------
 
-// Returns the DayData object holding the score for the given calendar day, creating an
+// Returns the dayScore object holding the score for the given calendar day, creating an
 // empty one (score 0) if none exists yet. Mutating scorers call this so every day that
 // earns points owns a persistent record the calendar chevrons can read back later.
-func dayData(for date: Date, viewContext: NSManagedObjectContext) -> DayData {
-    let request: NSFetchRequest<DayData> = DayData.fetchRequest()
+func dayData(for date: Date, modelContext: ModelContext) -> dayScore {
     let start = calendar.startOfDay(for: date)
     let end = calendar.date(byAdding: .day, value: 1, to: start)!
-    request.predicate = NSPredicate(format: "day >= %@ AND day < %@", start as NSDate, end as NSDate)
+    var request = FetchDescriptor<dayScore>(predicate: #Predicate { $0.day >= start && $0.day < end })
     request.fetchLimit = 1
 
-    if let existing = try? viewContext.fetch(request).first {
+    if let existing = try? modelContext.fetch(request).first {
         return existing
     }
 
-    let newDay = DayData(context: viewContext)
-    newDay.day = start
-    newDay.score = 0
+    let newDay = dayScore(day: start, score: 0)
+    modelContext.insert(newDay)
     return newDay
 }
 
 // Read-only lookup of a day's stored score; returns 0 for days that never earned points
-// (and never creates a record, so merely viewing a day doesn't litter empty DayData rows).
-func scoreFor(date: Date, viewContext: NSManagedObjectContext) -> Int16 {
-    let request: NSFetchRequest<DayData> = DayData.fetchRequest()
+// (and never creates a record, so merely viewing a day doesn't litter empty dayScore rows).
+func scoreFor(date: Date, modelContext: ModelContext) -> Int {
     let start = calendar.startOfDay(for: date)
     let end = calendar.date(byAdding: .day, value: 1, to: start)!
-    request.predicate = NSPredicate(format: "day >= %@ AND day < %@", start as NSDate, end as NSDate)
+    var request = FetchDescriptor<dayScore>(predicate: #Predicate { $0.day >= start && $0.day < end })
     request.fetchLimit = 1
 
-    return (try? viewContext.fetch(request).first?.score) ?? 0
+    return (try? modelContext.fetch(request).first?.score) ?? 0
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // VALUEMOD FUNCTIONS
 // ---------------------------------------------------------------------------------------------------------------------
 
-func addValue(item: Item, value: Int16, viewContext: NSManagedObjectContext, Celebrate: inout Int16){
-    if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true {
+func addValue(item: listItem, value: Int, modelContext: ModelContext, Celebrate: inout Int){
+    if Calendar.current.isDate(item.timestamp, equalTo: Date(), toGranularity: .day) == true {
 
         item.value = item.value + value
-        
+
         if item.value >= item.goal {
             if item.complete == false {
 
-                let today = dayData(for: Date(), viewContext: viewContext)
+                let today = dayData(for: Date(), modelContext: modelContext)
                 today.score += item.reward
 
                 Celebrate = today.score
@@ -537,7 +509,7 @@ func addValue(item: Item, value: Int16, viewContext: NSManagedObjectContext, Cel
             }
             item.complete = true
         }
-        
+
         if Celebrate >= UserDefaults.standard.integer(forKey: "dailyGoal") {
             celebrationProcedure()
         }
@@ -549,30 +521,30 @@ func addValue(item: Item, value: Int16, viewContext: NSManagedObjectContext, Cel
             }
         }
     }
-    
-    
-    
-    saveViewContext(viewContext: viewContext)
-    generateNotifications(viewContext: viewContext) 
+
+
+
+    saveContext(modelContext: modelContext)
+    generateNotifications(modelContext: modelContext)
 
 }
 
-func completeHabit(item: Item, viewContext: NSManagedObjectContext, Celebrate: inout Int16) {
-        
-    if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true {
+func completeHabit(item: listItem, modelContext: ModelContext, Celebrate: inout Int) {
+
+    if Calendar.current.isDate(item.timestamp, equalTo: Date(), toGranularity: .day) == true {
 
         if item.complete == false {
             item.value = item.goal
             item.complete = true
 
-            let today = dayData(for: Date(), viewContext: viewContext)
+            let today = dayData(for: Date(), modelContext: modelContext)
             today.score += item.reward
 
             Celebrate = today.score
 
             item.notFloater = true
         }
-        
+
         if Celebrate >= UserDefaults.standard.integer(forKey: "dailyGoal") {
             celebrationProcedure()
         }
@@ -583,24 +555,24 @@ func completeHabit(item: Item, viewContext: NSManagedObjectContext, Celebrate: i
             item.notFloater = true
         }
     }
-      
-    saveViewContext(viewContext: viewContext)
-    generateNotifications(viewContext: viewContext)
+
+    saveContext(modelContext: modelContext)
+    generateNotifications(modelContext: modelContext)
 
 }
 
-func subValue(item: Item, value: Int16, viewContext: NSManagedObjectContext, Celebrate: inout Int16) {
-    
-    if Calendar.current.isDate((item.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) == true {
-        
+func subValue(item: listItem, value: Int, modelContext: ModelContext, Celebrate: inout Int) {
+
+    if Calendar.current.isDate(item.timestamp, equalTo: Date(), toGranularity: .day) == true {
+
         if item.value > 0 {
             item.value = item.value - value
         }
-        
+
         if item.value < item.goal {
             if item.complete == true {
 
-                let today = dayData(for: Date(), viewContext: viewContext)
+                let today = dayData(for: Date(), modelContext: modelContext)
                 today.score -= item.reward
 
                 Celebrate = today.score
@@ -616,17 +588,17 @@ func subValue(item: Item, value: Int16, viewContext: NSManagedObjectContext, Cel
             }
         }
     }
-    saveViewContext(viewContext: viewContext)
-    generateNotifications(viewContext: viewContext)
+    saveContext(modelContext: modelContext)
+    generateNotifications(modelContext: modelContext)
 
 }
 
-func setStatus(refItem: Item, viewContext: NSManagedObjectContext, updateItemStatus: String) {
+func setStatus(refItem: listItem, modelContext: ModelContext, updateItemStatus: String) {
     refItem.statusText = updateItemStatus
 
-    saveViewContext(viewContext: viewContext)
+    saveContext(modelContext: modelContext)
 
-    print(refItem.statusText ?? "")
+    print(refItem.statusText)
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -674,12 +646,11 @@ func playCustomHaptic() {
 // ---------------------------------------------------------------------------------------------------------------------
 
 // Backfills the past 14 days (excluding today, so the daily checklist isn't disturbed) with one
-// randomized Item per existing HabitItem, for previewing graphs and testing future features.
-func generateTestHabitData (viewContext: NSManagedObjectContext) {
+// randomized item per existing habit, for previewing graphs and testing future features.
+func generateTestHabitData (modelContext: ModelContext) {
 
     do {
-        let request: NSFetchRequest<HabitItem> = HabitItem.fetchRequest()
-        let habitData = try viewContext.fetch(request)
+        let habitData = try modelContext.fetch(FetchDescriptor<habItem>())
 
         let todayStart = Calendar.current.startOfDay(for: Date())
 
@@ -687,26 +658,16 @@ func generateTestHabitData (viewContext: NSManagedObjectContext) {
             let day = Calendar.current.date(byAdding: .day, value: -dayOffset, to: todayStart) ?? todayStart
 
             for index in habitData {
-                let newItem = Item(context: viewContext)
-                newItem.timestamp = day
-                newItem.name = index.name
-                newItem.goal = index.goal
-                newItem.unit = index.unit
-                newItem.whichProtocol = index.whichProtocol
-                newItem.reward = index.reward
-                newItem.id = UUID()
-                newItem.hasStatus = index.hasStatus
-                newItem.hasCheckbox = index.hasCheckbox
-                newItem.isTask = false
-                newItem.notFloater = true
-                newItem.timeRegion = index.timeRegion
+                let newItem = listItem(from: index, timestamp: day)
 
                 if index.hasCheckbox {
                     newItem.complete = Bool.random()
                 } else {
-                    newItem.value = Int16.random(in: 0...max(index.goal, 1))
+                    newItem.value = Int.random(in: 0...max(index.goal, 1))
                     newItem.complete = newItem.value >= index.goal
                 }
+
+                modelContext.insert(newItem)
             }
         }
 
@@ -715,7 +676,7 @@ func generateTestHabitData (viewContext: NSManagedObjectContext) {
         return
     }
 
-    saveViewContext(viewContext: viewContext)
+    saveContext(modelContext: modelContext)
 
 }
 
@@ -723,13 +684,12 @@ func generateTestHabitData (viewContext: NSManagedObjectContext) {
 // INDEX PROTOCOLS
 // ---------------------------------------------------------------------------------------------------------------------
 
-func indexProtocols (viewContext: NSManagedObjectContext) {
-    
-    var habitData: [HabitItem] = []
-    
+func indexProtocols (modelContext: ModelContext) {
+
+    var habitData: [habItem] = []
+
     do {
-        let request: NSFetchRequest<HabitItem> = HabitItem.fetchRequest()
-        habitData = try viewContext.fetch(request)
+        habitData = try modelContext.fetch(FetchDescriptor<habItem>())
     } catch {}
 
 
@@ -757,14 +717,14 @@ func indexProtocols (viewContext: NSManagedObjectContext) {
 
                 for ndx in habitData {
                     var inArray = false
-                    print("Executing for item ", ndx.name ?? "")
+                    print("Executing for item ", ndx.name)
                     for ndx2 in protocolArray {
                         if ndx.whichProtocol == ndx2.ProtocolName {
                             inArray = true
                         }
                     }
                     if inArray == false {
-                        protocolArray.append(HabitProtocol(ProtocolName: ndx.whichProtocol ?? "", ProtocolDescription: ""))
+                        protocolArray.append(HabitProtocol(ProtocolName: ndx.whichProtocol, ProtocolDescription: ""))
                     }
                 }
 
@@ -774,7 +734,5 @@ func indexProtocols (viewContext: NSManagedObjectContext) {
             let pArray: [HabitProtocol] = []
             UserDefaults.standard.setEncodable(pArray, forKey: "protocol")
         }
-    
-        saveViewContext(viewContext: viewContext)
 
     }

@@ -4,13 +4,13 @@
 //
 
 import SwiftUI
-import CoreData
+import SwiftData
 import Charts
 
 struct DayPoint: Identifiable {
     let id: UUID = UUID()
     let day: Date
-    let value: Int16
+    let value: Int
     let complete: Bool
 }
 
@@ -23,17 +23,11 @@ struct UnifiedPoint: Identifiable {
 
 struct GraphTabView: View {
 
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \HabitItem.order, ascending: true)],
-        animation: .default)
-    private var habitData: FetchedResults<HabitItem>
+    @Query(sort: \habItem.order, animation: .default)
+    private var habitData: [habItem]
 
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
-        animation: .default)
-    private var itemData: FetchedResults<Item>
-
-    @Environment(\.managedObjectContext) var viewContext: NSManagedObjectContext
+    @Query(sort: \listItem.timestamp, animation: .default)
+    private var itemData: [listItem]
 
     @State private var unifiedGraph: Bool = false
     @State private var habitColors: [String: Color] = [:]
@@ -72,7 +66,7 @@ struct GraphTabView: View {
 
                         VStack(alignment: .leading) {
 
-                            Text(habit.name ?? "")
+                            Text(habit.name)
                                 .fontWeight(.bold)
                                 .foregroundColor(ForeColor)
 
@@ -137,7 +131,7 @@ struct GraphTabView: View {
     }
 
     private func unifiedLineGraph() -> some View {
-        let names = habitData.map { $0.name ?? "" }
+        let names = habitData.map { $0.name }
         return Chart(unifiedPoints()) { point in
             LineMark(
                 x: .value("Day", point.day, unit: .day),
@@ -174,11 +168,11 @@ struct GraphTabView: View {
     // DATA SHAPING
     // ---------------------------------------------------------------------------------------------------------------------
 
-    private func weekPoints(for habit: HabitItem) -> [DayPoint] {
+    private func weekPoints(for habit: habItem) -> [DayPoint] {
         weekDays.map { day in
             let match = itemData.first { item in
-                baseName(item.name) == (habit.name ?? "") &&
-                Calendar.current.isDate((item.timestamp ?? Date.distantPast), equalTo: day, toGranularity: .day)
+                baseName(item.name) == habit.name &&
+                Calendar.current.isDate(item.timestamp, equalTo: day, toGranularity: .day)
             }
             return DayPoint(day: day, value: match?.value ?? 0, complete: match?.complete ?? false)
         }
@@ -187,13 +181,13 @@ struct GraphTabView: View {
     private func unifiedPoints() -> [UnifiedPoint] {
         habitData.flatMap { habit in
             weekPoints(for: habit).map { point in
-                UnifiedPoint(habitName: habit.name ?? "", day: point.day, percent: percent(point, for: habit))
+                UnifiedPoint(habitName: habit.name, day: point.day, percent: percent(point, for: habit))
             }
         }
     }
 
     // Checkbox habits (and any habit without a goal to divide by) are all-or-nothing: 100% or 0%
-    private func percent(_ point: DayPoint, for habit: HabitItem) -> Double {
+    private func percent(_ point: DayPoint, for habit: habItem) -> Double {
         if habit.hasCheckbox || habit.goal <= 0 {
             return point.complete ? 100 : 0
         }
@@ -202,7 +196,7 @@ struct GraphTabView: View {
 
     private func assignColors() {
         for habit in habitData {
-            let name = habit.name ?? ""
+            let name = habit.name
             if habitColors[name] == nil {
                 habitColors[name] = Color(hue: .random(in: 0 ... 1), saturation: 0.8, brightness: 0.9)
             }
@@ -210,8 +204,8 @@ struct GraphTabView: View {
     }
 
     // Items moved to tomorrow get renamed with a "> " prefix by scootItem(); strip it so they still match their habit
-    private func baseName(_ name: String?) -> String {
-        var trimmed = name ?? ""
+    private func baseName(_ name: String) -> String {
+        var trimmed = name
         while trimmed.hasPrefix("> ") {
             trimmed = String(trimmed.dropFirst(2))
         }
@@ -221,5 +215,5 @@ struct GraphTabView: View {
 }
 
 #Preview {
-    GraphTabView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+    GraphTabView().modelContainer(for: [habItem.self, listItem.self, taskItem.self, dayScore.self], inMemory: true)
 }

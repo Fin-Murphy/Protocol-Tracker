@@ -9,12 +9,12 @@ import SwiftUI
 
 struct ListLabelView: View {
 
-    @Binding var itemz: Item
+    var itemz: listItem
 
     var body: some View {
-        
+
         HStack{
-            
+
             if itemz.isTask == true {
                 Image(systemName: "t.square")
                     .resizable()
@@ -26,12 +26,12 @@ struct ListLabelView: View {
                     .scaledToFit()
                     .frame(width: 20,height: 20)
             }
-            
+
             if itemz.complete == true {
-                Text(String(itemz.name ?? ""))
+                Text(String(itemz.name))
                     .strikethrough()
             } else {
-                Text(String(itemz.name ?? ""))
+                Text(String(itemz.name))
             }
             Spacer()
             

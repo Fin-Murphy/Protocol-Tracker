@@ -6,12 +6,12 @@
 //
 
 import SwiftUI
-import CoreData
+import SwiftData
 
 struct navLinkLabel: View {
-    
-    @ObservedObject var item: Item
-    
+
+    var item: listItem
+
     var body: some View {
         
         HStack{
@@ -48,11 +48,11 @@ struct navLinkLabel: View {
             }
             
             if item.complete == true {
-                Text(String(item.name ?? ""))
+                Text(String(item.name))
                     .strikethrough()
                     .foregroundColor(.green)
             } else {
-                Text(String(item.name ?? ""))
+                Text(String(item.name))
             }
             Spacer()
             
@@ -71,31 +71,31 @@ struct navLinkLabel: View {
 }
 
 struct valueModView: View {
-    
-    @ObservedObject var item: Item
-    @Binding var Celebrate: Int16
-    @Environment(\.managedObjectContext) private var viewContext
-    
+
+    var item: listItem
+    @Binding var Celebrate: Int
+    @Environment(\.modelContext) private var modelContext
+
     var body: some View {
-        
-        
+
+
         if item.complete == true {
-            Text("☑ \(item.value)/\(item.goal) \(item.unit ?? "")")
+            Text("☑ \(item.value)/\(item.goal) \(item.unit)")
                 .font(.title)
                 .padding()
                 .bckMod()
-            
+
         } else {
-            Text("☐ \(item.value)/\(item.goal) \(item.unit ?? "")")
+            Text("☐ \(item.value)/\(item.goal) \(item.unit)")
                 .font(.title)
                 .padding()
                 .bckMod()
         }
-        
+
         HStack{
             if item.goal > 10 {
                 Button {
-                    addValue(item: item, value: 10, viewContext: viewContext, Celebrate: &Celebrate)
+                    addValue(item: item, value: 10, modelContext: modelContext, Celebrate: &Celebrate)
                 } label: {
                     Text("+ 10")
                         .bckMod()
@@ -103,15 +103,15 @@ struct valueModView: View {
             }
             if item.goal > 5 {
                 Button {
-                    addValue(item: item, value: 5, viewContext: viewContext, Celebrate: &Celebrate)
+                    addValue(item: item, value: 5, modelContext: modelContext, Celebrate: &Celebrate)
                 } label: {
                     Text("+ 5")
                         .bckMod()
                 }
             }
             Button {
-                
-                addValue(item: item, value: 1, viewContext: viewContext, Celebrate: &Celebrate)
+
+                addValue(item: item, value: 1, modelContext: modelContext, Celebrate: &Celebrate)
 //                    if item.value == item.goal {
 //
 //                    }
@@ -120,9 +120,9 @@ struct valueModView: View {
                 Text("+ 1")
                     .bckMod()
             }
-            
+
             Button {
-                subValue(item: item, value: 1, viewContext: viewContext, Celebrate: &Celebrate)
+                subValue(item: item, value: 1, modelContext: modelContext, Celebrate: &Celebrate)
 //                    if item.value == item.goal {
 //
 //                    }
@@ -130,10 +130,10 @@ struct valueModView: View {
                 Text("- 1")
                     .bckMod()
             }
-            
+
             if item.goal > 5 {
                 Button {
-                    subValue(item: item, value: 5, viewContext: viewContext, Celebrate: &Celebrate)
+                    subValue(item: item, value: 5, modelContext: modelContext, Celebrate: &Celebrate)
                 } label: {
                     Text("- 5")
                         .bckMod()
@@ -141,44 +141,44 @@ struct valueModView: View {
             }
             if item.goal > 10 {
                 Button {
-                    subValue(item: item, value: 10, viewContext: viewContext, Celebrate: &Celebrate)
+                    subValue(item: item, value: 10, modelContext: modelContext, Celebrate: &Celebrate)
                 } label: {
                     Text("- 10")
                         .bckMod()
                 }
             }
-            
+
         } // END HSTACK
     }
 }
 
 struct navLinkContent: View {
-    
-    @Binding var forceUpdate: Bool
-    
-    @ObservedObject var item: Item
 
-    @Environment(\.managedObjectContext) private var viewContext
+    @Binding var forceUpdate: Bool
+
+    var item: listItem
+
+    @Environment(\.modelContext) private var modelContext
 
     @State var updateItemStatus: String = ""
 
-    @Binding var Celebrate: Int16
+    @Binding var Celebrate: Int
 
     var body: some View {
-        
+
         if item.complete == true {
-            Text(String(item.name ?? ""))
+            Text(String(item.name))
                 .font(.title)
                 .fontWeight(.bold)
                 .strikethrough()
         } else {
-            Text(String(item.name ?? ""))
+            Text(String(item.name))
                 .font(.title)
                 .fontWeight(.bold)
         }
-        
+
         if item.hasStatus == true {
-            
+
             VStack {
                 HStack {
                     Text("Habit status:")
@@ -186,59 +186,58 @@ struct navLinkContent: View {
                     TextField("", text: $updateItemStatus)
                         .frame(maxWidth: 100, alignment: .center)
                         .onChange(of: updateItemStatus) {
-                            setStatus(refItem: item, viewContext: viewContext, updateItemStatus: updateItemStatus)
+                            setStatus(refItem: item, modelContext: modelContext, updateItemStatus: updateItemStatus)
                         }
                 }
                 .bckMod()
 
             }
-            .onAppear{updateItemStatus = item.statusText ?? ""}
+            .onAppear{updateItemStatus = item.statusText}
             .bckMod()
-            
-            
+
+
         } else {}
-        
+
         Spacer()
-        
+
         ScrollView {
-            
+
             if item.isTask != true {
-                if displayHabitDescription(identifier: item.name ?? "", viewContext: viewContext) != "" {
-                    Text(displayHabitDescription(identifier: item.name ?? "", viewContext: viewContext))
+                if displayHabitDescription(identifier: item.name, modelContext: modelContext) != "" {
+                    Text(displayHabitDescription(identifier: item.name, modelContext: modelContext))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding()
                         .bckMod()
                 }
-                
+
             } else {
                 if item.descriptor != "" {
-                    Text(item.descriptor ?? "")
+                    Text(item.descriptor)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding()
                         .bckMod()
                 }
-        
-            }
-            
-            
-        }.frame(width: 350)
-        
-        Spacer()
-        
-        // ---------------------- BEGIN VALUE MODIFICATION
-        
-        if item.hasCheckbox == false {
-            
-            valueModView(item: item, Celebrate: $Celebrate)
-                .environment(\.managedObjectContext, viewContext)
 
-            
+            }
+
+
+        }.frame(width: 350)
+
+        Spacer()
+
+        // ---------------------- BEGIN VALUE MODIFICATION
+
+        if item.hasCheckbox == false {
+
+            valueModView(item: item, Celebrate: $Celebrate)
+
+
         } else {
-            
-            
+
+
             if item.complete == true {
                 Button{
-                    subValue(item: item, value: 1, viewContext: viewContext, Celebrate: &Celebrate)
+                    subValue(item: item, value: 1, modelContext: modelContext, Celebrate: &Celebrate)
                     forceUpdate.toggle()
                 } label: {
                     Text("☑")
@@ -246,10 +245,10 @@ struct navLinkContent: View {
                         .padding()
                         .bckMod()
                 }
-                
+
             } else {
                 Button{
-                    addValue(item: item, value: 1, viewContext: viewContext, Celebrate: &Celebrate)
+                    addValue(item: item, value: 1, modelContext: modelContext, Celebrate: &Celebrate)
                     forceUpdate.toggle()
                 } label: {
                     Text("☐")
@@ -259,17 +258,17 @@ struct navLinkContent: View {
                 }
             }
         }
-        
+
         if item.notFloater == true && item.complete == false {
-            
+
             Button {
-                scootItem(item: item, viewContext: viewContext)
+                scootItem(item: item, modelContext: modelContext)
             } label: {
                 Text("Move this item to tomorrow?")
             }
         }
         // ---------------------- END VALUE MODIFICATION
-        
+
         Spacer()
     }
 }
@@ -281,51 +280,32 @@ struct MainListTab: View {
     // ---------------------------------------------------------------------------------------------------------------------
 
     @Binding var selectedTab: Tabs
-        
-    @Binding var Celebrate: Int16
-    
+
+    @Binding var Celebrate: Int
+
     @Binding var SelectedDate: Date
-    
+
     // ---------------------------------------------------------------------------------------------------------------------
     // STATES
     // ---------------------------------------------------------------------------------------------------------------------
 
-    @State var updateItemStatus: Int16 = 0
-
     @State var seenWelcome: Bool = !UserDefaults.standard.bool(forKey: "seenWelcome")  // MAKE BINDING
-    
-    @State var forceUpdate: Bool = false
-    
-    // ---------------------------------------------------------------------------------------------------------------------
-    // COREDATA
-    // ---------------------------------------------------------------------------------------------------------------------
-    
-    @Environment(\.managedObjectContext) private var viewContext
-    
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
-        animation: .default)
-    private var items: FetchedResults<Item>
 
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \HabitItem.order, ascending: true)],
-        animation: .default)
-    private var habitData: FetchedResults<HabitItem>
-    
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \TaskItem.name, ascending: true)],
-        animation: .default)
-    private var taskData: FetchedResults<TaskItem>
-    
-    //Day Data currently not being used ( Need to
-    
-//    @FetchRequest(
-//        sortDescriptors: [NSSortDescriptor(keyPath: \DayData.day, ascending: true)],
-//        animation: .default)
-//    private var dayData: FetchedResults<DayData>
-    
-    
-    
+    @State var forceUpdate: Bool = false
+
+    // ---------------------------------------------------------------------------------------------------------------------
+    // SWIFTDATA
+    // ---------------------------------------------------------------------------------------------------------------------
+
+    @Environment(\.modelContext) private var modelContext
+
+    @Query(sort: \listItem.timestamp, animation: .default)
+    private var items: [listItem]
+
+    @Query(sort: \habItem.order, animation: .default)
+    private var habitData: [habItem]
+
+
     // ---------------------------------------------------------------------------------------------------------------------
     // WELCOME MESSAGE
     // ---------------------------------------------------------------------------------------------------------------------
@@ -372,64 +352,62 @@ struct MainListTab: View {
                         List {
                             
                                 ForEach(items) { item in
-                                    if (Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true && item.complete == false) || (item.notFloater == false && item.complete == false) {
-                                        
+                                    if (Calendar.current.isDate(item.timestamp, equalTo: SelectedDate, toGranularity: .day) == true && item.complete == false) || (item.notFloater == false && item.complete == false) {
+
                                         NavigationLink {
-                                            
+
                                             navLinkContent(forceUpdate: $forceUpdate, item: item, Celebrate: $Celebrate)
-                                                .environment(\.managedObjectContext, viewContext)
-                                            
-                                            
+
+
                                         } label: {
                                             navLinkLabel(item: item)
                                         }
                                         .swipeActions(edge: .trailing) {
                                             Button("Complete") {
-                                                completeHabit(item: item, viewContext: viewContext, Celebrate: &Celebrate)
+                                                completeHabit(item: item, modelContext: modelContext, Celebrate: &Celebrate)
 //                                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
 //                                                impactFeedback.impactOccurred()
-                                                
+
                                                 playCustomHaptic()
                                             }
                                             .tint(.blue)
-                                            
+
                                         }
                                         .swipeActions(edge: .leading) {
                                             Button("Delete") {
-                                                deleteEntity(withUUID: item.id ?? UUID(), viewContext: viewContext)
+                                                deleteEntity(withUUID: item.id, modelContext: modelContext)
                                             }
                                             .tint(.red)
                                         }
                                     } else {}
                                 }
-                                
+
                                 ForEach(items) { item in
-                                    
-                                    if (Calendar.current.isDate((item.timestamp ?? Date()), equalTo: SelectedDate, toGranularity: .day) == true && item.complete == true)  || (item.notFloater == false && item.complete == true) {
-                                        
+
+                                    if (Calendar.current.isDate(item.timestamp, equalTo: SelectedDate, toGranularity: .day) == true && item.complete == true)  || (item.notFloater == false && item.complete == true) {
+
                                         NavigationLink {
-                                            
+
                                             navLinkContent(forceUpdate: $forceUpdate, item: item, Celebrate: $Celebrate)
-                                                .environment(\.managedObjectContext, viewContext)
-                                            
+
                                         } // End of navigation link
                                         label: {
-                                            
+
                                             navLinkLabel(item: item)
                                         }
                                         .swipeActions(edge: .trailing) {
                                             Button("Complete") {
-                                                completeHabit(item: item, viewContext: viewContext, Celebrate: &Celebrate)
+                                                completeHabit(item: item, modelContext: modelContext, Celebrate: &Celebrate)
 //                                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
 //                                                impactFeedback.impactOccurred()
                                                 playCustomHaptic()
                                             }
                                             .tint(.blue)
-                                            
+
                                         }
                                         .swipeActions(edge: .leading) {
                                             Button("Delete") {
-                                                deleteEntity(withUUID: item.id ?? UUID(), viewContext: viewContext)
+                                                deleteEntity(withUUID: item.id, modelContext: modelContext)
                                             }
                                             .tint(.red)
                                         }
@@ -463,7 +441,7 @@ struct MainListTab: View {
                 }
                 
                 checkDate()
-                Celebrate = scoreFor(date: Date(), viewContext: viewContext)
+                Celebrate = scoreFor(date: Date(), modelContext: modelContext)
                 
             } // END ZSTACK
             
@@ -482,11 +460,11 @@ struct MainListTab: View {
 
             if comparison == .orderedDescending {
 
-                // Each day's score already lives in its own DayData record (written live as
+                // Each day's score already lives in its own dayScore record (written live as
                 // habits are completed), so the rollover just needs to refresh the checklist.
                 populateTasks()
-                
-                generateNotifications(viewContext: viewContext) // NEW ADDITION!! ! ! ! ! ! ! ! ! ! ! ! !
+
+                generateNotifications(modelContext: modelContext) // NEW ADDITION!! ! ! ! ! ! ! ! ! ! ! ! !
                 
                 UserDefaults.standard.set(Date(), forKey: "DailyTaskPopulate?")
                 Celebrate = 0
@@ -528,79 +506,50 @@ struct MainListTab: View {
         let dayOfWeek = dformatter.string(from: date)
 
         for taskFinder in items {
-            if (taskFinder.isTask == true) && (Calendar.current.isDate((taskFinder.timestamp ?? Date()), equalTo: Date(), toGranularity: .day) != true) && (taskFinder.complete == false) && (taskFinder.notFloater == true){
+            if (taskFinder.isTask == true) && (Calendar.current.isDate(taskFinder.timestamp, equalTo: Date(), toGranularity: .day) != true) && (taskFinder.complete == false) && (taskFinder.notFloater == true){
                     deshuntTask(item: taskFinder)
             } else if taskFinder.notFloater == false {
                 taskFinder.timestamp = Date()
             }
         }
-        
-        shuntTodaysTasks(viewContext: viewContext)
+
+        shuntTodaysTasks(modelContext: modelContext)
         
         for index in habitData {
-            print("\(index.name ?? "") - \(daysBetween(start: index.startDate ?? Date(),end: Calendar.current.startOfDay(for: Date())))")
+            print("\(index.name) - \(daysBetween(start: index.startDate,end: Calendar.current.startOfDay(for: Date())))")
         }
-        
+
         for index in habitData {
-            
+
             if index.useDow == false {
-                
-                if (daysBetween(start: Calendar.current.startOfDay(for: index.startDate ?? Date()),
+
+                if (daysBetween(start: Calendar.current.startOfDay(for: index.startDate),
                                 end: Calendar.current.startOfDay(for: Date())) >= 0)
-                    && (daysBetween(start:  Calendar.current.startOfDay(for: index.startDate ?? Date()),
-                                 end: Calendar.current.startOfDay(for: Date())) % Int(index.repeatValue) == 0) {
-                                            
-                    let newItem = Item(context: viewContext)
-                    newItem.timestamp = Date()
-                    newItem.name = index.name
-                    newItem.goal = index.goal
-                    newItem.unit = index.unit
-                    newItem.whichProtocol = index.whichProtocol
-                    newItem.complete = false
-                    newItem.reward = index.reward
-                    newItem.id = UUID()
-                    newItem.hasStatus = index.hasStatus
-                    newItem.hasCheckbox = index.hasCheckbox
-                    newItem.notFloater = true
-                    newItem.timeRegion = index.timeRegion
+                    && (daysBetween(start:  Calendar.current.startOfDay(for: index.startDate),
+                                 end: Calendar.current.startOfDay(for: Date())) % index.repeatValue == 0) {
+
+                    modelContext.insert(listItem(from: index, timestamp: Date()))
 
                 }
 
             } else {
-                
-                if  (index.onMon == true && dayOfWeek == "Monday") ||
-                    (index.onTues == true && dayOfWeek == "Tuesday") ||
-                    (index.onWed == true && dayOfWeek == "Wednesday") ||
-                    (index.onThurs == true && dayOfWeek == "Thursday") ||
-                    (index.onFri == true && dayOfWeek == "Friday") ||
-                    (index.onSat == true && dayOfWeek == "Saturday") ||
-                    (index.onSun == true && dayOfWeek == "Sunday")
+
+                if  (index.dow.onMon == true && dayOfWeek == "Monday") ||
+                    (index.dow.onTues == true && dayOfWeek == "Tuesday") ||
+                    (index.dow.onWed == true && dayOfWeek == "Wednesday") ||
+                    (index.dow.onThurs == true && dayOfWeek == "Thursday") ||
+                    (index.dow.onFri == true && dayOfWeek == "Friday") ||
+                    (index.dow.onSat == true && dayOfWeek == "Saturday") ||
+                    (index.dow.onSun == true && dayOfWeek == "Sunday")
                 {
-                        
-                    let newItem = Item(context: viewContext)
-                    newItem.timestamp = Date()
-                    newItem.name = index.name
-                    newItem.goal = index.goal
-                    newItem.unit = index.unit
-                    newItem.whichProtocol = index.whichProtocol
-                    newItem.complete = false
-                    newItem.reward = index.reward
-                    newItem.id = UUID()
-                    newItem.hasStatus = index.hasStatus
-                    newItem.hasCheckbox = index.hasCheckbox
-                    newItem.notFloater = true
-                    newItem.timeRegion = index.timeRegion
-          
+
+                    modelContext.insert(listItem(from: index, timestamp: Date()))
+
                 }
             }
         }
 
-        do {
-            try viewContext.save()
-        } catch {
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-        }
+        saveContext(modelContext: modelContext)
     }
     
     // ---------------------------------------------------------------------------------------------------------------------
@@ -608,30 +557,22 @@ struct MainListTab: View {
     // ---------------------------------------------------------------------------------------------------------------------
 
 
-    private func deshuntTask(item: Item) {
-        
-        let returnedTaskItem = TaskItem(context: viewContext)
-        
-        returnedTaskItem.id = UUID()
-        returnedTaskItem.name = item.name ?? ""
-        returnedTaskItem.descript = item.descriptor ?? ""
-        returnedTaskItem.reward = item.reward
-        returnedTaskItem.dueDate = (calendar.date(byAdding: .day, value: 1, to: Date())!)
-        returnedTaskItem.unit = item.unit ?? ""
-        returnedTaskItem.goal = item.goal
-        returnedTaskItem.hasCheckbox = item.hasCheckbox
-        returnedTaskItem.notFloater = item.notFloater
+    private func deshuntTask(item: listItem) {
 
-        do {
-            try viewContext.save()
-        } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-        }
+        let returnedTaskItem = taskItem(descript: item.descriptor,
+                                        dueDate: (calendar.date(byAdding: .day, value: 1, to: Date())!),
+                                        goal: item.goal,
+                                        hasCheckbox: item.hasCheckbox,
+                                        id: UUID(),
+                                        name: item.name,
+                                        notFloater: item.notFloater,
+                                        reward: item.reward,
+                                        unit: item.unit)
 
-        deleteEntity(withUUID: item.id ?? UUID(), viewContext: viewContext)
+        modelContext.insert(returnedTaskItem)
+        modelContext.delete(item)
+
+        saveContext(modelContext: modelContext)
     }
 }
 

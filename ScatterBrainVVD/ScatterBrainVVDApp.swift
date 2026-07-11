@@ -10,13 +10,11 @@ import SwiftData
 
 @main
 struct ScatterBrainVVDApp: App {
-    let persistenceController = PersistenceController.shared
 
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                .modelContainer(for: habItem.self)
+                .modelContainer(for: [habItem.self, listItem.self, taskItem.self, dayScore.self])
         }
     }
 }

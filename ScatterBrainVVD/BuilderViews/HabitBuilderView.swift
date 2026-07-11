@@ -6,15 +6,13 @@
 //
 
 import SwiftUI
-import CoreData
 import SwiftData
 
 struct HabitBuilderView: View {
-    
+
     @Query(sort: \habItem.order)
     var its: [habItem]
 
-    @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.modelContext) private var modelContext
         
     @State var DisplayHabitMaker: Bool = false
@@ -138,7 +136,7 @@ struct HabitBuilderView: View {
             
             
             Section {
-                Button {addItem(viewContext: viewContext)} label: {Text("Save Habit")}
+                Button {addItem()} label: {Text("Save Habit")}
             }
         }
     }
@@ -315,7 +313,7 @@ struct HabitBuilderView: View {
                                                                         updateHabit(habitToEdit: habitNdx)
                                                                         //------------------------------------
                                                                         DisplayHabitEditor = false
-                                                                        indexProtocols(viewContext: viewContext)
+                                                                        indexProtocols(modelContext: modelContext)
                                                                         listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol")
                                                                         
                                                                     } label: {Text("Save Habit")}
@@ -494,9 +492,9 @@ struct HabitBuilderView: View {
                                                                     updateHabit(habitToEdit: habitNdx)
                                                                     //------------------------------------
                                                                     DisplayHabitEditor = false
-                                                                    indexProtocols(viewContext: viewContext)
+                                                                    indexProtocols(modelContext: modelContext)
                                                                     listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol")
-                                                                    
+
                                                                     //crap commit
                                                                 } label: {Text("Save Habit")}
                                                             }
@@ -552,7 +550,7 @@ struct HabitBuilderView: View {
 //                } // END PROT LIST CONDITIONAL
 
                 Button {
-                    generateTestHabitData(viewContext: viewContext)
+                    generateTestHabitData(modelContext: modelContext)
                 } label: {
                     Text("generate test habits")
                 }
@@ -588,7 +586,7 @@ struct HabitBuilderView: View {
                 })
             } else {}
 
-        }.onAppear{indexProtocols(viewContext: viewContext)}
+        }.onAppear{indexProtocols(modelContext: modelContext)}
     }
         
     // ------------------------------------ Spacer
@@ -626,7 +624,7 @@ struct HabitBuilderView: View {
     }
     
 
-    private func addItem(viewContext: NSManagedObjectContext) {
+    private func addItem() {
         
         let date = Date()
         
@@ -691,28 +689,16 @@ struct HabitBuilderView: View {
         //Code To shove new habit on creation if the repetition matches properly
         
         if newHabitItem.useDow == false {
-            
+
             if (daysBetween(start: Calendar.current.startOfDay(for: newHabitItem.startDate),end: Calendar.current.startOfDay(for: Date())) >= 0)
-                && (daysBetween(start:  Calendar.current.startOfDay(for: newHabitItem.startDate),end: Calendar.current.startOfDay(for: Date())) % Int(newHabitItem.repeatValue) == 0) {
-                                        
-                let newItem = Item(context: viewContext)
-                newItem.timestamp = Date()
-                newItem.name = newHabitItem.name
-                newItem.goal = Int16(newHabitItem.goal)
-                newItem.unit = newHabitItem.unit
-                newItem.whichProtocol = newHabitItem.whichProtocol
-                newItem.complete = false
-                newItem.reward = Int16(newHabitItem.reward)
-                newItem.id = UUID()
-                newItem.hasStatus = newHabitItem.hasStatus
-                newItem.hasCheckbox = newHabitItem.hasCheckbox
-                newItem.notFloater = true
-                newItem.timeRegion = newHabitItem.timeRegion == "None" ? nil : newHabitItem.timeRegion
+                && (daysBetween(start:  Calendar.current.startOfDay(for: newHabitItem.startDate),end: Calendar.current.startOfDay(for: Date())) % newHabitItem.repeatValue == 0) {
+
+                modelContext.insert(listItem(from: newHabitItem, timestamp: Date()))
 
             }
 
         } else {
-            
+
             if  (newHabitItem.dow.onMon == true && dayOfWeek == "Monday") ||
                 (newHabitItem.dow.onTues == true && dayOfWeek == "Tuesday") ||
                 (newHabitItem.dow.onWed == true && dayOfWeek == "Wednesday") ||
@@ -721,26 +707,14 @@ struct HabitBuilderView: View {
                 (newHabitItem.dow.onSat == true && dayOfWeek == "Saturday") ||
                 (newHabitItem.dow.onSun == true && dayOfWeek == "Sunday")
             {
-                    
-                let newItem = Item(context: viewContext)
-                newItem.timestamp = Date()
-                newItem.name = newHabitItem.name
-                newItem.goal = Int16(newHabitItem.goal)
-                newItem.unit = newHabitItem.unit
-                newItem.whichProtocol = newHabitItem.whichProtocol
-                newItem.complete = false
-                newItem.reward = Int16(newHabitItem.reward)
-                newItem.id = UUID()
-                newItem.hasStatus = newHabitItem.hasStatus
-                newItem.hasCheckbox = newHabitItem.hasCheckbox
-                newItem.notFloater = true
-                newItem.timeRegion = newHabitItem.timeRegion == "None" ? nil : newHabitItem.timeRegion
-      
+
+                modelContext.insert(listItem(from: newHabitItem, timestamp: Date()))
+
             }
 
         }
 
-        saveViewContext(viewContext: viewContext)
+        saveContext(modelContext: modelContext)
 
         DisplayHabitMaker = false
         HabitNameSet = ""
@@ -764,8 +738,8 @@ struct HabitBuilderView: View {
         HabitOnFriSet = false
         HabitOnSatSet = false
         HabitOnSunSet = false
-                
-        indexProtocols(viewContext: viewContext)
+
+        indexProtocols(modelContext: modelContext)
 
     }
 

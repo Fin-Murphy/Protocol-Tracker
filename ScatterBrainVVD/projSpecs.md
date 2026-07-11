@@ -2,7 +2,7 @@
 
 ## Overview
 
-ScatterBrainVVD is a habit tracking app that uses **Core Data** for persistent storage of habits, tasks, and daily items, with **UserDefaults** for lightweight settings and scoring.
+ScatterBrainVVD is a habit tracking app that uses **SwiftData** for persistent storage of habits, tasks, and daily items, with **UserDefaults** for lightweight settings and scoring.
 
 ---
 
@@ -12,66 +12,69 @@ ScatterBrainVVD is a habit tracking app that uses **Core Data** for persistent s
 
 | Layer | Technology | Purpose |
 |-------|------------|---------|
-| Primary | Core Data (SQLite) | Persistent storage of habits, tasks, daily items |
+| Primary | SwiftData (SQLite) | Persistent storage of habits, tasks, daily items |
 | Secondary | UserDefaults | Settings, scoring, lightweight state |
 
-### Core Data Entities
+### SwiftData Models (BuilderViews/Datum.swift)
+
+All fields are non-optional with defaults; integer fields are `Int`.
 
 ```
-Item (Daily task/habit instance)
+listItem (Daily task/habit instance)
 ├── id: UUID
 ├── name: String
-├── goal: Int16 (target value)
-├── value: Int16 (current progress)
+├── goal: Int (target value)
+├── value: Int (current progress)
 ├── unit: String
-├── complete: Boolean
+├── complete: Bool
 ├── timestamp: Date
 ├── whichProtocol: String
-├── reward: Int16 (points)
-├── hasStatus: Boolean
-├── hasCheckbox: Boolean
-├── isTask: Boolean
-├── notFloater: Boolean
+├── reward: Int (points)
+├── hasStatus: Bool
+├── hasCheckbox: Bool
+├── isTask: Bool
+├── notFloater: Bool
 ├── statusText: String
-├── timeRegion: String (Morning/Noon/Afternoon/Evening, nil = any time)
+├── timeRegion: String (Morning/Noon/Afternoon/Evening, "None" = any time)
 └── descriptor: String
 
-HabitItem (Template for recurring habits)
+listItem(from: habItem, timestamp: Date) — convenience init that spawns a
+fresh checklist instance from a habit template (used by populateTasks,
+HabitBuilderView.addItem, and generateTestHabitData).
+
+habItem (Template for recurring habits)
 ├── id: UUID
 ├── name: String
-├── goal: Int16
+├── goal: Int
 ├── unit: String
 ├── whichProtocol: String
-├── repeatValue: Int16 (interval)
+├── repeatValue: Int (interval)
 ├── descript: String
 ├── startDate: Date
-├── reward: Int16
-├── hasStatus: Boolean
-├── hasCheckbox: Boolean
-├── isSubtask: Boolean
-├── hasSubtask: Boolean
-├── superTask: UUID
-├── order: Int32
-├── useDow: Boolean (day of week)
-├── onSun through onSat: Booleans (day selection)
-├── timeRegion: String (Morning/Noon/Afternoon/Evening, nil = any time)
-└── (not persisted in Core Data - recreated daily)
+├── reward: Int
+├── hasStatus: Bool
+├── hasCheckbox: Bool
+├── isSubtask: Bool
+├── hasSubtask: Bool
+├── order: Int
+├── useDow: Bool (day of week)
+├── dow: dow (related model holding onSun through onSat Bools)
+└── timeRegion: String (Morning/Noon/Afternoon/Evening, "None" = any time)
 
-TaskItem (One-off tasks)
+taskItem (One-off tasks)
 ├── id: UUID
 ├── name: String
 ├── descript: String
-├── goal: Int16
+├── goal: Int
 ├── unit: String
 ├── dueDate: Date
-├── reward: Int16
-├── hasCheckbox: Boolean
-└── notFloater: Boolean
+├── reward: Int
+├── hasCheckbox: Bool
+└── notFloater: Bool
 
-DayData (Historical daily scores)
+dayScore (Historical daily scores)
 ├── day: Date
-├── score: Int16
-└── habits: Date
+└── score: Int
 ```
 
 ---
@@ -83,9 +86,9 @@ DayData (Historical daily scores)
 ```
 User Input (HabitBuilderView)
         ↓
-Create HabitItem (Core Data)
+Create habItem (SwiftData)
         ↓
-Save to Core Data via saveViewContext()
+modelContext.insert + save
         ↓
 Index protocols to UserDefaults (indexProtocols())
 ```
@@ -99,13 +102,13 @@ Is it a new day? (compare to DailyTaskPopulate)
         ↓
 YES: Run populateTasks()
         ↓
-For each HabitItem:
+For each habItem:
     - Check if habit should appear today
       (interval-based OR day-of-week based)
         ↓
-    - Create Item entity for today
+    - Insert a listItem for today (listItem(from:timestamp:))
         ↓
-    - Run shuntTodaysTasks() for due TaskItems
+    - Run shuntTodaysTasks() for due taskItems
         ↓
 Update DailyTaskPopulate in UserDefaults
 ```
@@ -115,21 +118,21 @@ Update DailyTaskPopulate in UserDefaults
 ```
 User views MainListTab
         ↓
-For each Item:
+For each listItem:
     - Checkbox items: tap to toggle complete
     - Unit-based items: use +/- buttons
         ↓
-addValue() / subValue() updates Item.value
+addValue() / subValue() updates listItem.value
         ↓
 When value >= goal:
     → completeHabit() called
-    → Add reward points to today's DayData.score
-    → Mark Item.complete = true
+    → Add reward points to today's dayScore.score
+    → Mark listItem.complete = true
 ```
 
 ### 4. Scoring Flow
 
-Each calendar day owns a persistent `DayData` record holding that day's point total, so
+Each calendar day owns a persistent `dayScore` record holding that day's point total, so
 the per-day score survives indefinitely and the date-bar chevrons can read back the score
 for any past day.
 
@@ -137,9 +140,9 @@ for any past day.
 User completes habit (value >= goal)
         ↓
 completeHabit() function:
-    - Item.complete = true
-    - dayData(for: today).score += Item.reward (Core Data)
-      (DayData row is created lazily on the first point of the day)
+    - listItem.complete = true
+    - dayData(for: today).score += listItem.reward (SwiftData)
+      (dayScore row is created lazily on the first point of the day)
     - Celebrate binding = today's score
         ↓
 Check: Celebrate >= dailyGoal?
@@ -147,7 +150,7 @@ Check: Celebrate >= dailyGoal?
 YES: Trigger celebrationProcedure()
      (haptic feedback)
 
-DateBarView reads scoreFor(SelectedDate) to display the
+DateBarView reads its @Query of dayScore rows to display the
 chosen day's total; today's record updates the view live.
 ```
 
@@ -161,9 +164,9 @@ generateNotifications() called
 HabitNotificationManager schedules reminders
         ↓
 For each remaining hour of the day (stepped by notifFreq):
-    - Build a body from today's incomplete Items whose
-      timeRegion matches that hour's region, plus Items
-      with no timeRegion (included in every sendout)
+    - Build a body from today's incomplete listItems whose
+      timeRegion matches that hour's region, plus items
+      with timeRegion "None" (included in every sendout)
     - Regions: Morning 12am-12pm, Noon 12:01pm-3pm,
       Afternoon 3:01pm-7pm, Evening 7:01pm-11:59pm
     - Skip hours whose body would be empty
@@ -176,7 +179,7 @@ User swipes/taps to move item:
     - scootItem() → move to tomorrow
     - shuntTask() → convert task to today's item
         ↓
-Update Item.timestamp to next day
+Update listItem.timestamp to next day
         ↓
 Items marked notFloater persist across days
 ```
@@ -185,18 +188,20 @@ Items marked notFloater persist across days
 
 ## Key Functions (Globals.swift)
 
+Free functions take an explicit `modelContext: ModelContext` parameter.
+
 | Function | Purpose |
 |----------|---------|
-| `populateTasks()` | Create daily items from habit templates |
+| `populateTasks()` | Create daily items from habit templates (in MainListTab) |
 | `shuntTodaysTasks()` | Convert due tasks to today's items |
 | `addValue()` / `subValue()` | Increment/decrement item progress |
 | `completeHabit()` | Mark habit complete, add reward points |
-| `dayData(for:)` | Get-or-create a day's DayData score record |
+| `dayData(for:)` | Get-or-create a day's dayScore record (inserts on create) |
 | `scoreFor(date:)` | Read-only lookup of a day's stored score |
 | `scootItem()` | Move incomplete item to tomorrow |
 | `shuntTask()` | Convert task to today's item |
-| `deleteEntity*()` | Delete items by UUID |
-| `saveViewContext()` | Core Data save wrapper |
+| `deleteEntity` / `deleteEntityTask` | Delete items/tasks by UUID |
+| `saveContext()` | SwiftData save wrapper |
 | `celebrationProcedure()` | Trigger when daily goal reached |
 | `generateNotifications()` | Schedule smart reminders |
 | `indexProtocols()` | Sync protocols to UserDefaults |
@@ -240,12 +245,13 @@ Sub-views:
 
 ## Persistence
 
-**Persistence.swift** provides the Core Data container:
+**ScatterBrainVVDApp.swift** attaches the SwiftData container at the root:
 
 ```swift
-PersistenceController.shared.container.viewContext
+ContentView()
+    .modelContainer(for: [habItem.self, listItem.self, taskItem.self, dayScore.self])
 ```
 
-- Auto-merges changes from parent context
-- SQLite backing store
-- Preview mode available for development
+- Views read via `@Query` and mutate via `@Environment(\.modelContext)`
+- SQLite backing store (SwiftData default.store)
+- Previews use `.modelContainer(..., inMemory: true)`
