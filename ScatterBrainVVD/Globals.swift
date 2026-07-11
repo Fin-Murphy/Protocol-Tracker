@@ -9,7 +9,6 @@ import Foundation
 import CoreData
 import SwiftUI
 import CoreHaptics
-//import Supabase
 
 import UserNotifications // IMPORT FOR NOTIFICATION SERVICES
 

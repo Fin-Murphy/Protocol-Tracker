@@ -14,7 +14,10 @@ struct HabitBuilderView: View {
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \HabitItem.order, ascending: true)],
         animation: .default)
-    private var habitData: FetchedResults<HabitItem>
+    private var habitData: FetchedResults<HabitItem> // CoreData habit saving (Soon to be deprecated)
+    
+   @Query
+    var its: [habItem]
     
     @Environment(\.managedObjectContext) private var viewContext
         

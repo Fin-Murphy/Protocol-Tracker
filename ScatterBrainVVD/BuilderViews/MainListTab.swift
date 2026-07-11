@@ -452,8 +452,6 @@ struct MainListTab: View {
                 
             }.onAppear{ // END DEPTH STACK
                                 
-//                generateNotifications(viewContext: viewContext) // MOVED TO ContentView() for HIGHER LEVEL OPERATION
-
                 
                 UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
                     
