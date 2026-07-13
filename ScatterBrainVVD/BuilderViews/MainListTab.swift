@@ -273,6 +273,101 @@ struct navLinkContent: View {
     }
 }
 
+struct dayListView: View {
+
+    @Binding var forceUpdate: Bool
+
+    @Binding var Celebrate: Int
+
+    @Environment(\.modelContext) private var modelContext
+
+    // Fetches only the selected day's items (plus floaters), rather than every listItem
+    @Query private var items: [listItem]
+
+    init(selectedDate: Date, forceUpdate: Binding<Bool>, Celebrate: Binding<Int>) {
+
+        _forceUpdate = forceUpdate
+        _Celebrate = Celebrate
+
+        let dayStart = Calendar.current.startOfDay(for: selectedDate)
+        let dayEnd = Calendar.current.date(byAdding: .day, value: 1, to: dayStart) ?? dayStart
+
+        _items = Query(filter: #Predicate<listItem> { item in
+            (item.timestamp >= dayStart && item.timestamp < dayEnd) || item.notFloater == false
+        }, sort: \listItem.timestamp, animation: .default)
+    }
+
+    var body: some View {
+
+        List {
+
+                ForEach(items) { item in
+                    if item.complete == false {
+
+                        NavigationLink {
+
+                            navLinkContent(forceUpdate: $forceUpdate, item: item, Celebrate: $Celebrate)
+
+
+                        } label: {
+                            navLinkLabel(item: item)
+                        }
+                        .swipeActions(edge: .trailing) {
+                            Button("Complete") {
+                                completeHabit(item: item, modelContext: modelContext, Celebrate: &Celebrate)
+//                                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+//                                                impactFeedback.impactOccurred()
+
+                                playCustomHaptic()
+                            }
+                            .tint(.blue)
+
+                        }
+                        .swipeActions(edge: .leading) {
+                            Button("Delete") {
+                                deleteEntity(withUUID: item.id, modelContext: modelContext)
+                            }
+                            .tint(.red)
+                        }
+                    } else {}
+                }
+
+                ForEach(items) { item in
+
+                    if item.complete == true {
+
+                        NavigationLink {
+
+                            navLinkContent(forceUpdate: $forceUpdate, item: item, Celebrate: $Celebrate)
+
+                        } // End of navigation link
+                        label: {
+
+                            navLinkLabel(item: item)
+                        }
+                        .swipeActions(edge: .trailing) {
+                            Button("Complete") {
+                                completeHabit(item: item, modelContext: modelContext, Celebrate: &Celebrate)
+//                                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+//                                                impactFeedback.impactOccurred()
+                                playCustomHaptic()
+                            }
+                            .tint(.blue)
+
+                        }
+                        .swipeActions(edge: .leading) {
+                            Button("Delete") {
+                                deleteEntity(withUUID: item.id, modelContext: modelContext)
+                            }
+                            .tint(.red)
+                        }
+                    } else {}
+                }
+
+        }//END LIST
+    }
+}
+
 struct MainListTab: View {
     
     // ---------------------------------------------------------------------------------------------------------------------
@@ -298,9 +393,6 @@ struct MainListTab: View {
     // ---------------------------------------------------------------------------------------------------------------------
 
     @Environment(\.modelContext) private var modelContext
-
-    @Query(sort: \listItem.timestamp, animation: .default)
-    private var items: [listItem]
 
     @Query(sort: \habItem.order, animation: .default)
     private var habitData: [habItem]
@@ -348,78 +440,13 @@ struct MainListTab: View {
                 NavigationView {
                     
                     VStack{
-                        
-                        List {
-                            
-                                ForEach(items) { item in
-                                    if (Calendar.current.isDate(item.timestamp, equalTo: SelectedDate, toGranularity: .day) == true && item.complete == false) || (item.notFloater == false && item.complete == false) {
 
-                                        NavigationLink {
+                        dayListView(selectedDate: SelectedDate, forceUpdate: $forceUpdate, Celebrate: $Celebrate)
 
-                                            navLinkContent(forceUpdate: $forceUpdate, item: item, Celebrate: $Celebrate)
-
-
-                                        } label: {
-                                            navLinkLabel(item: item)
-                                        }
-                                        .swipeActions(edge: .trailing) {
-                                            Button("Complete") {
-                                                completeHabit(item: item, modelContext: modelContext, Celebrate: &Celebrate)
-//                                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-//                                                impactFeedback.impactOccurred()
-
-                                                playCustomHaptic()
-                                            }
-                                            .tint(.blue)
-
-                                        }
-                                        .swipeActions(edge: .leading) {
-                                            Button("Delete") {
-                                                deleteEntity(withUUID: item.id, modelContext: modelContext)
-                                            }
-                                            .tint(.red)
-                                        }
-                                    } else {}
-                                }
-
-                                ForEach(items) { item in
-
-                                    if (Calendar.current.isDate(item.timestamp, equalTo: SelectedDate, toGranularity: .day) == true && item.complete == true)  || (item.notFloater == false && item.complete == true) {
-
-                                        NavigationLink {
-
-                                            navLinkContent(forceUpdate: $forceUpdate, item: item, Celebrate: $Celebrate)
-
-                                        } // End of navigation link
-                                        label: {
-
-                                            navLinkLabel(item: item)
-                                        }
-                                        .swipeActions(edge: .trailing) {
-                                            Button("Complete") {
-                                                completeHabit(item: item, modelContext: modelContext, Celebrate: &Celebrate)
-//                                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-//                                                impactFeedback.impactOccurred()
-                                                playCustomHaptic()
-                                            }
-                                            .tint(.blue)
-
-                                        }
-                                        .swipeActions(edge: .leading) {
-                                            Button("Delete") {
-                                                deleteEntity(withUUID: item.id, modelContext: modelContext)
-                                            }
-                                            .tint(.red)
-                                        }
-                                    } else {}
-                                }
-                            
-                        }//END LIST
-                        
                         .onAppear{
                             testTasksForSillyness()
                         }
-       
+
                     }//END VSTACK
                     
                 }//END NAV VIEW
@@ -485,10 +512,9 @@ struct MainListTab: View {
 
     
     private func testTasksForSillyness() {
-        for taskFinder in items {
-            if taskFinder.notFloater == false {
-                taskFinder.timestamp = Date()
-            }
+        let descriptor = FetchDescriptor<listItem>(predicate: #Predicate { $0.notFloater == false })
+        for taskFinder in (try? modelContext.fetch(descriptor)) ?? [] {
+            taskFinder.timestamp = Date()
         }
     }
     
@@ -505,7 +531,9 @@ struct MainListTab: View {
         dformatter.dateFormat = "EEEE"
         let dayOfWeek = dformatter.string(from: date)
 
-        for taskFinder in items {
+        // Only tasks and floaters can be acted on below, so fetch just those
+        let descriptor = FetchDescriptor<listItem>(predicate: #Predicate { $0.isTask == true || $0.notFloater == false })
+        for taskFinder in (try? modelContext.fetch(descriptor)) ?? [] {
             if (taskFinder.isTask == true) && (Calendar.current.isDate(taskFinder.timestamp, equalTo: Date(), toGranularity: .day) != true) && (taskFinder.complete == false) && (taskFinder.notFloater == true){
                     deshuntTask(item: taskFinder)
             } else if taskFinder.notFloater == false {
