@@ -74,6 +74,7 @@ class habItem { // Wow, thats a lot of data fields! Time to use sum inheritance
     var unit: String = "Units"
     var useDow: Bool = false
     var whichProtocol: String = "Daily"
+    var subhabits: [String] = []
 }
 
 
@@ -132,6 +133,8 @@ class listItem { // A concrete instance on a specific day's checklist, spawned f
     var unit: String = "Units"
     var value: Int = 0
     var whichProtocol: String = "Daily"
+    var subhabits: [String] = []
+    var subhabitChecked: [Bool] = []
 }
 
 extension listItem {
@@ -153,6 +156,8 @@ extension listItem {
                   unit: habit.unit,
                   value: 0,
                   whichProtocol: habit.whichProtocol)
+        self.subhabits = habit.subhabits
+        self.subhabitChecked = Array(repeating: false, count: habit.subhabits.count)
     }
 }
 

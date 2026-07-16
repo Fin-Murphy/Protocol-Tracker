@@ -30,6 +30,7 @@ struct HabitBuilderView: View {
     @State var HabitStartDateSet: Date = Date()
     @State var HabitHasCheckboxSet: Bool = true
     @State var HabitHasSubTaskSet: Bool = false
+    @State var HabitSubhabitsSet: [String] = []
     @State var HabitSuperTaskSet: UUID? = nil
     @State var HabitTimeRegionSet: String = "None"
     
@@ -61,14 +62,39 @@ struct HabitBuilderView: View {
 //        }
 //    }
     
+    private var subhabitEditor: some View {
+        Section(header: Text("Subhabits:")) {
+            ForEach(HabitSubhabitsSet.indices, id: \.self) { ndx in
+                HStack {
+                    TextField("Subhabit name", text: Binding(
+                        get: { ndx < HabitSubhabitsSet.count ? HabitSubhabitsSet[ndx] : "" },
+                        set: { if ndx < HabitSubhabitsSet.count { HabitSubhabitsSet[ndx] = $0 } }))
+                    Button { HabitSubhabitsSet.remove(at: ndx) } label: {
+                        Image(systemName: "minus.circle")
+                    }
+                    .buttonStyle(.borderless)
+                }
+            }
+            Button { HabitSubhabitsSet.append("") } label: { Text("+ Add subhabit") }
+        }
+    }
+
     private var habitBuilderForm: some View {
-        
+
         Form {
             Section(header: Text("Habit Name:")) {
                 TextField("", text: $HabitNameSet)
             }
-            Toggle("Use checkbox instead of units",isOn: $HabitHasCheckboxSet)
-            if HabitHasCheckboxSet == false {
+            Section("Habit Start Date") {
+                DatePicker("Select Date",
+                           selection: $HabitStartDateSet,
+                           displayedComponents: .date)
+                .datePickerStyle(.compact)
+            }
+            
+            Toggle("Use checkbox instead of units?",isOn: $HabitHasCheckboxSet)
+            Toggle("Use subhabits instead of units?", isOn: $HabitHasSubTaskSet)
+            if (HabitHasCheckboxSet || HabitHasSubTaskSet) == false {
                 Section(header: Text("Habit Goal:")) {
                     TextField("", value: $HabitGoalSet, format: .number)
                 }
@@ -76,14 +102,12 @@ struct HabitBuilderView: View {
                     TextField("", text: $HabitUnitSet)
                 }
             }
-            
-            Toggle("Include Subhabits?", isOn: $HabitHasSubTaskSet)
             if HabitHasSubTaskSet == true {
-                
-                Text("Subhabit Creator View")
-                
-            } else {}
-            
+
+                subhabitEditor
+
+            }
+
                 Toggle("Choose days of the week to repeat on?", isOn: $HabitUseDOWSet)
                 if HabitUseDOWSet == true {
                     Toggle("Repeat on Sunday", isOn: $HabitOnSunSet)
@@ -111,12 +135,7 @@ struct HabitBuilderView: View {
                                 .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                         )
                 }
-                Section("Habit Start Date") {
-                    DatePicker("Select Date",
-                               selection: $HabitStartDateSet,
-                               displayedComponents: .date)
-                    .datePickerStyle(.compact)
-                }
+ 
                 Section(header: Text("Time of day (narrows reminder notifications):")) {
                     Picker("Time of day", selection: $HabitTimeRegionSet) {
                         ForEach(timeRegionOptions, id: \.self) { region in
@@ -124,20 +143,22 @@ struct HabitBuilderView: View {
                         }
                     }
                 }
+            
                 Section(header: Text("Habit Reward (Points for completion)")) {
                     TextField("", value: $HabitRewardSet, format: .number)
                 }
-                Toggle("Include status update", isOn: $HabitHasStatusSet)
             
-//            } // END SUBTASKER BRACKET
-            
+            Toggle("Include status update", isOn: $HabitHasStatusSet)
+                    
             
             Section {
                 Button {addItem()} label: {Text("Save Habit")}
             }
         }
+        .onChange(of: HabitHasCheckboxSet) { if HabitHasCheckboxSet { HabitHasSubTaskSet = false } }
+        .onChange(of: HabitHasSubTaskSet) { if HabitHasSubTaskSet { HabitHasCheckboxSet = false } }
     }
-        
+
     // -----------------------------------------------
     //                  END VAR DECLARATIONS
     // ----------------------------------------------
@@ -250,7 +271,8 @@ struct HabitBuilderView: View {
                                                                     TextField("", text: $HabitNameSet)
                                                                 }
                                                                 Toggle("Use checkbox instead of units",isOn: $HabitHasCheckboxSet)
-                                                                if HabitHasCheckboxSet == false {
+                                                                Toggle("Use subhabits instead of units?", isOn: $HabitHasSubTaskSet)
+                                                                if (HabitHasCheckboxSet || HabitHasSubTaskSet) == false {
                                                                     Section(header: Text("Habit Goal:")) {
                                                                         TextField("", value: $HabitGoalSet, format: .number)
                                                                     }
@@ -258,7 +280,9 @@ struct HabitBuilderView: View {
                                                                         TextField("", text: $HabitUnitSet)
                                                                     }
                                                                 }
-
+                                                                if HabitHasSubTaskSet == true {
+                                                                    subhabitEditor
+                                                                }
 
                                                                 Toggle("Choose days of the week to repeat on?", isOn: $HabitUseDOWSet)
                                                                 if HabitUseDOWSet == true {
@@ -316,6 +340,8 @@ struct HabitBuilderView: View {
                                                                     } label: {Text("Save Habit")}
                                                                 }
                                                             }
+                                                            .onChange(of: HabitHasCheckboxSet) { if HabitHasCheckboxSet { HabitHasSubTaskSet = false } }
+                                                            .onChange(of: HabitHasSubTaskSet) { if HabitHasSubTaskSet { HabitHasCheckboxSet = false } }
                                                             .onAppear{
 
                                                                 //Keep commented out for now, possibly problematic
@@ -331,6 +357,8 @@ struct HabitBuilderView: View {
                                                         HabitRewardSet = Int16(habitNdx.reward)
                                                         HabitHasCheckboxSet = habitNdx.hasCheckbox
                                                         HabitHasStatusSet = habitNdx.hasStatus
+                                                        HabitHasSubTaskSet = habitNdx.hasSubtask
+                                                        HabitSubhabitsSet = habitNdx.subhabits
                                                         HabitTimeRegionSet = habitNdx.timeRegion
 //
                                                         HabitUseDOWSet = habitNdx.useDow
@@ -425,7 +453,8 @@ struct HabitBuilderView: View {
                                                                 TextField("", text: $HabitNameSet)
                                                             }
                                                             Toggle("Use checkbox instead of units",isOn: $HabitHasCheckboxSet)
-                                                            if HabitHasCheckboxSet == false {
+                                                            Toggle("Use subhabits instead of units?", isOn: $HabitHasSubTaskSet)
+                                                            if (HabitHasCheckboxSet || HabitHasSubTaskSet) == false {
                                                                 Section(header: Text("Habit Goal:")) {
                                                                     TextField("", value: $HabitGoalSet, format: .number)
                                                                 }
@@ -433,8 +462,10 @@ struct HabitBuilderView: View {
                                                                     TextField("", text: $HabitUnitSet)
                                                                 }
                                                             }
-                                                            
-                                                            
+                                                            if HabitHasSubTaskSet == true {
+                                                                subhabitEditor
+                                                            }
+
                                                             Toggle("Choose days of the week to repeat on?", isOn: $HabitUseDOWSet)
                                                             if HabitUseDOWSet == true {
                                                                 Toggle("Repeat on Sunday", isOn: $HabitOnSunSet)
@@ -495,6 +526,8 @@ struct HabitBuilderView: View {
                                                                 } label: {Text("Save Habit")}
                                                             }
                                                         }
+                                                        .onChange(of: HabitHasCheckboxSet) { if HabitHasCheckboxSet { HabitHasSubTaskSet = false } }
+                                                        .onChange(of: HabitHasSubTaskSet) { if HabitHasSubTaskSet { HabitHasCheckboxSet = false } }
                                                         .onAppear{
                                                             
                                                             
@@ -508,6 +541,8 @@ struct HabitBuilderView: View {
                                                             HabitRewardSet = Int16(habitNdx.reward)
                                                             HabitHasCheckboxSet = habitNdx.hasCheckbox
                                                             HabitHasStatusSet = habitNdx.hasStatus
+                                                            HabitHasSubTaskSet = habitNdx.hasSubtask
+                                                            HabitSubhabitsSet = habitNdx.subhabits
                                                             HabitTimeRegionSet = habitNdx.timeRegion
 //
                                                             HabitUseDOWSet = habitNdx.useDow
@@ -610,6 +645,24 @@ struct HabitBuilderView: View {
         habitToEdit.dow.onFri = HabitOnFriSet
         habitToEdit.dow.onSat = HabitOnSatSet
 
+        habitToEdit.hasSubtask = HabitHasSubTaskSet
+
+        if HabitHasSubTaskSet == true {
+            habitToEdit.subhabits = HabitSubhabitsSet
+                .map { $0.trimmingCharacters(in: .whitespaces) }
+                .filter { $0 != "" }
+            if habitToEdit.subhabits.isEmpty {
+                habitToEdit.hasSubtask = false
+                habitToEdit.hasCheckbox = true
+            } else {
+                habitToEdit.hasCheckbox = false
+                habitToEdit.goal = habitToEdit.subhabits.count
+                habitToEdit.unit = "subhabits"
+            }
+        } else {
+            habitToEdit.subhabits = []
+        }
+
         if habitToEdit.hasCheckbox == true {
             habitToEdit.goal = 1
             habitToEdit.unit = "units"
@@ -631,7 +684,25 @@ struct HabitBuilderView: View {
             HabitGoalSet = 1
             HabitUnitSet = "units"
         }
-        
+
+        if HabitHasSubTaskSet == true {
+            HabitSubhabitsSet = HabitSubhabitsSet
+                .map { $0.trimmingCharacters(in: .whitespaces) }
+                .filter { $0 != "" }
+            if HabitSubhabitsSet.isEmpty {
+                // No usable subhabits: fall back to a plain checkbox habit
+                HabitHasSubTaskSet = false
+                HabitHasCheckboxSet = true
+                HabitGoalSet = 1
+                HabitUnitSet = "units"
+            } else {
+                HabitGoalSet = Int16(HabitSubhabitsSet.count)
+                HabitUnitSet = "subhabits"
+            }
+        } else {
+            HabitSubhabitsSet = []
+        }
+
         if HabitUseDOWSet == false {
             HabitOnMonSet = false
             HabitOnTuesSet = false
@@ -669,6 +740,8 @@ struct HabitBuilderView: View {
                                onFri: HabitOnFriSet,
                                onSat: HabitOnSatSet)
 
+        newHabitItem.subhabits = HabitSubhabitsSet
+
         modelContext.insert(newHabitItem)
         try? modelContext.save()
         
@@ -701,7 +774,7 @@ struct HabitBuilderView: View {
 
         }
 
-        saveContext(modelContext: modelContext)
+        
 
         DisplayHabitMaker = false
         HabitNameSet = ""
@@ -713,8 +786,8 @@ struct HabitBuilderView: View {
         HabitRewardSet = 1
         HabitStartDateSet = Date()
         HabitHasCheckboxSet = true
-        HabitSuperTaskSet = nil
         HabitHasSubTaskSet = false
+        HabitSubhabitsSet = []
         HabitTimeRegionSet = "None"
         
         HabitOnMonSet = false

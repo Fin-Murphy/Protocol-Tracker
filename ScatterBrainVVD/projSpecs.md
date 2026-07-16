@@ -36,7 +36,9 @@ listItem (Daily task/habit instance)
 ├── notFloater: Bool
 ├── statusText: String
 ├── timeRegion: String (Morning/Noon/Afternoon/Evening, "None" = any time)
-└── descriptor: String
+├── descriptor: String
+├── subhabits: [String] (snapshot of the habit's subhabit names)
+└── subhabitChecked: [Bool] (per-subhabit checked state, index-parallel to subhabits)
 
 listItem(from: habItem, timestamp: Date) — convenience init that spawns a
 fresh checklist instance from a habit template (used by populateTasks,
@@ -54,8 +56,8 @@ habItem (Template for recurring habits)
 ├── reward: Int
 ├── hasStatus: Bool
 ├── hasCheckbox: Bool
-├── isSubtask: Bool
 ├── hasSubtask: Bool
+├── subhabits: [String] (subhabit names; when non-empty, goal = subhabits.count)
 ├── order: Int
 ├── useDow: Bool (day of week)
 ├── dow: dow (related model holding onSun through onSat Bools)
@@ -121,6 +123,8 @@ User views MainListTab
 For each listItem:
     - Checkbox items: tap to toggle complete
     - Unit-based items: use +/- buttons
+    - Subhabit items: one checkbox per subhabit; each check/uncheck
+      calls addValue(1)/subValue(1) against goal = subhabit count
         ↓
 addValue() / subValue() updates listItem.value
         ↓

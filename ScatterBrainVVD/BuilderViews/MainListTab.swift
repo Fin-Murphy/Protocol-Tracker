@@ -152,6 +152,53 @@ struct valueModView: View {
     }
 }
 
+struct subhabitChecklistView: View {
+
+    var item: listItem
+    @Binding var Celebrate: Int
+    @Environment(\.modelContext) private var modelContext
+
+    var body: some View {
+
+        if item.complete == true {
+            Text("☑ \(item.value)/\(item.goal) \(item.unit)")
+                .font(.title)
+                .padding()
+                .bckMod()
+
+        } else {
+            Text("☐ \(item.value)/\(item.goal) \(item.unit)")
+                .font(.title)
+                .padding()
+                .bckMod()
+        }
+
+        VStack(alignment: .leading) {
+            ForEach(item.subhabits.indices, id: \.self) { ndx in
+                Button {
+                    var checks = item.subhabitChecked
+                    while checks.count < item.subhabits.count { checks.append(false) }
+                    if checks[ndx] == true {
+                        checks[ndx] = false
+                        item.subhabitChecked = checks
+                        subValue(item: item, value: 1, modelContext: modelContext, Celebrate: &Celebrate)
+                    } else {
+                        checks[ndx] = true
+                        item.subhabitChecked = checks
+                        addValue(item: item, value: 1, modelContext: modelContext, Celebrate: &Celebrate)
+                    }
+                } label: {
+                    HStack {
+                        Text(ndx < item.subhabitChecked.count && item.subhabitChecked[ndx] ? "☑" : "☐")
+                        Text(item.subhabits[ndx])
+                    }
+                }
+            }
+        }
+        .bckMod()
+    }
+}
+
 struct navLinkContent: View {
 
     @Binding var forceUpdate: Bool
@@ -227,7 +274,11 @@ struct navLinkContent: View {
 
         // ---------------------- BEGIN VALUE MODIFICATION
 
-        if item.hasCheckbox == false {
+        if item.subhabits.isEmpty == false {
+
+            subhabitChecklistView(item: item, Celebrate: $Celebrate)
+
+        } else if item.hasCheckbox == false {
 
             valueModView(item: item, Celebrate: $Celebrate)
 

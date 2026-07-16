@@ -188,6 +188,7 @@ struct Habit: Identifiable, Codable, Hashable {
     var HabitIsSubtask: Bool = false
     var HabitHasSubtask: Bool = false
     var HabitSuperTask: UUID?
+    var HabitSubhabits: [String]? = nil
 
     var HabitTimeRegion: String? = nil
 
@@ -306,6 +307,10 @@ func scootItem(item: listItem, modelContext: ModelContext){
                            unit: item.unit,
                            value: 0,
                            whichProtocol: item.whichProtocol)
+
+    newItem.subhabits = item.subhabits
+    newItem.subhabitChecked = Array(repeating: false, count: item.subhabits.count)
+
     modelContext.insert(newItem)
 
     item.name = ("> " + item.name)
@@ -537,6 +542,10 @@ func completeHabit(item: listItem, modelContext: ModelContext, Celebrate: inout 
             item.value = item.goal
             item.complete = true
 
+            if item.subhabits.isEmpty == false {
+                item.subhabitChecked = Array(repeating: true, count: item.subhabits.count)
+            }
+
             let today = dayData(for: Date(), modelContext: modelContext)
             today.score += item.reward
 
@@ -552,6 +561,11 @@ func completeHabit(item: listItem, modelContext: ModelContext, Celebrate: inout 
         if item.complete == false {
             item.value = item.goal
             item.complete = true
+
+            if item.subhabits.isEmpty == false {
+                item.subhabitChecked = Array(repeating: true, count: item.subhabits.count)
+            }
+
             item.notFloater = true
         }
     }

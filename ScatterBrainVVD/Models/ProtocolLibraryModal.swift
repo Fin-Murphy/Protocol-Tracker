@@ -112,6 +112,8 @@ struct ProtocolLibraryModal: View {
                                onFri: refHab.HabitOnFri,
                                onSat: refHab.HabitOnSat)
 
+        newHabitItem.subhabits = refHab.HabitSubhabits ?? []
+
         modelContext.insert(newHabitItem)
         try? modelContext.save()
 
