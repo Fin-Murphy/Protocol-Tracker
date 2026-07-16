@@ -93,7 +93,6 @@ struct ProtocolLibraryModal: View {
                                    hasStatus: refHab.HabitHasStatus,
                                    hasSubtask: refHab.HabitHasSubtask,
                                    id: UUID(),
-                                   isSubtask: refHab.HabitIsSubtask,
                                    name: refHab.HabitName,
                                    order: Int(refHab.HabitOrdering),
                                    repeatValue: refHab.HabitRepeatValue,

@@ -29,7 +29,6 @@ struct HabitBuilderView: View {
     @State var HabitRewardSet: Int16 = 1
     @State var HabitStartDateSet: Date = Date()
     @State var HabitHasCheckboxSet: Bool = true
-    @State var HabitIsSubtaskSet: Bool = false
     @State var HabitHasSubTaskSet: Bool = false
     @State var HabitSuperTaskSet: UUID? = nil
     @State var HabitTimeRegionSet: String = "None"
@@ -78,14 +77,12 @@ struct HabitBuilderView: View {
                 }
             }
             
-//            Toggle("Make this habit a subhabit of another habit?", isOn: $HabitIsSubtaskSet)
-//            if HabitIsSubtaskSet == true {
-//                
-//                Text("Superhabit: \(displayNameByUUID(id: HabitSuperTaskSet ?? UUID()))")
-//                
-//                    habLister
-//          
-//            } else {
+            Toggle("Include Subhabits?", isOn: $HabitHasSubTaskSet)
+            if HabitHasSubTaskSet == true {
+                
+                Text("Subhabit Creator View")
+                
+            } else {}
             
                 Toggle("Choose days of the week to repeat on?", isOn: $HabitUseDOWSet)
                 if HabitUseDOWSet == true {
@@ -193,7 +190,7 @@ struct HabitBuilderView: View {
 
                                         ForEach(its) { habitNdx in
 
-                                            if habitNdx.whichProtocol == index.ProtocolName && habitNdx.isSubtask == false {
+                                            if habitNdx.whichProtocol == index.ProtocolName {
 
                                                 NavigationLink{
                                                     ZStack{
@@ -369,7 +366,6 @@ struct HabitBuilderView: View {
                                     
                                     ForEach(its) { habitNdx in
                                         
-                                        if habitNdx.isSubtask == false {
                                             
                                             NavigationLink{
                                                 ZStack{
@@ -539,7 +535,6 @@ struct HabitBuilderView: View {
                                                     //-----------------------------------------------------
                                                 }
                                             }
-                                        } else {}
                                     }.onMove(perform: move)
                                 } // END ELSE (DISPLAY BY PROTOCOL)
                             }
@@ -647,14 +642,7 @@ struct HabitBuilderView: View {
             HabitOnSunSet = false
         }
         
-//        if HabitIsSubtaskSet == true && HabitSuperTaskSet != nil {
-//            for index in 0..<habitData.count {
-//                if habitData[index].id == HabitSuperTaskSet {
-////                    habitData[index].hasSubtask = true
-//                }
-//            }
-////            UserDefaults.standard.setEncodable(habitData, forKey: "habitList")
-//        } else {}
+
         
         let newHabitItem = habItem(descript: HabitDescriptionSet,
                                    goal: Int(HabitGoalSet),
@@ -662,7 +650,6 @@ struct HabitBuilderView: View {
                                    hasStatus: HabitHasStatusSet,
                                    hasSubtask: HabitHasSubTaskSet,
                                    id: UUID(),
-                                   isSubtask: HabitIsSubtaskSet,
                                    name: HabitNameSet,
                                    order: its.count,
                                    repeatValue: Int(HabitRepetitionSet),
@@ -726,7 +713,6 @@ struct HabitBuilderView: View {
         HabitRewardSet = 1
         HabitStartDateSet = Date()
         HabitHasCheckboxSet = true
-        HabitIsSubtaskSet = false
         HabitSuperTaskSet = nil
         HabitHasSubTaskSet = false
         HabitTimeRegionSet = "None"
@@ -765,6 +751,6 @@ struct HabitBuilderView: View {
     }
 }
 
-//#Preview {
-//    HabitBuilderView()
-//}
+#Preview {
+    HabitBuilderView()
+}
