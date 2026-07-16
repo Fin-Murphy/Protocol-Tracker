@@ -92,8 +92,10 @@ struct HabitBuilderView: View {
                 .datePickerStyle(.compact)
             }
             
-            Toggle("Use checkbox instead of units?",isOn: $HabitHasCheckboxSet)
             Toggle("Use subhabits instead of units?", isOn: $HabitHasSubTaskSet)
+            if HabitHasSubTaskSet == false {
+                Toggle("Use checkbox instead of units?",isOn: $HabitHasCheckboxSet)
+            }
             if (HabitHasCheckboxSet || HabitHasSubTaskSet) == false {
                 Section(header: Text("Habit Goal:")) {
                     TextField("", value: $HabitGoalSet, format: .number)
@@ -270,8 +272,10 @@ struct HabitBuilderView: View {
                                                                 Section(header: Text("Habit Name:")) {
                                                                     TextField("", text: $HabitNameSet)
                                                                 }
-                                                                Toggle("Use checkbox instead of units",isOn: $HabitHasCheckboxSet)
                                                                 Toggle("Use subhabits instead of units?", isOn: $HabitHasSubTaskSet)
+                                                                if HabitHasSubTaskSet == false {
+                                                                    Toggle("Use checkbox instead of units",isOn: $HabitHasCheckboxSet)
+                                                                }
                                                                 if (HabitHasCheckboxSet || HabitHasSubTaskSet) == false {
                                                                     Section(header: Text("Habit Goal:")) {
                                                                         TextField("", value: $HabitGoalSet, format: .number)
@@ -452,8 +456,10 @@ struct HabitBuilderView: View {
                                                             Section(header: Text("Habit Name:")) {
                                                                 TextField("", text: $HabitNameSet)
                                                             }
-                                                            Toggle("Use checkbox instead of units",isOn: $HabitHasCheckboxSet)
                                                             Toggle("Use subhabits instead of units?", isOn: $HabitHasSubTaskSet)
+                                                            if HabitHasSubTaskSet == false {
+                                                                Toggle("Use checkbox instead of units",isOn: $HabitHasCheckboxSet)
+                                                            }
                                                             if (HabitHasCheckboxSet || HabitHasSubTaskSet) == false {
                                                                 Section(header: Text("Habit Goal:")) {
                                                                     TextField("", value: $HabitGoalSet, format: .number)
@@ -606,6 +612,10 @@ struct HabitBuilderView: View {
                 .background(Rectangle()
                     .foregroundColor(.black))
                 .cornerRadius(20)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Color.gray, lineWidth: 1)
+                )
                 .shadow(radius: 20)
                 
             } else {}
