@@ -74,6 +74,23 @@ taskItem (One-off tasks)
 ├── hasCheckbox: Bool
 └── notFloater: Bool
 
+eventItem (Reminder-only items)
+├── id: UUID
+├── name: String
+├── descript: String
+├── startDate: Date
+├── repeatValue: Int (interval)
+├── useDow: Bool (day of week)
+├── dow: dow (related model holding onSun through onSat Bools)
+├── useExactTime: Bool (false = timeRegion digest mode)
+├── fireTime: Date (only hour/minute read; dedicated notification time)
+└── timeRegion: String (Morning/Noon/Afternoon/Evening, "None" = every sendout)
+
+eventItem never becomes a listItem — it has no score, progress, or
+completion. Its only job is notifications: useExactTime = true fires a
+dedicated notification at fireTime's hour:minute; false appends the
+event's name to the hourly digest sendouts matching its timeRegion.
+
 dayScore (Historical daily scores)
 ├── day: Date
 └── score: Int
@@ -168,15 +185,30 @@ generateNotifications() called on:
     - Day rollover (checkDate in MainListTab)
     - Settings changes (toggles / frequency saves)
         ↓
-All pending requests removed, then two passes rebuild them
+All pending requests removed, then three passes rebuild them
 as non-repeating requests for the rest of today
-(iOS caps 64 pending: hourly pass ≤ 23, mini pass ≤ 40)
+(iOS caps 64 pending: hourly pass ≤ 23, event pass takes one per
+due exact-time event, mini pass ≤ min(40, 64 − hourly − events))
+        ↓
+Event pass (runs even when both digest toggles are off):
+Due-today eventItems are computed with the same recurrence math
+as populateTasks (interval daysBetween % repeatValue, or dow flags).
+    - useExactTime events get a dedicated request at fireTime's
+      hour:minute, identifier "event-reminder <uuid>", title =
+      event name, body = descript (falls back to name)
+    - Times already past today are skipped (next occurrence is
+      scheduled by a later rebuild)
+    - Deleting an event purges its request on the next rebuild
+      (deleteEntityEvent regenerates immediately)
         ↓
 Hourly pass (skipped if hourlyNotifsDisabled):
 For each remaining hour of the day (stepped by notifFreq):
     - Build a body from today's incomplete listItems whose
       timeRegion matches that hour's region, plus items
       with timeRegion "None" (included in every sendout)
+    - Due region-mode events (useExactTime = false) are appended
+      under the same rule, name only (no progress suffix); they
+      produce nothing when the hourly pass is disabled
     - Regions: Morning 12am-12pm, Noon 12:01pm-3pm,
       Afternoon 3:01pm-7pm, Evening 7:01pm-11:59pm
     - Skip hours whose body would be empty
@@ -217,10 +249,10 @@ Free functions take an explicit `modelContext: ModelContext` parameter.
 | `scoreFor(date:)` | Read-only lookup of a day's stored score |
 | `scootItem()` | Move incomplete item to tomorrow |
 | `shuntTask()` | Convert task to today's item |
-| `deleteEntity` / `deleteEntityTask` | Delete items/tasks by UUID |
+| `deleteEntity` / `deleteEntityTask` / `deleteEntityEvent` | Delete items/tasks/events by UUID (event delete also regenerates notifications) |
 | `saveContext()` | SwiftData save wrapper |
 | `celebrationProcedure()` | Trigger when daily goal reached |
-| `generateNotifications()` | Rebuild both reminder timescales (hourly list + mini single-habit) |
+| `generateNotifications()` | Rebuild all reminders (exact-time events + hourly list + mini single-habit) |
 | `indexProtocols()` | Sync protocols to UserDefaults |
 
 ---
@@ -257,6 +289,7 @@ TabView (5 tabs via TabBar)
 Sub-views:
 ├── HabitBuilderView
 ├── TaskBuilderView
+├── EventBuilderView (Events tab, hidden by default; hideTabEvents)
 ├── DateBarView
 └── ListLabelView
 ```
@@ -269,7 +302,7 @@ Sub-views:
 
 ```swift
 ContentView()
-    .modelContainer(for: [habItem.self, listItem.self, taskItem.self, dayScore.self])
+    .modelContainer(for: [habItem.self, listItem.self, taskItem.self, dayScore.self, eventItem.self])
 ```
 
 - Views read via `@Query` and mutate via `@Environment(\.modelContext)`

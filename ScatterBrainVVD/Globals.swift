@@ -64,9 +64,66 @@ func generateNotifications (modelContext: ModelContext) {
     do {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests() // Removes all leftover notifications
 
+        let manager = HabitNotificationManager.shared
+        let now = Date()
+
+        // -------- Event pass: reminder-only eventItems due today (same recurrence math as populateTasks) --------
+
+        let eventData = try modelContext.fetch(FetchDescriptor<eventItem>())
+
+        let dformatter = DateFormatter()
+        dformatter.dateFormat = "EEEE"
+        let dayOfWeek = dformatter.string(from: now)
+
+        var todaysEvents: [eventItem] = []
+
+        for index in eventData {
+
+            if index.useDow == false {
+
+                let gap = daysBetween(start: calendar.startOfDay(for: index.startDate),
+                                      end: calendar.startOfDay(for: now))
+                if gap >= 0 && gap % max(index.repeatValue, 1) == 0 {
+                    todaysEvents.append(index)
+                }
+
+            } else {
+
+                if  (index.dow.onMon == true && dayOfWeek == "Monday") ||
+                    (index.dow.onTues == true && dayOfWeek == "Tuesday") ||
+                    (index.dow.onWed == true && dayOfWeek == "Wednesday") ||
+                    (index.dow.onThurs == true && dayOfWeek == "Thursday") ||
+                    (index.dow.onFri == true && dayOfWeek == "Friday") ||
+                    (index.dow.onSat == true && dayOfWeek == "Saturday") ||
+                    (index.dow.onSun == true && dayOfWeek == "Sunday")
+                {
+                    todaysEvents.append(index)
+                }
+            }
+        }
+
+        // Exact-time events get their own dedicated notification and are scheduled even
+        // when both digest timescales are toggled off
+        var eventCount = 0
+
+        for index in todaysEvents {
+            if index.useExactTime == true {
+                let comps = calendar.dateComponents([.hour, .minute], from: index.fireTime)
+                if let fireDate = calendar.date(bySettingHour: comps.hour ?? 0, minute: comps.minute ?? 0, second: 0, of: now) {
+                    if fireDate > now { // Already-past times wait for tomorrow's rebuild
+                        manager.scheduleReminder(at: fireDate,
+                                                 identifier: "event-reminder \(index.id.uuidString)",
+                                                 title: index.name,
+                                                 body: index.descript == "" ? index.name : index.descript)
+                        eventCount += 1
+                    }
+                }
+            }
+        }
+
         let hourlyDisabled = UserDefaults.standard.bool(forKey: "hourlyNotifsDisabled")
         let miniDisabled = UserDefaults.standard.bool(forKey: "miniNotifsDisabled")
-        if hourlyDisabled && miniDisabled { return } // Both timescales off; everything already cleared above
+        if hourlyDisabled && miniDisabled { return } // Both timescales off; only event alarms remain scheduled
 
         var NotifFreq: Int = UserDefaults.standard.integer(forKey: "notifFreq")
         if NotifFreq < 1 {
@@ -86,9 +143,6 @@ func generateNotifications (modelContext: ModelContext) {
 
         // Timestamp sort mirrors the daily list's order, so first(where:) below = "top of the list"
         let itemData = try modelContext.fetch(FetchDescriptor<listItem>(sortBy: [SortDescriptor(\.timestamp)]))
-        let manager = HabitNotificationManager.shared
-
-        let now = Date()
 
         var todaysItems: [listItem] = []
 
@@ -111,6 +165,14 @@ func generateNotifications (modelContext: ModelContext) {
                 for index in todaysItems { // Items with no time region go in every sendout; the rest only in their region's hours
                     if index.timeRegion == "" || index.timeRegion == "None" || index.timeRegion == timeRegion(forHour: hour) {
                         notifBody += "\(index.name) (\(index.value)/\(index.goal))\n"
+                    }
+                }
+
+                for index in todaysEvents { // Region events join the digest under the same rule; no progress suffix
+                    if index.useExactTime == false {
+                        if index.timeRegion == "" || index.timeRegion == "None" || index.timeRegion == timeRegion(forHour: hour) {
+                            notifBody += "\(index.name)\n"
+                        }
                     }
                 }
 
@@ -140,7 +202,7 @@ func generateNotifications (modelContext: ModelContext) {
             }
 
             // iOS caps 64 pending requests total; hourly pass takes at most 23
-            let miniBudget = min(40, 64 - hourlyCount)
+            let miniBudget = min(40, 64 - hourlyCount - eventCount)
             let endOfDay = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: now)) ?? now
             var fireDate = now.addingTimeInterval(TimeInterval(MiniNotifFreq * 60))
             var scheduled = 0
@@ -379,6 +441,24 @@ func deleteEntityTask(withUUID uuid: UUID, modelContext: ModelContext) {
     } catch {
         print("Error deleting entity: \(error)")
     }
+}
+
+func deleteEntityEvent(withUUID uuid: UUID, modelContext: ModelContext) {
+
+    var request = FetchDescriptor<eventItem>(predicate: #Predicate { $0.id == uuid })
+    request.fetchLimit = 1
+
+    do {
+        let results = try modelContext.fetch(request)
+        if let entityToDelete = results.first {
+            modelContext.delete(entityToDelete)
+            try modelContext.save()
+        }
+    } catch {
+        print("Error deleting entity: \(error)")
+    }
+
+    generateNotifications(modelContext: modelContext) // Purges the dead event's pending request
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

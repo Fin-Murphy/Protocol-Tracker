@@ -15,6 +15,7 @@ enum Tabs: Int {
     case Goals = 4
     case ProtocolList = 5
     case Test = 6
+    case Events = 7
 }
 
 
@@ -29,6 +30,7 @@ struct TabBar: View {
     @AppStorage("hideTabGraphs") var hideTabGraphs: Bool = false
     @AppStorage("hideTabProtocolList") var hideTabProtocolList: Bool = true
     @AppStorage("hideTabTest") var hideTabTest: Bool = true
+    @AppStorage("hideTabEvents") var hideTabEvents: Bool = true
 
 
     var body: some View {
@@ -171,6 +173,28 @@ struct TabBar: View {
                         selectedTab = .ProtocolList
                     } label: {
                         SymbolButton(bIcon: "list.bullet.rectangle", bTxt: "")
+                    }.foregroundColor(ForeColor)
+
+            }
+            }
+
+            //-----------------------------------------------
+
+            if !hideTabEvents {
+            if selectedTab == .Events {
+
+                    Button {
+                        selectedTab = .Events
+                    } label: {
+                        SymbolButton(bIcon: "bell.badge.fill", bTxt: "Events")
+                    }.foregroundColor(ForeColor)
+
+            } else {
+
+                    Button {
+                        selectedTab = .Events
+                    } label: {
+                        SymbolButton(bIcon: "bell.badge", bTxt: "")
                     }.foregroundColor(ForeColor)
 
             }

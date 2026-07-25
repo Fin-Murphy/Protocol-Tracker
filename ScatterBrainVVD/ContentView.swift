@@ -92,6 +92,14 @@ struct ContentView: View {
 
                 TestView()
 
+/* *******************************************************
+            EVENTS TAB
+****************************************************** */
+
+            } else if selectedTab == .Events {
+
+                EventBuilderView()
+
             }
             
             Spacer()
