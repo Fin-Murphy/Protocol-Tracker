@@ -67,11 +67,11 @@ struct SettingsView: View {
                     }
                 }
 
-                Section("Notifications") {
+                Section("Digest Notifications") {
                     Toggle("Hourly reminders", isOn: Binding(
                         get: { !hourlyNotifsDisabled },
                         set: { hourlyNotifsDisabled = !$0
-                               generateNotifications(modelContext: modelContext) }))
+                            generateNotifications(modelContext: modelContext) }))
                     LabeledContent("Frequency (hours)") {
                         TextField("1", text: $NotifFreq)
                             .keyboardType(.numberPad)
@@ -84,7 +84,9 @@ struct SettingsView: View {
                             generateNotifications(modelContext: modelContext)
                         }
                     }
-
+                }
+                
+                Section("Mini Notifications") {
                     Toggle("Mini reminders", isOn: Binding(
                         get: { !miniNotifsDisabled },
                         set: { miniNotifsDisabled = !$0
@@ -101,7 +103,7 @@ struct SettingsView: View {
                             generateNotifications(modelContext: modelContext)
                         }
                     }
-                }
+                } // Notif Section end
 
                 Section("Tabs") {
 //                TabToggleRow(name: "Settings", tab: .Calendar, hidden: $hideTabSettings, canHide: false, canEnable: true, selectedTab: $selectedTab)
