@@ -105,10 +105,13 @@ struct ContentView: View {
        }
        .onChange(of: scenePhase) {
                refreshVisualData(ForeColor: &ForeColor)
+               if scenePhase == .active { // Refresh the pre-scheduled reminders on foreground
+                   generateNotifications(modelContext: modelContext)
+               }
        }
     }
 }
 
 #Preview {
-    ContentView().modelContainer(for: [habItem.self, listItem.self, taskItem.self, dayScore.self], inMemory: true)
+    ContentView().modelContainer(for: [habItem.self, listItem.self, taskItem.self, dayScore.self, eventItem.self], inMemory: true)
 }

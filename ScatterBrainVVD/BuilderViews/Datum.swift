@@ -189,6 +189,37 @@ class taskItem { // A one-off task with a due date, waiting to be shunted into t
 }
 
 @Model
+class eventItem { // Reminder-only item: fires notifications, never appears on the checklist
+
+    init(descript: String, fireTime: Date, id: UUID, name: String, repeatValue: Int, startDate: Date, timeRegion: String, useDow: Bool, useExactTime: Bool) {
+
+        self.dow = .init(onSun: false, onMon: false, onTues: false, onWed: false, onThurs: false, onFri: false, onSat: false)
+
+        self.descript = descript
+        self.fireTime = fireTime
+        self.id = id
+        self.name = name
+        self.repeatValue = repeatValue
+        self.startDate = startDate
+        self.timeRegion = timeRegion
+        self.useDow = useDow
+        self.useExactTime = useExactTime
+    }
+
+    var dow: dow
+
+    var descript: String = ""
+    var fireTime: Date = Date() // Only the hour/minute components are read
+    var id: UUID = UUID()
+    var name: String = "Event"
+    var repeatValue: Int = 1
+    var startDate: Date = Date()
+    var timeRegion: String = "None"
+    var useDow: Bool = false
+    var useExactTime: Bool = false
+}
+
+@Model
 class dayScore { // One record per calendar day holding that day's accumulated points
 
     init(day: Date, score: Int) {

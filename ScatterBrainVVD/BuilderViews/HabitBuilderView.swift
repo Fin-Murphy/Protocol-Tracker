@@ -585,14 +585,6 @@ struct HabitBuilderView: View {
                     } else {Text("No Habits")}
 //                } // END PROT LIST CONDITIONAL
 
-                Button {
-                    generateTestHabitData(modelContext: modelContext)
-                } label: {
-                    Text("generate test habits")
-                }
-                .foregroundColor(ForeColor)
-                .padding(.bottom)
-
             }
             
             if DisplayHabitMaker == true {

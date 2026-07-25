@@ -14,7 +14,7 @@ struct ScatterBrainVVDApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .modelContainer(for: [habItem.self, listItem.self, taskItem.self, dayScore.self])
+                .modelContainer(for: [habItem.self, listItem.self, taskItem.self, dayScore.self, eventItem.self])
         }
     }
 }

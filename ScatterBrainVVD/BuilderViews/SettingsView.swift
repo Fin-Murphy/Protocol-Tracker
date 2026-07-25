@@ -11,8 +11,16 @@ struct SettingsView: View {
 
     @Binding var selectedTab: Tabs
 
+    @Environment(\.modelContext) private var modelContext
+
     @State var DailyGoalSet: Int = UserDefaults.standard.integer(forKey: "dailyGoal")
     @State var NotifFreq: Int = UserDefaults.standard.integer(forKey: "notifFreq")
+    // integer(forKey:) returns 0 when the key is unset; the mini default is 20 min
+    @State var MiniNotifFreq: Int = UserDefaults.standard.integer(forKey: "miniNotifFreq") == 0 ? 20 : UserDefaults.standard.integer(forKey: "miniNotifFreq")
+
+    // Stored as "disabled" so the unset default (false) means enabled, like the hideTab* keys
+    @AppStorage("hourlyNotifsDisabled") var hourlyNotifsDisabled: Bool = false
+    @AppStorage("miniNotifsDisabled") var miniNotifsDisabled: Bool = false
 
     @AppStorage("hideTabSettings") var hideTabSettings: Bool = false
     @AppStorage("hideTabHabits") var hideTabHabits: Bool = false
@@ -56,6 +64,10 @@ struct SettingsView: View {
             }.bckMod()
             
             VStack{
+                Toggle("Hourly reminders", isOn: Binding(
+                    get: { !hourlyNotifsDisabled },
+                    set: { hourlyNotifsDisabled = !$0
+                           generateNotifications(modelContext: modelContext) }))
                 Text("Notfication Frequency (hours)")
                 TextField("Once every ___ hours", value: $NotifFreq, format: .number)
                 Button {
@@ -65,11 +77,34 @@ struct SettingsView: View {
                         NotifFreq = 1
                     }
                     UserDefaults.standard.set(NotifFreq, forKey: "notifFreq")
+                    generateNotifications(modelContext: modelContext)
                 } label : {
                     Text("Save Notificiation Frequency")
                         .bckMod()
                 }
-                
+
+            }.bckMod()
+
+            VStack{
+                Toggle("Mini reminders", isOn: Binding(
+                    get: { !miniNotifsDisabled },
+                    set: { miniNotifsDisabled = !$0
+                           generateNotifications(modelContext: modelContext) }))
+                Text("Mini Reminder Frequency (minutes)")
+                TextField("Once every ___ minutes", value: $MiniNotifFreq, format: .number)
+                Button {
+                    if MiniNotifFreq > 120 {
+                        MiniNotifFreq = 120
+                    } else if MiniNotifFreq < 10 {
+                        MiniNotifFreq = 10
+                    }
+                    UserDefaults.standard.set(MiniNotifFreq, forKey: "miniNotifFreq")
+                    generateNotifications(modelContext: modelContext)
+                } label : {
+                    Text("Save Mini Reminder Frequency")
+                        .bckMod()
+                }
+
             }.bckMod()
 
             VStack{

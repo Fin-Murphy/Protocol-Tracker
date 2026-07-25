@@ -161,12 +161,18 @@ chosen day's total; today's record updates the view live.
 ### 5. Notification Flow
 
 ```
-App appears (onAppear in MainListTab)
+generateNotifications() called on:
+    - ContentView onAppear (launch)
+    - App foregrounding (scenePhase → .active)
+    - Every progress mutation (addValue/subValue/completeHabit)
+    - Day rollover (checkDate in MainListTab)
+    - Settings changes (toggles / frequency saves)
         ↓
-generateNotifications() called
+All pending requests removed, then two passes rebuild them
+as non-repeating requests for the rest of today
+(iOS caps 64 pending: hourly pass ≤ 23, mini pass ≤ 40)
         ↓
-HabitNotificationManager schedules reminders
-        ↓
+Hourly pass (skipped if hourlyNotifsDisabled):
 For each remaining hour of the day (stepped by notifFreq):
     - Build a body from today's incomplete listItems whose
       timeRegion matches that hour's region, plus items
@@ -174,6 +180,13 @@ For each remaining hour of the day (stepped by notifFreq):
     - Regions: Morning 12am-12pm, Noon 12:01pm-3pm,
       Afternoon 3:01pm-7pm, Evening 7:01pm-11:59pm
     - Skip hours whose body would be empty
+        ↓
+Mini pass (skipped if miniNotifsDisabled):
+For each fire time from now+miniNotifFreq minutes to midnight:
+    - Body names ONE habit: the top incomplete item (list
+      order) whose timeRegion matches the fire time's region,
+      falling back to "None"-region items, then any
+      incomplete item; nothing scheduled if all complete
 ```
 
 ### 6. Moving Tasks Flow
@@ -207,7 +220,7 @@ Free functions take an explicit `modelContext: ModelContext` parameter.
 | `deleteEntity` / `deleteEntityTask` | Delete items/tasks by UUID |
 | `saveContext()` | SwiftData save wrapper |
 | `celebrationProcedure()` | Trigger when daily goal reached |
-| `generateNotifications()` | Schedule smart reminders |
+| `generateNotifications()` | Rebuild both reminder timescales (hourly list + mini single-habit) |
 | `indexProtocols()` | Sync protocols to UserDefaults |
 
 ---
@@ -217,7 +230,10 @@ Free functions take an explicit `modelContext: ModelContext` parameter.
 | Key | Type | Purpose |
 |-----|------|---------|
 | `dailyGoal` | Int | Target points per day |
-| `notifFreq` | Int | Notification frequency in hours |
+| `notifFreq` | Int | Hourly reminder frequency in hours (1-24) |
+| `hourlyNotifsDisabled` | Bool | Turns off the hourly reminders (unset = enabled) |
+| `miniNotifsDisabled` | Bool | Turns off the mini reminders (unset = enabled) |
+| `miniNotifFreq` | Int | Mini reminder frequency in minutes (10-120, unset = 20) |
 | `seenWelcome` | Bool | First launch flag |
 | `DailyTaskPopulate?` | Date | Last population date |
 | `protocol` | [HabitProtocol] | Array of Codable protocols |

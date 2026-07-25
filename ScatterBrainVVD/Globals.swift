@@ -37,27 +37,23 @@ func timeRegion(forHour hour: Int) -> String {
 class HabitNotificationManager {
     static let shared = HabitNotificationManager()
     
-    func scheduleSmartReminder(at hour: Int, minute: Int, title: String, body: String) {
+    func scheduleReminder(at fireDate: Date, identifier: String, title: String, body: String) {
         let content = UNMutableNotificationContent()
-        content.title = "Incomplete Task!"
+        content.title = title
         content.body = body
         content.sound = .default
-        
-        var dateComponents = DateComponents()
-        dateComponents.hour = hour
-        dateComponents.minute = minute
-        
+
         let trigger = UNCalendarNotificationTrigger(
-            dateMatching: dateComponents,
-            repeats: true
+            dateMatching: calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: fireDate),
+            repeats: false
         )
-        
+
         let request = UNNotificationRequest(
-            identifier: "daily-habit-reminder \(hour) \(minute)",
+            identifier: identifier,
             content: content,
             trigger: trigger
         )
-        
+
         UNUserNotificationCenter.current().add(request)
     }
 }
@@ -65,69 +61,99 @@ class HabitNotificationManager {
 
 func generateNotifications (modelContext: ModelContext) {
 
-
     do {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests() // Removes all leftover notifications
 
-        let itemData = try modelContext.fetch(FetchDescriptor<listItem>()) // Pulling in the item data from the calendar (REMEMBER TO FIX THIS LOGIC FLOW!)
-        let manager = HabitNotificationManager.shared
-
-        var notifBody: String = ""
+        let hourlyDisabled = UserDefaults.standard.bool(forKey: "hourlyNotifsDisabled")
+        let miniDisabled = UserDefaults.standard.bool(forKey: "miniNotifsDisabled")
+        if hourlyDisabled && miniDisabled { return } // Both timescales off; everything already cleared above
 
         var NotifFreq: Int = UserDefaults.standard.integer(forKey: "notifFreq")
         if NotifFreq < 1 {
             NotifFreq = 1
+        } else if NotifFreq > 24 {
+            NotifFreq = 24
         }
 
-        var hour = calendar.component(.hour, from: Today)
-//        var min = calendar.component(.minute, from: Today)
+        var MiniNotifFreq: Int = UserDefaults.standard.integer(forKey: "miniNotifFreq")
+        if MiniNotifFreq == 0 { // Unset key
+            MiniNotifFreq = 20
+        } else if MiniNotifFreq < 10 {
+            MiniNotifFreq = 10
+        } else if MiniNotifFreq > 120 {
+            MiniNotifFreq = 120
+        }
 
+        // Timestamp sort mirrors the daily list's order, so first(where:) below = "top of the list"
+        let itemData = try modelContext.fetch(FetchDescriptor<listItem>(sortBy: [SortDescriptor(\.timestamp)]))
+        let manager = HabitNotificationManager.shared
+
+        let now = Date()
 
         var todaysItems: [listItem] = []
 
         for index in itemData {
-            if ((Calendar.current.isDate(index.timestamp, equalTo: Date(), toGranularity: .day) == true) && index.complete == false){ //If the item matches today...
+            if ((Calendar.current.isDate(index.timestamp, equalTo: now, toGranularity: .day) == true) && index.complete == false){ //If the item matches today...
                 todaysItems.append(index)
             }
         }
 
-        hour += 1
-        while hour < 24 {
+        // -------- Large-scale pass: every NotifFreq hours, list of everything incomplete --------
 
-            notifBody = ""
+        var hourlyCount = 0
 
-            for index in todaysItems { // Items with no time region go in every sendout; the rest only in their region's hours
-                if index.timeRegion == "" || index.timeRegion == "None" || index.timeRegion == timeRegion(forHour: hour) {
-                    notifBody += "\(index.name) (\(index.value)/\(index.goal))\n"
+        if !hourlyDisabled {
+            var hour = calendar.component(.hour, from: now) + 1
+            while hour < 24 {
+
+                var notifBody = ""
+
+                for index in todaysItems { // Items with no time region go in every sendout; the rest only in their region's hours
+                    if index.timeRegion == "" || index.timeRegion == "None" || index.timeRegion == timeRegion(forHour: hour) {
+                        notifBody += "\(index.name) (\(index.value)/\(index.goal))\n"
+                    }
                 }
-            }
 
-            if notifBody != "" {
-                manager.scheduleSmartReminder(at: hour, minute: 0, title: "f", body: notifBody)
-                print("Scheduling notification for \(hour)")
-            }
+                if notifBody != "" {
+                    if let fireDate = calendar.date(bySettingHour: hour, minute: 0, second: 0, of: now) {
+                        manager.scheduleReminder(at: fireDate, identifier: "daily-habit-reminder \(hour) 0", title: "Incomplete Task!", body: notifBody)
+                        hourlyCount += 1
+                        print("Scheduling notification for \(hour)")
+                    }
+                }
 
-            hour += NotifFreq
+                hour += NotifFreq
+            }
         }
 
-//        min += 1 // Test block
-//        while min < 60 {
-//            manager.scheduleSmartReminder(at: hour, minute: min, title: "f", body: notifBody)
-//            min += 1
-//            print("Scheduling notification for \(hour):\(min)\n")
-//        }
+        // -------- Mini pass: every MiniNotifFreq minutes, single top habit in the fire time's region --------
 
-//        UNUserNotificationCenter.current().getPendingNotificationRequests { requests in //Unnesecary test block
-//            print("Total pending notifications: \(requests.count)")
-//            for request in requests {
-//                print("ID: \(request.identifier)")
-//                if let trigger = request.trigger as? UNCalendarNotificationTrigger {
-//                    print("  Trigger: \(trigger.dateComponents)")
-//                }
-//            }
-//        }
+        if !miniDisabled && !todaysItems.isEmpty {
 
-        
+            // Top incomplete item for the region containing `hour`; falls back to
+            // region-less items, then any incomplete item.
+            func topIncompleteItem(forHour hour: Int) -> listItem? {
+                let region = timeRegion(forHour: hour)
+                return todaysItems.first(where: { $0.timeRegion == region })
+                    ?? todaysItems.first(where: { $0.timeRegion == "" || $0.timeRegion == "None" })
+                    ?? todaysItems.first
+            }
+
+            // iOS caps 64 pending requests total; hourly pass takes at most 23
+            let miniBudget = min(40, 64 - hourlyCount)
+            let endOfDay = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: now)) ?? now
+            var fireDate = now.addingTimeInterval(TimeInterval(MiniNotifFreq * 60))
+            var scheduled = 0
+
+            while fireDate < endOfDay && scheduled < miniBudget {
+                if let item = topIncompleteItem(forHour: calendar.component(.hour, from: fireDate)) {
+                    manager.scheduleReminder(at: fireDate, identifier: "mini-habit-reminder \(scheduled)", title: "Quick check-in!", body: "\(item.name) (\(item.value)/\(item.goal))")
+                    scheduled += 1
+                }
+                fireDate = fireDate.addingTimeInterval(TimeInterval(MiniNotifFreq * 60))
+            }
+        }
+
     } catch {
         let nsError = error as NSError
         fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
