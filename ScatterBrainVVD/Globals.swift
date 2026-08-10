@@ -601,6 +601,28 @@ func scoreFor(date: Date, modelContext: ModelContext) -> Int {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+// DAILY GOAL
+// ---------------------------------------------------------------------------------------------------------------------
+
+// The day's goal is the combined reward of everything on that day's checklist, so hitting it
+// means the docket is done. Items renamed with the "> " prefix by scootItem() were migrated to
+// tomorrow and can never be completed, so they're excluded — otherwise scooting anything would
+// leave the day's goal permanently out of reach.
+func goalTotal(for items: [listItem]) -> Int {
+    items
+        .filter { $0.name.hasPrefix("> ") == false }
+        .reduce(0) { $0 + $1.reward }
+}
+
+func goalFor(date: Date, modelContext: ModelContext) -> Int {
+    let start = calendar.startOfDay(for: date)
+    let end = calendar.date(byAdding: .day, value: 1, to: start)!
+    let request = FetchDescriptor<listItem>(predicate: #Predicate { $0.timestamp >= start && $0.timestamp < end })
+
+    return goalTotal(for: (try? modelContext.fetch(request)) ?? [])
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 // VALUEMOD FUNCTIONS
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -621,9 +643,7 @@ func addValue(item: listItem, value: Int, modelContext: ModelContext, Celebrate:
             item.complete = true
         }
 
-        if Celebrate >= UserDefaults.standard.integer(forKey: "dailyGoal") {
-            celebrationProcedure()
-        }
+        checkDayCompletion(modelContext: modelContext)
     } else {
         item.value = item.value + value
         if item.value >= item.goal {
@@ -660,9 +680,7 @@ func completeHabit(item: listItem, modelContext: ModelContext, Celebrate: inout 
             item.notFloater = true
         }
 
-        if Celebrate >= UserDefaults.standard.integer(forKey: "dailyGoal") {
-            celebrationProcedure()
-        }
+        checkDayCompletion(modelContext: modelContext)
     } else {
         if item.complete == false {
             item.value = item.goal
@@ -729,6 +747,25 @@ func celebrationProcedure () {
         print("Goal for the day has been completed!")
     
     
+}
+
+// Fires at most once per calendar day: the latch date means a docket that grows after the goal
+// was already met doesn't re-trigger the event.
+func checkDayCompletion(modelContext: ModelContext) {
+    let today = calendar.startOfDay(for: Date())
+
+    if let last = UserDefaults.standard.object(forKey: "lastCelebrationDay") as? Date,
+       calendar.isDate(last, inSameDayAs: today) {
+        return
+    }
+
+    let goal = goalFor(date: Date(), modelContext: modelContext)
+
+    // goal == 0 means nothing is on the docket — an empty day isn't a completed one
+    guard goal > 0, scoreFor(date: Date(), modelContext: modelContext) >= goal else { return }
+
+    UserDefaults.standard.set(today, forKey: "lastCelebrationDay")
+    celebrationProcedure()
 }
 
 var hapticEngine: CHHapticEngine?

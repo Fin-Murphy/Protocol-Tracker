@@ -46,10 +46,31 @@ struct DateBarView: View {
     @Query
     private var dayScores: [dayScore]
 
+    // The selected day's checklist, which the goal is derived from. Querying it (rather than
+    // reading a stored number) is what makes the goal climb the moment a task or habit lands
+    // on the docket.
+    @Query
+    private var dayItems: [listItem]
+
+    init(SelectedDate: Binding<Date>) {
+        _SelectedDate = SelectedDate
+
+        let dayStart = calendar.startOfDay(for: SelectedDate.wrappedValue)
+        let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart) ?? dayStart
+
+        _dayItems = Query(filter: #Predicate<listItem> { item in
+            item.timestamp >= dayStart && item.timestamp < dayEnd
+        }, sort: \listItem.timestamp)
+    }
+
     private var displayedScore: Int {
         dayScores.first(where: {
             calendar.isDate($0.day, inSameDayAs: SelectedDate)
         })?.score ?? 0
+    }
+
+    private var displayedGoal: Int {
+        goalTotal(for: dayItems)
     }
 
     var body: some View {
@@ -77,7 +98,7 @@ struct DateBarView: View {
 //                    .fontWeight(.bold)
 //                    .font(.title2)
                 
-                Text("- (\(displayedScore)/\(UserDefaults.standard.integer(forKey: "dailyGoal")) Points)")
+                Text("- (\(displayedScore)/\(displayedGoal) Points)")
 //                Text(" - (\(displayedScore) Points)")
                     .fontWeight(.bold)
                     .font(.title2)

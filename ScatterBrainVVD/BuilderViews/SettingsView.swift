@@ -16,7 +16,6 @@ struct SettingsView: View {
     // String-backed so the field can go blank while editing; only valid numbers
     // are saved, so a blank field falls back to the stored value when the view
     // is recreated on tab switch.
-    @State var DailyGoalSet: String = String(UserDefaults.standard.integer(forKey: "dailyGoal"))
     @State var NotifFreq: String = String(UserDefaults.standard.integer(forKey: "notifFreq"))
     // integer(forKey:) returns 0 when the key is unset; the mini default is 20 min
     @State var MiniNotifFreq: String = String(UserDefaults.standard.integer(forKey: "miniNotifFreq") == 0 ? 20 : UserDefaults.standard.integer(forKey: "miniNotifFreq"))
@@ -53,20 +52,6 @@ struct SettingsView: View {
             }.foregroundColor(ForeColor)
 
             Form {
-                Section {
-                    LabeledContent("Daily goal") {
-                        TextField("0", text: $DailyGoalSet)
-                            .keyboardType(.numberPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(maxWidth: 80)
-                    }
-                    .onChange(of: DailyGoalSet) {
-                        if let goal = Int(DailyGoalSet) {
-                            UserDefaults.standard.set(goal, forKey: "dailyGoal")
-                        }
-                    }
-                }
-
                 Section("Digest Notifications") {
                     Toggle("Hourly reminders", isOn: Binding(
                         get: { !hourlyNotifsDisabled },
