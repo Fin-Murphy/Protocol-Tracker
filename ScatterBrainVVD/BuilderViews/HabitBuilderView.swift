@@ -33,6 +33,7 @@ struct HabitBuilderView: View {
     @State var HabitSubhabitsSet: [String] = []
     @State var HabitSuperTaskSet: UUID? = nil
     @State var HabitTimeRegionSet: String = "None"
+    @State var HabitColorSet: String = "Default"
     
     @State var HabitUseDOWSet: Bool = false
     // -------------------------------------- DOW REP VALS
@@ -145,6 +146,19 @@ struct HabitBuilderView: View {
                         }
                     }
                 }
+                Picker("Habit Color:", selection: $HabitColorSet) {
+                    ForEach(habitColorOptions, id: \.self) { name in
+                        HStack {
+                            Circle()
+                                .fill(habitColor(name))
+                                .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 1))
+                                .frame(width: 20, height: 20)
+                            Text(name)
+                        }
+                        .tag(name)
+                    }
+                }
+                .pickerStyle(.inline)
             
                 Section(header: Text("Habit Reward (Points for completion)")) {
                     TextField("", value: $HabitRewardSet, format: .number)
@@ -328,6 +342,19 @@ struct HabitBuilderView: View {
                                                                         }
                                                                     }
                                                                 }
+                                                                Picker("Habit Color:", selection: $HabitColorSet) {
+                                                                    ForEach(habitColorOptions, id: \.self) { name in
+                                                                        HStack {
+                                                                            Circle()
+                                                                                .fill(habitColor(name))
+                                                                                .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 1))
+                                                                                .frame(width: 20, height: 20)
+                                                                            Text(name)
+                                                                        }
+                                                                        .tag(name)
+                                                                    }
+                                                                }
+                                                                .pickerStyle(.inline)
                                                                 Section(header: Text("Habit Reward (Points for completion)")) {
                                                                     TextField("", value: $HabitRewardSet, format: .number)
                                                                 }
@@ -364,6 +391,7 @@ struct HabitBuilderView: View {
                                                         HabitHasSubTaskSet = habitNdx.hasSubtask
                                                         HabitSubhabitsSet = habitNdx.subhabits
                                                         HabitTimeRegionSet = habitNdx.timeRegion
+                                                        HabitColorSet = habitNdx.colorName
 //
                                                         HabitUseDOWSet = habitNdx.useDow
 //
@@ -383,6 +411,7 @@ struct HabitBuilderView: View {
                                                     HStack {
                                                         //-----------------------------------------------------
                                                         Text(habitNdx.name)
+                                                            .foregroundColor(habitColor(habitNdx.colorName))
 
                                                         Spacer()
 
@@ -514,6 +543,19 @@ struct HabitBuilderView: View {
                                                                     }
                                                                 }
                                                             }
+                                                            Picker("Habit Color:", selection: $HabitColorSet) {
+                                                                ForEach(habitColorOptions, id: \.self) { name in
+                                                                    HStack {
+                                                                        Circle()
+                                                                            .fill(habitColor(name))
+                                                                            .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 1))
+                                                                            .frame(width: 20, height: 20)
+                                                                        Text(name)
+                                                                    }
+                                                                    .tag(name)
+                                                                }
+                                                            }
+                                                            .pickerStyle(.inline)
                                                             Section(header: Text("Habit Reward (Points for completion)")) {
                                                                 TextField("", value: $HabitRewardSet, format: .number)
                                                             }
@@ -550,6 +592,7 @@ struct HabitBuilderView: View {
                                                             HabitHasSubTaskSet = habitNdx.hasSubtask
                                                             HabitSubhabitsSet = habitNdx.subhabits
                                                             HabitTimeRegionSet = habitNdx.timeRegion
+                                                            HabitColorSet = habitNdx.colorName
 //
                                                             HabitUseDOWSet = habitNdx.useDow
 //                                                            
@@ -569,6 +612,7 @@ struct HabitBuilderView: View {
                                                 HStack {
                                                     //-----------------------------------------------------
                                                     Text(habitNdx.name)
+                                                        .foregroundColor(habitColor(habitNdx.colorName))
                                                     
                                                     Spacer()
                                                     
@@ -636,6 +680,7 @@ struct HabitBuilderView: View {
         habitToEdit.hasStatus = HabitHasStatusSet
         habitToEdit.hasCheckbox = HabitHasCheckboxSet
         habitToEdit.timeRegion = HabitTimeRegionSet
+        habitToEdit.colorName = HabitColorSet
 
         habitToEdit.useDow = HabitUseDOWSet
 
@@ -742,6 +787,7 @@ struct HabitBuilderView: View {
                                onFri: HabitOnFriSet,
                                onSat: HabitOnSatSet)
 
+        newHabitItem.colorName = HabitColorSet
         newHabitItem.subhabits = HabitSubhabitsSet
 
         modelContext.insert(newHabitItem)
@@ -791,6 +837,7 @@ struct HabitBuilderView: View {
         HabitHasSubTaskSet = false
         HabitSubhabitsSet = []
         HabitTimeRegionSet = "None"
+        HabitColorSet = "Default"
         
         HabitOnMonSet = false
         HabitOnTuesSet = false

@@ -12,6 +12,8 @@ struct navLinkLabel: View {
 
     var item: listItem
 
+    private var tint: Color { habitColor(item.colorName) }
+
     var body: some View {
         
         HStack{
@@ -35,6 +37,7 @@ struct navLinkLabel: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 20,height: 20)
+                    .foregroundColor(tint)
                 
             } else {
                 
@@ -44,15 +47,17 @@ struct navLinkLabel: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 20,height: 20)
+                    .foregroundColor(tint)
                 
             }
             
             if item.complete == true {
                 Text(String(item.name))
                     .strikethrough()
-                    .foregroundColor(.green)
+                    .foregroundColor(tint)
             } else {
                 Text(String(item.name))
+                    .foregroundColor(tint)
             }
             Spacer()
             
@@ -211,6 +216,8 @@ struct navLinkContent: View {
 
     @Binding var Celebrate: Int
 
+    private var tint: Color { habitColor(item.colorName) }
+
     var body: some View {
 
         if item.complete == true {
@@ -218,10 +225,12 @@ struct navLinkContent: View {
                 .font(.title)
                 .fontWeight(.bold)
                 .strikethrough()
+                .foregroundColor(tint)
         } else {
             Text(String(item.name))
                 .font(.title)
                 .fontWeight(.bold)
+                .foregroundColor(tint)
         }
 
         if item.hasStatus == true {

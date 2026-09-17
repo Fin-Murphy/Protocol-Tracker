@@ -104,6 +104,8 @@ struct ProtocolLibraryModal: View {
                                    useDow: refHab.HabitUseDow,
                                    whichProtocol: refHab.HabitProtocol)
 
+        newHabitItem.colorName = refHab.HabitColor ?? "Default"
+
         newHabitItem.dow = dow(onSun: refHab.HabitOnSun,
                                onMon: refHab.HabitOnMon,
                                onTues: refHab.HabitOnTues,

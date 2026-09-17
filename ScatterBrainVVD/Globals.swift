@@ -23,6 +23,8 @@ let calendar: Calendar = .current
 
 let timeRegionOptions = ["None", "Morning", "Noon", "Afternoon", "Evening"]
 
+let habitColorOptions = ["Default", "Red", "Orange", "Green", "Teal", "Blue", "Purple", "Pink"]
+
 // Notifications only fire on the hour, so hour granularity is exact:
 // Morning 12am-12pm, Noon 12:01pm-3pm, Afternoon 3:01pm-7pm, Evening 7:01pm-11:59pm.
 func timeRegion(forHour hour: Int) -> String {
@@ -279,6 +281,7 @@ struct Habit: Identifiable, Codable, Hashable {
     var HabitSubhabits: [String]? = nil
 
     var HabitTimeRegion: String? = nil
+    var HabitColor: String? = nil
 
     var HabitOrdering: Int32
     
@@ -373,6 +376,36 @@ func getCurrentColorScheme() -> ColorScheme {
 var currentScheme = getCurrentColorScheme()
 
 var ForeColor: Color = currentScheme == .dark ? .white : .black
+
+private func uiColor(_ hex: UInt) -> UIColor {
+    UIColor(red:   CGFloat((hex >> 16) & 0xFF) / 255,
+            green: CGFloat((hex >> 8)  & 0xFF) / 255,
+            blue:  CGFloat( hex        & 0xFF) / 255,
+            alpha: 1)
+}
+
+// Explicit light/dark pairs rather than the system colors, which are chrome-tuned and several
+// of which fall under 2.5:1 on white as body text. Every pair here measures at least 4.95:1 in
+// its own mode. The UIColor provider re-resolves on a light/dark switch, which the ForeColor
+// global (resolved once at launch) does not.
+private func habitPair(_ light: UInt, _ dark: UInt) -> Color {
+    Color(UIColor { $0.userInterfaceStyle == .dark ? uiColor(dark) : uiColor(light) })
+}
+
+// Resolves a habit's stored palette name to a Color. "Default" (and any name no longer in the
+// palette) falls back to the default label color, i.e. the app's pre-palette appearance.
+func habitColor(_ name: String) -> Color {
+    switch name {
+    case "Red":    return habitPair(0xC62828, 0xFF6F61)
+    case "Orange": return habitPair(0xA85400, 0xFFA64D)
+    case "Green":  return habitPair(0x1B7F3B, 0x4ED07A)
+    case "Teal":   return habitPair(0x0E7C86, 0x40C8D4)
+    case "Blue":   return habitPair(0x1560C4, 0x6FA8FF)
+    case "Purple": return habitPair(0x7A3FC0, 0xC08CFF)
+    case "Pink":   return habitPair(0xC2185B, 0xFF7AB0)
+    default:       return Color.primary
+    }
+}
 // ---------------------------------------------------------------------------------------------------------------------
 // SCOOT ITEM
 // ---------------------------------------------------------------------------------------------------------------------
@@ -396,6 +429,7 @@ func scootItem(item: listItem, modelContext: ModelContext){
                            value: 0,
                            whichProtocol: item.whichProtocol)
 
+    newItem.colorName = item.colorName
     newItem.subhabits = item.subhabits
     newItem.subhabitChecked = Array(repeating: false, count: item.subhabits.count)
 
