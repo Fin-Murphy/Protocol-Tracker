@@ -4,7 +4,7 @@ https://finnian-murphy.me/protocol_tracker_privacy_policy
 
 https://finnian-murphy.me/protocol_tracker_support_page
 
-I built this whole app by hand, like its the 2010s or something. 
+I built the whole MVP by hand, like its the 2010s or something. 
 
 
 One of the greatest causes of unnecessary mental strain every day is decision fatigue. In a primarily knowledge-work society like ours, few can afford to waste precious cognitive power on the chore of figuring out what they have to do every day, which is why I designed and built Protocol Tracker.
