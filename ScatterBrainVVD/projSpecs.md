@@ -266,6 +266,8 @@ Free functions take an explicit `modelContext: ModelContext` parameter.
 | `hourlyNotifsDisabled` | Bool | Turns off the hourly reminders (unset = enabled) |
 | `miniNotifsDisabled` | Bool | Turns off the mini reminders (unset = enabled) |
 | `miniNotifFreq` | Int | Mini reminder frequency in minutes (10-120, unset = 20) |
+| `wakeupTime` | Date | Wakeup time from Settings; only hour/minute used (unset = 7:00 AM) |
+| `bedtime` | Date | Bedtime from Settings; only hour/minute used (unset = 11:00 PM) |
 | `seenWelcome` | Bool | First launch flag |
 | `DailyTaskPopulate?` | Date | Last population date |
 | `protocol` | [HabitProtocol] | Array of Codable protocols |

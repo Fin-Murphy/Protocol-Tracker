@@ -21,9 +21,14 @@ struct SymbolButton: View {
                 .scaledToFit()
                 .frame(width: 24,height: 24)
                 
-            Text(bTxt).frame(width: 70,height: 17).font(.caption)
+            Text(bTxt)
+                .font(.caption)
+                .lineLimit(1)
+                .fixedSize()
+                .frame(height: 17)
                 
         }
+        .frame(maxWidth: .infinity)
         
         
     }

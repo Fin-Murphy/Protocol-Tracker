@@ -24,6 +24,13 @@ struct SettingsView: View {
     @AppStorage("hourlyNotifsDisabled") var hourlyNotifsDisabled: Bool = false
     @AppStorage("miniNotifsDisabled") var miniNotifsDisabled: Bool = false
 
+    // Stored as Date under UserDefaults; only the hour/minute matter.
+    // Defaults: 7:00 AM wakeup, 11:00 PM bedtime.
+    @State var wakeupTime: Date = UserDefaults.standard.object(forKey: "wakeupTime") as? Date
+        ?? Calendar.current.date(bySettingHour: 7, minute: 0, second: 0, of: Date())!
+    @State var bedtime: Date = UserDefaults.standard.object(forKey: "bedtime") as? Date
+        ?? Calendar.current.date(bySettingHour: 23, minute: 0, second: 0, of: Date())!
+
     @AppStorage("hideTabSettings") var hideTabSettings: Bool = false
     @AppStorage("hideTabHabits") var hideTabHabits: Bool = false
     @AppStorage("hideTabHub") var hideTabHub: Bool = false
@@ -32,6 +39,11 @@ struct SettingsView: View {
     @AppStorage("hideTabProtocolList") var hideTabProtocolList: Bool = true
     @AppStorage("hideTabTest") var hideTabTest: Bool = true
     @AppStorage("hideTabEvents") var hideTabEvents: Bool = true
+
+    // The number pad has no return key, so a keyboard toolbar "Done" button
+    // clears this to dismiss it.
+    private enum NumField { case hourly, mini }
+    @FocusState private var focusedField: NumField?
 
     let maxActiveTabs = 6
 
@@ -60,6 +72,7 @@ struct SettingsView: View {
                     LabeledContent("Frequency (hours)") {
                         TextField("1", text: $NotifFreq)
                             .keyboardType(.numberPad)
+                            .focused($focusedField, equals: .hourly)
                             .multilineTextAlignment(.trailing)
                             .frame(maxWidth: 80)
                     }
@@ -79,6 +92,7 @@ struct SettingsView: View {
                     LabeledContent("Mini frequency (minutes)") {
                         TextField("20", text: $MiniNotifFreq)
                             .keyboardType(.numberPad)
+                            .focused($focusedField, equals: .mini)
                             .multilineTextAlignment(.trailing)
                             .frame(maxWidth: 80)
                     }
@@ -90,6 +104,17 @@ struct SettingsView: View {
                     }
                 } // Notif Section end
 
+                Section("Sleep Schedule") {
+                    DatePicker("Wakeup", selection: $wakeupTime, displayedComponents: .hourAndMinute)
+                        .onChange(of: wakeupTime) {
+                            UserDefaults.standard.set(wakeupTime, forKey: "wakeupTime")
+                        }
+                    DatePicker("Bedtime", selection: $bedtime, displayedComponents: .hourAndMinute)
+                        .onChange(of: bedtime) {
+                            UserDefaults.standard.set(bedtime, forKey: "bedtime")
+                        }
+                }
+
                 Section("Tabs") {
 //                TabToggleRow(name: "Settings", tab: .Calendar, hidden: $hideTabSettings, canHide: false, canEnable: true, selectedTab: $selectedTab)
 //                TabToggleRow(name: "Habits", tab: .Protocols, hidden: $hideTabHabits, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
@@ -98,6 +123,12 @@ struct SettingsView: View {
                     TabToggleRow(name: "Graphs", tab: .Settings, hidden: $hideTabGraphs, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
                     TabToggleRow(name: "Protocols", tab: .ProtocolList, hidden: $hideTabProtocolList, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
                     TabToggleRow(name: "Events", tab: .Events, hidden: $hideTabEvents, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
+                }
+            }
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") { focusedField = nil }
                 }
             }
         }
