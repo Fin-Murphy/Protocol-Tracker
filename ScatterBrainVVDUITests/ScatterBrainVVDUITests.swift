@@ -1,20 +1,41 @@
+//
+//  ScatterBrainVVDUITests.swift
+//  ScatterBrainVVDUITests
+//
+//  Created by Finnian Murphy on 6/20/25.
+//
+
 import XCTest
 
 final class ScatterBrainVVDUITests: XCTestCase {
-    let outDir = "/private/tmp/claude-501/-Users-fin-Protocol-Tracker/84132549-9cf4-43e5-bd0e-685d6a7f847f/scratchpad"
+
+    override func setUpWithError() throws {
+        // Put setup code here. This method is called before the invocation of each test method in the class.
+
+        // In UI tests it is usually best to stop immediately when a failure occurs.
+        continueAfterFailure = false
+
+        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
+    }
+
+    override func tearDownWithError() throws {
+        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    }
 
     @MainActor
-    func testEdges() throws {
+    func testExample() throws {
+        // UI tests must launch the application that they test.
         let app = XCUIApplication()
-        app.launchArguments = ["-seenWelcome", "YES", "-hideTabLog", "NO", "-hideTabGraphs", "NO", "-hideTabProtocolList", "NO", "-hideTabEvents", "YES"]
         app.launch()
-        let allow = XCUIApplication(bundleIdentifier: "com.apple.springboard").buttons["Allow"]
-        if allow.waitForExistence(timeout: 4) { allow.tap() }
-        sleep(1)
-        for (name, i) in [("settings", 0), ("protocols", 5)] {
-            app.coordinate(withNormalizedOffset: CGVector(dx: (Double(i) + 0.5) / 6, dy: 0.923)).tap()
-            usleep(600_000)
-            try! app.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: "\(outDir)/fixed_\(name).png"))
+
+        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    }
+
+    @MainActor
+    func testLaunchPerformance() throws {
+        // This measures how long it takes to launch your application.
+        measure(metrics: [XCTApplicationLaunchMetric()]) {
+            XCUIApplication().launch()
         }
     }
 }
