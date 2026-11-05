@@ -17,15 +17,15 @@ There is no package manager, linter, or CI — this is a plain Xcode project wit
 ```sh
 # Build for iOS Simulator
 xcodebuild -project ScatterBrainVVD.xcodeproj -scheme ScatterBrainVVD \
-  -destination 'platform=iOS Simulator,name=iPhone 16' build
+  -destination 'platform=iOS Simulator,name=iPhone 17' build
 
 # Run tests (unit + UI; note: test targets are currently empty templates)
 xcodebuild -project ScatterBrainVVD.xcodeproj -scheme ScatterBrainVVD \
-  -destination 'platform=iOS Simulator,name=iPhone 16' test
+  -destination 'platform=iOS Simulator,name=iPhone 17' test
 
 # Run a single test
 xcodebuild -project ScatterBrainVVD.xcodeproj -scheme ScatterBrainVVD \
-  -destination 'platform=iOS Simulator,name=iPhone 16' \
+  -destination 'platform=iOS Simulator,name=iPhone 17' \
   -only-testing:ScatterBrainVVDTests/ScatterBrainVVDTests/example test
 ```
 
@@ -42,7 +42,7 @@ The app target's deployment target is **iOS 26** (the test targets still say 18.
   - `eventItem` — a reminder-only recurrence (same interval/dow fields as a habit, plus `fireTime`/`useExactTime`/`timeRegion`). It **never becomes a listItem** and has no score or completion; its only output is notifications.
   - `dayScore` — one record per calendar day holding that day's accumulated points (`dayData(for:)` get-or-creates, `scoreFor(date:)` is read-only).
   - `habSubItem` is a declared-but-unused subclass of `habItem` (not in the model container, referenced nowhere). Leave it alone unless the task is about it.
-- **UserDefaults** holds notification settings (`notifFreq`, `miniNotifFreq`, `hourlyNotifsDisabled`, `miniNotifsDisabled`), sleep schedule (`wakeupTime`, `bedtime` — stored but not yet consumed by any logic), tab visibility (`hideTab*`), the last-population date (`DailyTaskPopulate?`), the celebration latch (`lastCelebrationDay`), and the JSON-encoded `[HabitProtocol]` array under key `protocol` (via the `setEncodable`/`getDecodable` extension in `Globals.swift`). There is **no `dailyGoal` key anymore** — see Scoring below.
+- **UserDefaults** holds notification settings (`notifFreq`, `miniNotifFreq`, `hourlyNotifsDisabled`, `miniNotifsDisabled`), sleep schedule (`wakeupTime` — read by the wake-up nudge notification pass; `bedtime` — stored but not yet consumed by any logic), tab visibility (`hideTab*`), the last-population date (`DailyTaskPopulate?`), the celebration latch (`lastCelebrationDay`), and the JSON-encoded `[HabitProtocol]` array under key `protocol` (via the `setEncodable`/`getDecodable` extension in `Globals.swift`). There is **no `dailyGoal` key anymore** — see Scoring below.
 
 There are parallel Codable structs (`Habit`, `Task`, `HabitProtocol` in `Globals.swift`) that mirror the SwiftData models — `Habit`/`Task` are used by the bundled protocol library and builders, while `HabitProtocol` is what gets persisted to UserDefaults. Field changes generally must be kept in sync across the struct, the SwiftData model, and `projSpecs.md`.
 
@@ -56,10 +56,11 @@ The day's goal is **derived, not configured**: `goalTotal(for:)`/`goalFor(date:)
 
 ### Notifications (Globals.swift `generateNotifications`)
 
-Rebuilt from scratch (all pending requests removed) on launch, foregrounding, every progress mutation, day rollover, and settings changes. Three passes, all non-repeating requests for the rest of today, budgeted against iOS's 64-pending cap:
-1. **Event pass** — due `eventItem`s with `useExactTime` get a dedicated request at `fireTime`'s hour:minute (`"event-reminder <uuid>"`). Runs even if both digest toggles are off.
-2. **Hourly digest** — every `notifFreq` hours, a list of incomplete items (and region-mode events) whose `timeRegion` matches that hour (`timeRegion(forHour:)`); `"None"` items appear in every sendout. Skipped if `hourlyNotifsDisabled`.
-3. **Mini pass** — every `miniNotifFreq` minutes, a single "top of list" incomplete item for the current region. Skipped if `miniNotifsDisabled`.
+Rebuilt from scratch (all pending requests removed) on launch, foregrounding, every progress mutation, day rollover, and settings changes (including the Wakeup picker). Four passes of non-repeating requests, budgeted against iOS's 64-pending cap. The nudge pass targets the next three days; the other three cover the rest of today:
+1. **Wake-up nudge pass** — two requests on each of the next three calendar days, at `wakeupTime` + 10 min and + 60 min (`"wake-nudge <dayOffset> <10|60>"`; unset key = 7:00 AM). Nothing is scheduled for today, so opening the app clears that day's nudges. Always reserves 6 slots and runs even if both digest toggles are off.
+2. **Event pass** — due `eventItem`s with `useExactTime` get a dedicated request at `fireTime`'s hour:minute (`"event-reminder <uuid>"`). Runs even if both digest toggles are off. Capped at 58 (64 minus the nudges).
+3. **Hourly digest** — every `notifFreq` hours, a list of incomplete items (and region-mode events) whose `timeRegion` matches that hour (`timeRegion(forHour:)`); `"None"` items appear in every sendout. Skipped if `hourlyNotifsDisabled`. Limited to the slots left after nudges and events.
+4. **Mini pass** — every `miniNotifFreq` minutes, a single "top of list" incomplete item for the current region. Skipped if `miniNotifsDisabled`. Budget is `min(40, 64 − 6 − hourly − events)`; if the configured interval would exhaust it before midnight, the interval is widened for that rebuild only (never saved) so the reminders spread evenly to midnight.
 
 ### Shared logic lives in Globals.swift
 

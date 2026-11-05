@@ -108,6 +108,7 @@ struct SettingsView: View {
                     DatePicker("Wakeup", selection: $wakeupTime, displayedComponents: .hourAndMinute)
                         .onChange(of: wakeupTime) {
                             UserDefaults.standard.set(wakeupTime, forKey: "wakeupTime")
+                            generateNotifications(modelContext: modelContext)
                         }
                     DatePicker("Bedtime", selection: $bedtime, displayedComponents: .hourAndMinute)
                         .onChange(of: bedtime) {

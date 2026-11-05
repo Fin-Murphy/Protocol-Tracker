@@ -69,6 +69,25 @@ func generateNotifications (modelContext: ModelContext) {
         let manager = HabitNotificationManager.shared
         let now = Date()
 
+        // -------- Wake-up nudge pass: 2 per day for the next 3 days, so a day the app is never opened still gets a reminder --------
+
+        let nudgeCount = 6 // Reserved against the 64-pending cap; the later passes budget around it
+        let nudgeBody = "Open Protocol Tracker to load today's list."
+        let nudgeTitle10 = "Good morning"
+        let nudgeTitle60 = "Your list is waiting"
+
+        let wakeupTime = UserDefaults.standard.object(forKey: "wakeupTime") as? Date
+        let wakeHour = wakeupTime.map { calendar.component(.hour, from: $0) } ?? 7 // Unset key = 7:00 AM, as in SettingsView
+        let wakeMinute = wakeupTime.map { calendar.component(.minute, from: $0) } ?? 0
+
+        for dayOffset in 1...3 {
+            if let day = calendar.date(byAdding: .day, value: dayOffset, to: calendar.startOfDay(for: now)),
+               let wake = calendar.date(bySettingHour: wakeHour, minute: wakeMinute, second: 0, of: day) {
+                manager.scheduleReminder(at: wake.addingTimeInterval(10 * 60), identifier: "wake-nudge \(dayOffset) 10", title: nudgeTitle10, body: nudgeBody)
+                manager.scheduleReminder(at: wake.addingTimeInterval(60 * 60), identifier: "wake-nudge \(dayOffset) 60", title: nudgeTitle60, body: nudgeBody)
+            }
+        }
+
         // -------- Event pass: reminder-only eventItems due today (same recurrence math as populateTasks) --------
 
         let eventData = try modelContext.fetch(FetchDescriptor<eventItem>())
@@ -109,7 +128,7 @@ func generateNotifications (modelContext: ModelContext) {
         var eventCount = 0
 
         for index in todaysEvents {
-            if index.useExactTime == true {
+            if index.useExactTime == true && eventCount < 64 - nudgeCount {
                 let comps = calendar.dateComponents([.hour, .minute], from: index.fireTime)
                 if let fireDate = calendar.date(bySettingHour: comps.hour ?? 0, minute: comps.minute ?? 0, second: 0, of: now) {
                     if fireDate > now { // Already-past times wait for tomorrow's rebuild
@@ -160,7 +179,7 @@ func generateNotifications (modelContext: ModelContext) {
 
         if !hourlyDisabled {
             var hour = calendar.component(.hour, from: now) + 1
-            while hour < 24 {
+            while hour < 24 && hourlyCount < 64 - nudgeCount - eventCount {
 
                 var notifBody = ""
 
@@ -203,10 +222,13 @@ func generateNotifications (modelContext: ModelContext) {
                     ?? todaysItems.first
             }
 
-            // iOS caps 64 pending requests total; hourly pass takes at most 23
-            let miniBudget = min(40, 64 - hourlyCount - eventCount)
+            // iOS caps 64 pending requests total; nudges reserve 6, hourly pass takes at most 23
+            let miniBudget = max(0, min(40, 64 - nudgeCount - hourlyCount - eventCount))
             let endOfDay = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: now)) ?? now
-            var fireDate = now.addingTimeInterval(TimeInterval(MiniNotifFreq * 60))
+            // If the configured interval would burn the budget before midnight, widen it (this rebuild
+            // only, never saved) so the budgeted reminders spread evenly over the rest of the day
+            let miniInterval = max(TimeInterval(MiniNotifFreq * 60), endOfDay.timeIntervalSince(now) / Double(max(miniBudget, 1)))
+            var fireDate = now.addingTimeInterval(miniInterval)
             var scheduled = 0
 
             while fireDate < endOfDay && scheduled < miniBudget {
@@ -214,7 +236,7 @@ func generateNotifications (modelContext: ModelContext) {
                     manager.scheduleReminder(at: fireDate, identifier: "mini-habit-reminder \(scheduled)", title: "Quick check-in!", body: "\(item.name) (\(item.value)/\(item.goal))")
                     scheduled += 1
                 }
-                fireDate = fireDate.addingTimeInterval(TimeInterval(MiniNotifFreq * 60))
+                fireDate = fireDate.addingTimeInterval(miniInterval)
             }
         }
 

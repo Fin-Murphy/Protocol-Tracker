@@ -183,12 +183,22 @@ generateNotifications() called on:
     - App foregrounding (scenePhase → .active)
     - Every progress mutation (addValue/subValue/completeHabit)
     - Day rollover (checkDate in MainListTab)
-    - Settings changes (toggles / frequency saves)
+    - Settings changes (toggles / frequency saves / wakeup time)
         ↓
-All pending requests removed, then three passes rebuild them
-as non-repeating requests for the rest of today
-(iOS caps 64 pending: hourly pass ≤ 23, event pass takes one per
-due exact-time event, mini pass ≤ min(40, 64 − hourly − events))
+All pending requests removed, then four passes rebuild them
+as non-repeating requests: wake-up nudges for the next 3 days,
+everything else for the rest of today
+(iOS caps 64 pending, filled in priority order: 6 nudges reserved,
+event pass takes one per due exact-time event (≤ 58), hourly pass
+≤ 23, mini pass ≤ min(40, 64 − 6 − hourly − events), floored at 0)
+        ↓
+Wake-up nudge pass (always runs, no toggle):
+For each of tomorrow, tomorrow+1, tomorrow+2 (calendar days):
+    - Two requests at wakeupTime's hour:minute +10 min and +60 min
+      (unset wakeupTime = 7:00 AM), identifiers
+      "wake-nudge <dayOffset> 10" / "wake-nudge <dayOffset> 60"
+    - Nothing is scheduled for today, so opening the app clears
+      that day's nudges and pushes the window forward one day
         ↓
 Event pass (runs even when both digest toggles are off):
 Due-today eventItems are computed with the same recurrence math
@@ -214,7 +224,11 @@ For each remaining hour of the day (stepped by notifFreq):
     - Skip hours whose body would be empty
         ↓
 Mini pass (skipped if miniNotifsDisabled):
-For each fire time from now+miniNotifFreq minutes to midnight:
+For each fire time from now+interval to midnight, where interval =
+max(miniNotifFreq minutes, time left until midnight / mini budget):
+    - The widened interval spreads the budgeted reminders evenly
+      over the rest of the day instead of running out early; it
+      applies to that rebuild only and is never saved
     - Body names ONE habit: the top incomplete item (list
       order) whose timeRegion matches the fire time's region,
       falling back to "None"-region items, then any
@@ -252,7 +266,7 @@ Free functions take an explicit `modelContext: ModelContext` parameter.
 | `deleteEntity` / `deleteEntityTask` / `deleteEntityEvent` | Delete items/tasks/events by UUID (event delete also regenerates notifications) |
 | `saveContext()` | SwiftData save wrapper |
 | `celebrationProcedure()` | Trigger when daily goal reached |
-| `generateNotifications()` | Rebuild all reminders (exact-time events + hourly list + mini single-habit) |
+| `generateNotifications()` | Rebuild all reminders (wake-up nudges + exact-time events + hourly list + mini single-habit) |
 | `indexProtocols()` | Sync protocols to UserDefaults |
 
 ---
