@@ -27,7 +27,7 @@ struct ContentView: View {
     
     var body: some View {
     
-       VStack{
+       VStack(spacing: 0){
     
 /* *******************************************************
                 Calendar TAB
@@ -102,17 +102,17 @@ struct ContentView: View {
 
             }
             
-            Spacer()
+            Spacer(minLength: 0)
 
            TabBar(selectedTab: $selectedTab)
        }
 
+       .background(Theme.bg.ignoresSafeArea())
+       .tint(Theme.accent)
        .onAppear{
            generateNotifications(modelContext: modelContext)
-           refreshVisualData(ForeColor: &ForeColor)
        }
        .onChange(of: scenePhase) {
-               refreshVisualData(ForeColor: &ForeColor)
                if scenePhase == .active { // Refresh the pre-scheduled reminders on foreground
                    generateNotifications(modelContext: modelContext)
                }

@@ -28,233 +28,236 @@ struct TaskBuilderView: View {
     @State var TaskIsntFloatingSet: Bool = true
     
     
-    var body: some View {
-        
-        ZStack{
-            
-            VStack{
-                
-                HStack{
-                    Text("Tasks")
-                        .fontWeight(.bold)
-                        .font(.title)
-                        .padding(.bottom)
-                    
-                    
-                    Button {
-                        DisplayTaskMaker = true
-                    } label: {
-                        Text("+")
-                            .font(.title)
-                            .padding(.bottom)
-                        
+    // Pushed task detail pages; emptied to pop back to the list once the task is gone
+    @State private var path: [taskItem] = []
+    @State private var confirmRemove: Bool = false
+
+    private var taskBuilderForm: some View {
+
+        Form {
+
+            Section {
+                TextField("Task name", text: $TaskNameSet)
+            } header: {
+                SectionLabel("Name")
+            }
+            .listRowBackground(Theme.surface)
+
+            Section {
+                Picker("Tracking", selection: $TaskHasCheckboxSet) {
+                    Text("Checkbox").tag(true)
+                    Text("Count").tag(false)
+                }
+                .pickerStyle(.segmented)
+
+                if TaskHasCheckboxSet == false {
+                    LabeledContent("Goal") {
+                        TextField("1", value: $TaskGoalSet, format: .number)
+                            .multilineTextAlignment(.trailing)
                     }
-                    
-                    
-                }.foregroundColor(ForeColor)
+                    LabeledContent("Unit") {
+                        TextField("units", text: $TaskUnitSet)
+                            .multilineTextAlignment(.trailing)
+                    }
+                }
+            } header: {
+                SectionLabel("Tracking")
+            }
+            .listRowBackground(Theme.surface)
+
+            Section {
+                DatePicker("Date",
+                           selection: $TaskDueDateSet,
+                           displayedComponents: .date)
+                .datePickerStyle(.compact)
+
+                Toggle("Carry over until done", isOn: Binding(
+                    get: { !TaskIsntFloatingSet },
+                    set: { TaskIsntFloatingSet = !$0 }))
+            } header: {
+                SectionLabel("Date")
+            } footer: {
+                Text("Stays on Today until you finish it")
+            }
+            .listRowBackground(Theme.surface)
+
+            Section {
+                NotesEditor(text: $TaskDescriptionSet)
+            } header: {
+                SectionLabel("Notes")
+            }
+            .listRowBackground(Theme.surface)
+
+            Section {
+                LabeledContent("Reward") {
+                    TextField("1", value: $TaskRewardSet, format: .number)
+                        .multilineTextAlignment(.trailing)
+                }
+            } footer: {
+                Text("Points for completing")
+            }
+            .listRowBackground(Theme.surface)
+        }
+        .daybookForm()
+    }
+
+    // One form for both create and edit; only the title and the Save action differ
+    private func taskFormSheet(title: String, onCancel: @escaping () -> Void, onSave: @escaping () -> Void) -> some View {
+        NavigationStack {
+            taskBuilderForm
+                .formSheetToolbar(title: title, onCancel: onCancel, onSave: onSave)
+        }
+    }
+
+    // The form fields are shared state, so a new task starts from the defaults rather than
+    // from whatever was last edited
+    private func resetForm() {
+        TaskNameSet = "Task"
+        TaskDescriptionSet = ""
+        TaskRewardSet = 1
+        TaskDueDateSet = Date()
+        TaskUnitSet = "units"
+        TaskGoalSet = 1
+        TaskHasCheckboxSet = true
+        TaskIsntFloatingSet = true
+    }
+
+    private func taskDetail(_ taskNdx: taskItem) -> some View {
+
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+
+                Text(taskNdx.name)
+                    .font(Theme.detailTitle)
+                    .foregroundStyle(Theme.text1)
+                    .accessibilityAddTraits(.isHeader)
+
+                RowCard {
+                    if taskNdx.hasCheckbox == false {
+                        CardRow(label: "Goal", value: "\(taskNdx.goal) \(taskNdx.unit)")
+                    }
+                    CardRow(label: "Due", value: taskNdx.dueDate.formatted(date: .abbreviated, time: .omitted))
+                }
+
+                if taskNdx.descript != "" {
+                    TextCard(text: taskNdx.descript)
+                }
+
+                VStack(spacing: 12) {
+                    Button("Move to today's list") {
+                        path.removeAll()
+                        shuntTask(taskToShunt: taskNdx, modelContext: modelContext)
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+
+                    Button("Edit task") {
+                        TaskNameSet = taskNdx.name
+                        TaskDescriptionSet = taskNdx.descript
+                        TaskRewardSet = Int16(taskNdx.reward)
+                        TaskDueDateSet = taskNdx.dueDate
+                        TaskUnitSet = taskNdx.unit
+                        TaskGoalSet = Int16(taskNdx.goal)
+                        TaskHasCheckboxSet = taskNdx.hasCheckbox
+                        TaskIsntFloatingSet = taskNdx.notFloater
+
+                        DisplayTaskEditor = true
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
+
+                    Button("Remove task") {
+                        confirmRemove = true
+                    }
+                    .buttonStyle(SecondaryButtonStyle(destructive: true))
+                }
+            }
+            .padding(16)
+        }
+        .background(Theme.bg)
+        .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $DisplayTaskEditor) {
+            taskFormSheet(title: "Edit task", onCancel: { DisplayTaskEditor = false }) {
+                DisplayTaskEditor = false
+                updateTask(taskToEdit: taskNdx)
+            }
+        }
+    }
+
+    var body: some View {
+
+        NavigationStack(path: $path) {
+
+            VStack(spacing: 0) {
+
+                ScreenHeader(title: "Tasks") {
+                    IconButton(systemName: "plus", label: "New task") {
+                        resetForm()
+                        DisplayTaskMaker = true
+                    }
+                }
 
                 if taskData.isEmpty == false {
 
-                    NavigationView {
-                        List{
-                            ForEach(taskData) { taskNdx in
-                                
-                                NavigationLink{
-                                    
-                                    ZStack {
-                                        
-                                        VStack{
-                                            
-                                            List {
-                                                Text(taskNdx.name)
-                                                    .font(.title)
-                                                    .padding()
-                                                Text("Item goal: \(taskNdx.goal) \(taskNdx.unit)" )
-                                                Text("Item due date: \(taskNdx.dueDate, formatter: itemFormatter)")
-                                                Section {
-                                                    Text("Item Description: \n")
-                                                        .font(.title2)
-                                                    Text("\(String(describing: taskNdx.descript))" )
-                                                }
-                                            }
-                                                
-                                            
-                                            Spacer()
-                                            
-                                            Button{
-                                                DisplayTaskEditor = true
-                                            } label: {
-                                                Text("Edit Task").bckMod()
-                                            }
-                                            
-                                            Button{
-                                                shuntTask(taskToShunt: taskNdx, modelContext: modelContext)
+                    List{
+                        ForEach(taskData) { taskNdx in
 
-                                            } label: {
-                                                Text("Shunt Task").bckMod()
-                                            }
+                            NavigationLink(value: taskNdx) {
+                                HStack(spacing: 12) {
+                                    CheckControl(isTask: true, complete: false, size: 20)
+                                        .accessibilityHidden(true)
 
-                                            Button{
-                                                deleteEntityTask(withUUID: taskNdx.id, modelContext: modelContext)
-                                            } label: {
-                                                Text("Remove this task").bckMod()
-                                            }
-                                            
-                                            Spacer()
-                                            
-                                        }
-                                        
-                                        if DisplayTaskEditor == true {
-                                            
-                                            VStack {
-                                                
-                    
-                                                Form {
-                                                    
-                                                    Section(header: Text("Task Name:")) {
-                                                        TextField("", text: $TaskNameSet)
-                                                    }
-                                                    Toggle("Use checkbox instead of units", isOn: $TaskHasCheckboxSet)
-                                                    if TaskHasCheckboxSet == false {
-                                                        Section(header: Text("Task Goal:")) {
-                                                            TextField("", value: $TaskGoalSet, format: .number)
-                                                        }
-                                                        Section(header: Text("Task Unit:")) {
-                                                            TextField("", text: $TaskUnitSet)
-                                                        }
-                                                    }
-                                                    
-                                                    Toggle("Task doesn't Persist", isOn: $TaskIsntFloatingSet)
-                                                    Section("TaskStart Date") {
-                                                        DatePicker("Select Date",
-                                                                   selection: $TaskDueDateSet,
-                                                                   displayedComponents: .date)
-                                                        .datePickerStyle(.compact)
-                                                    }
-                                                    
-                                                    
-                                                    Section(header: Text("Task Details")) {
-                                                        TextEditor(text: $TaskDescriptionSet)
-                                                            .frame(minHeight: 100)
-                                                            .overlay(
-                                                                RoundedRectangle(cornerRadius: 8)
-                                                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                                            )
-                                                    }
-                                                    Section(header: Text("Task Reward (Points for completion)")) {
-                                                        TextField("", value: $TaskRewardSet, format: .number)
-                                                    }
-                                                    
-                                                    
-                                                    Section{
-                                                        Button{
-                                                            DisplayTaskEditor = false
-                                                            updateTask(taskToEdit: taskNdx)
-                                                            
-                                                        } label: {
-                                                            Text("Save Habit")
-                                                        }
-                                                    }
-                                                    
-                                                    
-                                                }.onAppear{
-
-                                                    TaskNameSet = taskNdx.name
-                                                    TaskDescriptionSet = taskNdx.descript
-                                                    TaskRewardSet = Int16(taskNdx.reward)
-                                                    TaskDueDateSet = taskNdx.dueDate
-                                                    TaskUnitSet = taskNdx.unit
-                                                    TaskGoalSet = Int16(taskNdx.goal)
-                                                    TaskHasCheckboxSet = taskNdx.hasCheckbox
-                                                    TaskIsntFloatingSet = taskNdx.notFloater
-
-                                                }
-                                            }
-                                        } else {}
-                                        
-                                    }
-                                    
-                                } label: {
                                     Text(taskNdx.name)
+                                        .font(Theme.body)
+                                        .foregroundStyle(Theme.text1)
+                                        .lineLimit(3)
 
+                                    Spacer(minLength: 0)
+
+                                    Text(taskNdx.dueDate, format: .dateTime.day().month(.abbreviated))
+                                        .font(Theme.value)
+                                        .foregroundStyle(Theme.text2)
                                 }
+                                .frame(minHeight: 44)
                             }
+                            .listRowBackground(Theme.surface)
+                            .listRowSeparatorTint(Theme.separator)
                         }
                     }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
+
                 } // END IF STATEMENT
                 else {
-                    Text("No Tasks")
-                        .foregroundColor(ForeColor)
-                }
-                
-            } // End Vstack
-            
-            if DisplayTaskMaker == true {
-                
-                VStack{
-                    Button {
-                        DisplayTaskMaker = false
-                    } label: {
-                        Image(systemName: "x.circle")
-                            .resizable()
-                            .foregroundColor(.white)
-                            .scaledToFit()
-                            .frame(width: 100,height: 24)
-                            .bold()
-                    }.padding()
-                    
-                    Form {
-                        
-                        Section(header: Text("Task Name:")) {
-                            TextField("", text: $TaskNameSet)
-                        }
-                        Toggle("Use checkbox instead of units", isOn: $TaskHasCheckboxSet)
-                        if TaskHasCheckboxSet == false {
-                            Section(header: Text("Task Goal:")) {
-                                TextField("", value: $TaskGoalSet, format: .number)
-                            }
-                            Section(header: Text("Task Unit:")) {
-                                TextField("", text: $TaskUnitSet)
-                            }
-                        }
-                        
-                        
-                        Toggle("Task doesn't Persist", isOn: $TaskIsntFloatingSet)
-                        Section("Task Date") {
-                            DatePicker("Select Date",
-                                       selection: $TaskDueDateSet,
-                                       displayedComponents: .date)
-                            .datePickerStyle(.compact)
-                        }
-                        
-                        
-                        
-                        Section(header: Text("Task Details")) {
-                            TextEditor(text: $TaskDescriptionSet)
-                                .frame(minHeight: 100)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                )
-                        }
-                        Section(header: Text("Task Reward (Points for completion)")) {
-                            TextField("", value: $TaskRewardSet, format: .number)
-                        }
-                        
-                        Section {
-                            Button {addTask()} label: {Text("Save Task")}
-                        }
+                    EmptyState(symbol: "checkmark.square",
+                               title: "No tasks waiting",
+                               sentence: "Tasks wait here until their date, then move to Today.",
+                               buttonTitle: "New task") {
+                        resetForm()
+                        DisplayTaskMaker = true
                     }
-                    
-                } // VSTACK
-                .frame(width:300,height:700)
-                .cornerRadius(10)
-                .background(Rectangle()
-                    .foregroundColor(.black))
-                .cornerRadius(20)
-                .shadow(radius: 20)
-                
-            } else {}
+                }
+
+            } // End Vstack
+            .background(Theme.bg)
+            .toolbar(.hidden, for: .navigationBar)
+            .navigationDestination(for: taskItem.self) { taskNdx in
+                taskDetail(taskNdx)
+            }
+        }
+        // Presented from the stack rather than the detail page: the page is popped by the
+        // Remove action, and a dialog whose presenter disappears mid-dismissal eats the next tap.
+        .confirmationDialog("Remove this task?", isPresented: $confirmRemove, titleVisibility: .visible) {
+            Button("Remove", role: .destructive) {
+                if let taskNdx = path.last {
+                    path.removeAll()
+                    deleteEntityTask(withUUID: taskNdx.id, modelContext: modelContext)
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        }
+        .sheet(isPresented: $DisplayTaskMaker) {
+            taskFormSheet(title: "New task", onCancel: { DisplayTaskMaker = false }) {
+                addTask()
+            }
         }
     }
     /*    ------------------------------------------------

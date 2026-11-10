@@ -54,27 +54,30 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        
-        VStack{
 
-            HStack{
-                Text("Settings")
-                    .fontWeight(.bold)
-                    .font(.title)
-            }.foregroundColor(ForeColor)
+        NavigationStack {
+        VStack(spacing: 0) {
+
+            ScreenHeader(title: "Settings")
 
             Form {
-                Section("Digest Notifications") {
+                Section {
                     Toggle("Hourly reminders", isOn: Binding(
                         get: { !hourlyNotifsDisabled },
                         set: { hourlyNotifsDisabled = !$0
                             generateNotifications(modelContext: modelContext) }))
-                    LabeledContent("Frequency (hours)") {
+                    HStack {
+                        Text("Every")
+                        Spacer()
                         TextField("1", text: $NotifFreq)
                             .keyboardType(.numberPad)
                             .focused($focusedField, equals: .hourly)
                             .multilineTextAlignment(.trailing)
+                            .font(Theme.value)
                             .frame(maxWidth: 80)
+                            .accessibilityLabel("Hours between hourly reminders")
+                        Text("hours")
+                            .foregroundStyle(Theme.text2)
                     }
                     .onChange(of: NotifFreq) {
                         if let freq = Int(NotifFreq) {
@@ -82,19 +85,30 @@ struct SettingsView: View {
                             generateNotifications(modelContext: modelContext)
                         }
                     }
+                } header: {
+                    SectionLabel("Hourly digest")
+                } footer: {
+                    Text("1 to 24")
                 }
-                
-                Section("Mini Notifications") {
+                .listRowBackground(Theme.surface)
+
+                Section {
                     Toggle("Mini reminders", isOn: Binding(
                         get: { !miniNotifsDisabled },
                         set: { miniNotifsDisabled = !$0
                                generateNotifications(modelContext: modelContext) }))
-                    LabeledContent("Mini frequency (minutes)") {
+                    HStack {
+                        Text("Every")
+                        Spacer()
                         TextField("20", text: $MiniNotifFreq)
                             .keyboardType(.numberPad)
                             .focused($focusedField, equals: .mini)
                             .multilineTextAlignment(.trailing)
+                            .font(Theme.value)
                             .frame(maxWidth: 80)
+                            .accessibilityLabel("Minutes between mini reminders")
+                        Text("minutes")
+                            .foregroundStyle(Theme.text2)
                     }
                     .onChange(of: MiniNotifFreq) {
                         if let freq = Int(MiniNotifFreq) {
@@ -102,10 +116,15 @@ struct SettingsView: View {
                             generateNotifications(modelContext: modelContext)
                         }
                     }
+                } header: {
+                    SectionLabel("Mini reminders")
+                } footer: {
+                    Text("10 to 120")
                 } // Notif Section end
+                .listRowBackground(Theme.surface)
 
-                Section("Sleep Schedule") {
-                    DatePicker("Wakeup", selection: $wakeupTime, displayedComponents: .hourAndMinute)
+                Section {
+                    DatePicker("Wake up", selection: $wakeupTime, displayedComponents: .hourAndMinute)
                         .onChange(of: wakeupTime) {
                             UserDefaults.standard.set(wakeupTime, forKey: "wakeupTime")
                             generateNotifications(modelContext: modelContext)
@@ -114,9 +133,12 @@ struct SettingsView: View {
                         .onChange(of: bedtime) {
                             UserDefaults.standard.set(bedtime, forKey: "bedtime")
                         }
+                } header: {
+                    SectionLabel("Sleep")
                 }
+                .listRowBackground(Theme.surface)
 
-                Section("Tabs") {
+                Section {
 //                TabToggleRow(name: "Settings", tab: .Calendar, hidden: $hideTabSettings, canHide: false, canEnable: true, selectedTab: $selectedTab)
 //                TabToggleRow(name: "Habits", tab: .Protocols, hidden: $hideTabHabits, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
 //                TabToggleRow(name: "Hub", tab: .HUB, hidden: $hideTabHub, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
@@ -124,8 +146,20 @@ struct SettingsView: View {
                     TabToggleRow(name: "Graphs", tab: .Settings, hidden: $hideTabGraphs, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
                     TabToggleRow(name: "Protocols", tab: .ProtocolList, hidden: $hideTabProtocolList, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
                     TabToggleRow(name: "Events", tab: .Events, hidden: $hideTabEvents, canEnable: activeTabCount < maxActiveTabs, selectedTab: $selectedTab)
+                } header: {
+                    SectionLabel("Tabs")
+                } footer: {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("\(activeTabCount) of \(maxActiveTabs) tabs shown")
+                        if activeTabCount >= maxActiveTabs {
+                            Text("Turn one off to add another.")
+                                .foregroundStyle(Theme.warning)
+                        }
+                    }
                 }
+                .listRowBackground(Theme.surface)
             }
+            .daybookForm()
             .toolbar {
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
@@ -133,13 +167,15 @@ struct SettingsView: View {
                 }
             }
         }
-
+        .background(Theme.bg)
+        .toolbar(.hidden, for: .navigationBar)
+        }
 
     }
 }
 
 // One row in the Tabs section: tapping the name always navigates there,
-// even when the checkbox has removed the tab from the tab bar.
+// even when the toggle has removed the tab from the tab bar.
 struct TabToggleRow: View {
 
     let name: String
@@ -148,26 +184,35 @@ struct TabToggleRow: View {
     // The Settings tab can't be hidden — this pane is the only place
     // to turn tabs back on.
     var canHide: Bool = true
-    // False once maxActiveTabs are already showing; blocks checking, not unchecking.
+    // False once maxActiveTabs are already showing; blocks turning on, not turning off.
     let canEnable: Bool
     @Binding var selectedTab: Tabs
 
     var body: some View {
-        HStack{
+        HStack(spacing: 12) {
             Button {
                 selectedTab = tab
             } label: {
-                Text(name)
+                HStack {
+                    Text(name)
+                        .foregroundStyle(Theme.text1)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(Theme.text3)
+                }
+                .frame(minHeight: 44)
+                .contentShape(Rectangle())
             }
-            Spacer()
-            Button {
-                hidden.toggle()
-            } label: {
-                Image(systemName: hidden ? "square" : "checkmark.square")
-            }
+            .buttonStyle(.borderless)
+            .accessibilityLabel("Open \(name)")
+
+            Toggle("Show \(name) tab", isOn: Binding(
+                get: { !hidden },
+                set: { hidden = !$0 }))
+            .labelsHidden()
             .disabled(hidden ? !canEnable : !canHide)
         }
-        .foregroundColor(ForeColor)
     }
 }
 

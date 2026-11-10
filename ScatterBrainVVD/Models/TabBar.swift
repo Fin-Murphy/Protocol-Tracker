@@ -33,187 +33,87 @@ struct TabBar: View {
     @AppStorage("hideTabEvents") var hideTabEvents: Bool = true
 
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Namespace private var indicatorSpace
+
+    // Follows selectedTab one step behind so only the indicator animates; tab content switches instantly
+    @State private var indicatorTab: Tabs? = nil
+
+    private struct TabEntry: Identifiable {
+        let tab: Tabs
+        let label: String
+        let icon: String
+        var id: Int { tab.rawValue }
+    }
+
+    // Today, Habits and Settings are always shown (as before); the rest follow their hideTab flags
+    private var entries: [TabEntry] {
+        var list = [TabEntry(tab: .HUB, label: "Today", icon: "text.book.closed"),
+                    TabEntry(tab: .Protocols, label: "Habits", icon: "repeat")]
+        if !hideTabLog { list.append(TabEntry(tab: .Goals, label: "Tasks", icon: "checkmark.square")) }
+        if !hideTabGraphs { list.append(TabEntry(tab: .Settings, label: "Graphs", icon: "chart.dots.scatter")) }
+        if !hideTabProtocolList { list.append(TabEntry(tab: .ProtocolList, label: "Protocols", icon: "list.bullet.rectangle")) }
+        if !hideTabEvents { list.append(TabEntry(tab: .Events, label: "Events", icon: "bell")) }
+        list.append(TabEntry(tab: .Calendar, label: "Settings", icon: "gearshape"))
+        return list
+    }
+
     var body: some View {
-       
-        HStack {
-            
-            //-----------------------------------------------
-            Spacer()
-            //-----------------------------------------------
-            
-            if selectedTab == .Calendar {
 
-                    Button {
-                        selectedTab = .Calendar
-                    }
-                    label: {
-                        SymbolButton(bIcon: "gearshape.fill", bTxt: "Settings")
-                    }.foregroundColor(ForeColor)
-
-            } else { // shit commit
-
-                    Button {
-                        selectedTab = .Calendar
-                    }
-                    label: {
-                        SymbolButton(bIcon: "gearshape", bTxt: "")
-                    }.foregroundColor(ForeColor)
-
-            }
-            
-            //-----------------------------------------------
-            //Spacer()
-            //-----------------------------------------------
-            
-        
-            //-----------------------------------------------
-            
-            if selectedTab == .Protocols {
-
-                    Button {
-                        selectedTab = .Protocols
-                    } label: {
-                        SymbolButton(bIcon: "arrowtriangle.down.square.fill", bTxt: "Habits")
-                    }.foregroundColor(ForeColor)
-
-            } else {
-
-                    Button {
-                        selectedTab = .Protocols
-                    } label: {
-                        SymbolButton(bIcon: "arrowtriangle.down.square", bTxt: "")
-                    }.foregroundColor(ForeColor)
-
-            }
-            
-            //-----------------------------------------------
-            
-            if selectedTab == .HUB {
-
-                    Button {
-                        selectedTab = .HUB
-                    } label: {
-                        SymbolButton(bIcon: "h.square.fill", bTxt: "Hub")
-                    }.foregroundColor(ForeColor)
-
-            } else {
+        HStack(spacing: 0) {
+            ForEach(entries) { entry in
+                let selected = selectedTab == entry.tab
 
                 Button {
-                    selectedTab = .HUB
+                    selectedTab = entry.tab
                 } label: {
-                    SymbolButton(bIcon: "h.square", bTxt: "")
-                }.foregroundColor(ForeColor)
+                    VStack(spacing: 0) {
+                        ZStack {
+                            if (indicatorTab ?? selectedTab) == entry.tab {
+                                DoubleRuleMark()
+                                    .matchedGeometryEffect(id: "indicator", in: indicatorSpace)
+                            }
+                        }
+                        .frame(height: 7)
+                        .padding(.top, 6)
 
+                        Image(systemName: entry.icon)
+                            .symbolVariant(selected ? .fill : .none)
+                            .font(.system(size: 22))
+                            .frame(height: 26)
+                            .padding(.top, 2)
+
+                        Text(entry.label)
+                            .font(Theme.tabLabel)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                            .padding(.top, 1)
+
+                        Spacer(minLength: 0)
+                    }
+                    .foregroundStyle(selected ? Theme.text1 : Theme.text2)
+                    .frame(maxWidth: .infinity, minHeight: 56, maxHeight: 56)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(FadeButtonStyle())
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(entry.label)
+                .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+                .accessibilityShowsLargeContentViewer {
+                    Label(entry.label, systemImage: entry.icon)
+                }
             }
-                
-            //-----------------------------------------------
-            //Spacer()
-            //-----------------------------------------------
-            
-            if !hideTabLog {
-            if selectedTab == .Goals {
-
-                    Button {
-                        selectedTab = .Goals
-                    } label: {
-                        SymbolButton(bIcon: "checklist.checked", bTxt: "Log")
-                    }.foregroundColor(ForeColor)
-
-            } else {
-
-                    Button {
-                        selectedTab = .Goals
-                    } label: {
-                        SymbolButton(bIcon: "checklist.unchecked", bTxt: "")
-                    }.foregroundColor(ForeColor)
-
-            }
-            }
-            
-            
-            //-----------------------------------------------
-            //Spacer()
-            //-----------------------------------------------
-            
-            
-            if !hideTabGraphs {
-            if selectedTab == .Settings {
-
-                    Button  {
-                        selectedTab = .Settings
-                    } label: {
-                        SymbolButton(bIcon: "chart.xyaxis.line", bTxt: "Graphs")
-                    }.foregroundColor(ForeColor)
-
-            } else {
-
-                    Button  {
-                        selectedTab = .Settings
-                    } label: {
-                        SymbolButton(bIcon: "chart.xyaxis.line", bTxt: "")
-                    }.foregroundColor(ForeColor)
-
-            }
-            }
-
-            //-----------------------------------------------
-
-            if !hideTabProtocolList {
-            if selectedTab == .ProtocolList {
-
-                    Button {
-                        selectedTab = .ProtocolList
-                    } label: {
-                        SymbolButton(bIcon: "list.bullet.rectangle.fill", bTxt: "Protocols")
-                    }.foregroundColor(ForeColor)
-
-            } else {
-
-                    Button {
-                        selectedTab = .ProtocolList
-                    } label: {
-                        SymbolButton(bIcon: "list.bullet.rectangle", bTxt: "")
-                    }.foregroundColor(ForeColor)
-
-            }
-            }
-
-            //-----------------------------------------------
-
-            if !hideTabEvents {
-            if selectedTab == .Events {
-
-                    Button {
-                        selectedTab = .Events
-                    } label: {
-                        SymbolButton(bIcon: "bell.badge.fill", bTxt: "Events")
-                    }.foregroundColor(ForeColor)
-
-            } else {
-
-                    Button {
-                        selectedTab = .Events
-                    } label: {
-                        SymbolButton(bIcon: "bell.badge", bTxt: "")
-                    }.foregroundColor(ForeColor)
-
-            }
-            }
-
-
-            //-----------------------------------------------
-            Spacer()
-            //-----------------------------------------------
-            
         }
-        .colorScheme(.light)
-        .foregroundColor(ForeColor)
-//        .background(Rectangle()
-//            .foregroundColor(BackColor))
-        
-        
-        
-        
+        .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+        .background(Theme.bg)
+        .overlay(alignment: .top) {
+            Rectangle().fill(Theme.separator).frame(height: 1)
+        }
+        .onChange(of: selectedTab) {
+            withAnimation(reduceMotion ? nil : .spring(response: 0.3, dampingFraction: 0.8)) {
+                indicatorTab = selectedTab
+            }
+        }
     }
 }
 

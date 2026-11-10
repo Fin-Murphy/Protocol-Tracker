@@ -10,6 +10,8 @@ struct DayPoint: Identifiable {
     let id: UUID = UUID()
     let day: Date
     let complete: Bool
+    // View-only: whether the habit had an item on that day's list at all
+    let scheduled: Bool
 }
 
 struct GraphTabView: View {
@@ -19,6 +21,8 @@ struct GraphTabView: View {
 
     @Query(sort: \listItem.timestamp, animation: .default)
     private var itemData: [listItem]
+
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     // 0 = the week ending today; negative values page back through history
     @State private var weekOffset: Int = 0
@@ -31,73 +35,133 @@ struct GraphTabView: View {
         }
     }
 
+    private let cellFont = Font.system(.caption, design: .monospaced, weight: .medium)
+
+    @ViewBuilder
+    private func cell(_ point: DayPoint, colorName: String) -> some View {
+        Group {
+            if point.complete {
+                Circle()
+                    .fill(habitColor(colorName))
+                    .frame(width: 18, height: 18)
+            } else if point.scheduled {
+                Circle()
+                    .stroke(Theme.control, lineWidth: 1.5)
+                    .frame(width: 18, height: 18)
+            } else {
+                Circle()
+                    .fill(Theme.separator)
+                    .frame(width: 4, height: 4)
+            }
+        }
+        .frame(width: 28, height: 28)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(point.day.formatted(.dateTime.weekday(.wide))), \(point.complete ? "done" : (point.scheduled ? "not done" : "not on the list"))")
+    }
+
     var body: some View {
 
-        Text("Graphs")
-            .fontWeight(.bold)
-            .font(.title)
-            .padding(.bottom)
-            .foregroundColor(ForeColor)
+        VStack(spacing: 0) {
 
-        HStack {
+            ScreenHeader(title: "Graphs")
 
-            Button {
-                weekOffset -= 1
-            } label: {
-                Text("<<")
-                    .fontWeight(.bold)
-                    .font(.title2)
+            HStack {
+
+                IconButton(systemName: "chevron.left", label: "Previous week") {
+                    weekOffset -= 1
+                }
+
+                Spacer()
+
+                Text("\(weekDays.first!, format: .dateTime.day().month(.abbreviated)) – \(weekDays.last!, format: .dateTime.day().month(.abbreviated))")
+                    .font(Theme.value)
+                    .foregroundStyle(Theme.text1)
+
+                Spacer()
+
+                IconButton(systemName: "chevron.right", label: "Next week") {
+                    weekOffset += 1
+                }
+                .disabled(weekOffset == 0)
+
             }
+            .padding(.horizontal, 8)
 
-            Text("\(weekDays.first!, format: .dateTime.month(.abbreviated).day()) - \(weekDays.last!, format: .dateTime.month(.abbreviated).day())")
-                .fontWeight(.bold)
-                .font(.title2)
+            if habitData.isEmpty {
 
-            Button {
-                weekOffset += 1
-            } label: {
-                Text(">>")
-                    .fontWeight(.bold)
-                    .font(.title2)
+                EmptyState(symbol: "chart.dots.scatter",
+                           title: "Nothing to chart",
+                           sentence: "Add a habit and its week appears here.")
+
+            } else {
+
+                ScrollView {
+
+                    Grid(horizontalSpacing: 4, verticalSpacing: 0) {
+
+                        GridRow {
+                            Color.clear
+                                .gridCellUnsizedAxes([.horizontal, .vertical])
+                            ForEach(weekDays, id: \.self) { day in
+                                VStack(spacing: 2) {
+                                    Text(day, format: .dateTime.weekday(.narrow))
+                                    Text(day, format: .dateTime.day())
+                                }
+                                .font(cellFont)
+                                .foregroundStyle(calendar.isDateInToday(day) ? Theme.accent : Theme.text2)
+                                .frame(width: 28)
+                                .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+                                .accessibilityElement(children: .ignore)
+                                .accessibilityLabel(day.formatted(.dateTime.weekday(.wide).day()))
+                                .accessibilityShowsLargeContentViewer {
+                                    Text(day, format: .dateTime.weekday(.abbreviated).day())
+                                }
+                            }
+                        }
+                        .padding(.bottom, 4)
+
+                        ForEach(habitData) { habit in
+                            if dynamicTypeSize.isAccessibilitySize {
+                                // Large text: the name gets its own full-width line above its cells
+                                Text(habit.name)
+                                    .font(Theme.body)
+                                    .foregroundStyle(Theme.text1)
+                                    .lineLimit(1)
+                                    .truncationMode(.tail)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .gridCellColumns(8)
+                                    .padding(.top, 8)
+                                GridRow {
+                                    Color.clear
+                                        .gridCellUnsizedAxes([.horizontal, .vertical])
+                                    ForEach(weekPoints(for: habit)) { point in
+                                        cell(point, colorName: habit.colorName)
+                                    }
+                                }
+                            } else {
+                                GridRow {
+                                    Text(habit.name)
+                                        .font(Theme.body)
+                                        .foregroundStyle(Theme.text1)
+                                        .lineLimit(1)
+                                        .truncationMode(.tail)
+                                        .frame(minWidth: 96, maxWidth: .infinity, alignment: .leading)
+                                    ForEach(weekPoints(for: habit)) { point in
+                                        cell(point, colorName: habit.colorName)
+                                    }
+                                }
+                                .frame(minHeight: 44)
+                            }
+                        }
+
+                    }
+                    .card()
+                    .padding(16)
+
+                } // End scrollview
             }
-            .disabled(weekOffset == 0)
-
         }
-        .foregroundColor(ForeColor)
-
-        ScrollView {
-
-            Grid(horizontalSpacing: 4, verticalSpacing: 6) {
-
-                GridRow {
-                    Text("")
-                        .gridColumnAlignment(.leading)
-                    ForEach(weekDays, id: \.self) { day in
-                        VStack {
-                            Text(day, format: .dateTime.weekday(.abbreviated))
-                            Text(day, format: .dateTime.day())
-                        }
-                        .font(.caption)
-                    }
-                }
-
-                ForEach(habitData) { habit in
-                    GridRow {
-                        Text(habit.name)
-                            .lineLimit(1)
-                        ForEach(weekPoints(for: habit)) { point in
-                            Image(systemName: point.complete ? "checkmark.square.fill" : "square")
-                                .font(.title3)
-                        }
-                    }
-                }
-
-            }
-            .foregroundColor(ForeColor)
-            .bckMod()
-            .padding()
-
-        } // End scrollview
+        .background(Theme.bg)
 
     } // end body
 
@@ -111,7 +175,7 @@ struct GraphTabView: View {
                 baseName(item.name) == habit.name &&
                 Calendar.current.isDate(item.timestamp, equalTo: day, toGranularity: .day)
             }
-            return DayPoint(day: day, complete: match?.complete ?? false)
+            return DayPoint(day: day, complete: match?.complete ?? false, scheduled: match != nil)
         }
     }
 

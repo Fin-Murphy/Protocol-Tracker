@@ -357,12 +357,7 @@ var closeButton: some View {
 struct backgroundMod: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .padding()
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(ForeColor, lineWidth: 3)
-            )
-            .cornerRadius(10)
+            .card()
     }
 }
 
@@ -385,19 +380,9 @@ extension View {
 // COLOR SCHEME FUNCS
 // ---------------------------------------------------------------------------------------------------------------------
 
-func refreshVisualData(ForeColor:  inout Color) {
-    currentScheme = getCurrentColorScheme()
-    ForeColor = currentScheme == .dark ? .white : .black
-}
-
-func getCurrentColorScheme() -> ColorScheme {
-    let traitCollection = UITraitCollection.current
-    return traitCollection.userInterfaceStyle == .dark ? .dark : .light
-}
-
-var currentScheme = getCurrentColorScheme()
-
-var ForeColor: Color = currentScheme == .dark ? .white : .black
+// Retired: every screen now reads its colours from Theme. Kept only as an alias of Theme.text1
+// for the unrouted/untouched views that still name it (CalendarView, TestView).
+let ForeColor: Color = Theme.text1
 
 private func uiColor(_ hex: UInt) -> UIColor {
     UIColor(red:   CGFloat((hex >> 16) & 0xFF) / 255,
@@ -407,25 +392,24 @@ private func uiColor(_ hex: UInt) -> UIColor {
 }
 
 // Explicit light/dark pairs rather than the system colors, which are chrome-tuned and several
-// of which fall under 2.5:1 on white as body text. Every pair here measures at least 4.95:1 in
-// its own mode. The UIColor provider re-resolves on a light/dark switch, which the ForeColor
-// global (resolved once at launch) does not.
+// of which fall under 2.5:1 on white as body text. Every pair here measures at least 4.9:1 on
+// the Theme bg and surface in its own mode. The UIColor provider re-resolves on a light/dark switch.
 private func habitPair(_ light: UInt, _ dark: UInt) -> Color {
     Color(UIColor { $0.userInterfaceStyle == .dark ? uiColor(dark) : uiColor(light) })
 }
 
 // Resolves a habit's stored palette name to a Color. "Default" (and any name no longer in the
-// palette) falls back to the default label color, i.e. the app's pre-palette appearance.
+// palette) falls back to the primary ink colour.
 func habitColor(_ name: String) -> Color {
     switch name {
-    case "Red":    return habitPair(0xC62828, 0xFF6F61)
-    case "Orange": return habitPair(0xA85400, 0xFFA64D)
-    case "Green":  return habitPair(0x1B7F3B, 0x4ED07A)
-    case "Teal":   return habitPair(0x0E7C86, 0x40C8D4)
-    case "Blue":   return habitPair(0x1560C4, 0x6FA8FF)
-    case "Purple": return habitPair(0x7A3FC0, 0xC08CFF)
-    case "Pink":   return habitPair(0xC2185B, 0xFF7AB0)
-    default:       return Color.primary
+    case "Red":    return habitPair(0xA8322A, 0xF0857A)
+    case "Orange": return habitPair(0x8F5A00, 0xE8B04A)
+    case "Green":  return habitPair(0x2E6B3E, 0x7FCB8F)
+    case "Teal":   return habitPair(0x14696B, 0x5CC6C2)
+    case "Blue":   return habitPair(0x2B5A9E, 0x86B0F2)
+    case "Purple": return habitPair(0x6B4A9E, 0xBBA0F0)
+    case "Pink":   return habitPair(0xA83868, 0xF08AB4)
+    default:       return Theme.text1
     }
 }
 // ---------------------------------------------------------------------------------------------------------------------

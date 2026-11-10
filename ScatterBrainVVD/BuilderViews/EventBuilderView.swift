@@ -37,63 +37,154 @@ struct EventBuilderView: View {
     @State var EventOnSunSet: Bool = false
     // --------------------------------------
 
+    // Pushed event detail pages; emptied to pop back to the list after a removal
+    @State private var path: [eventItem] = []
+    @State private var confirmRemove: Bool = false
+
     private var eventBuilderForm: some View {
 
         Form {
-            Section(header: Text("Event Name:")) {
-                TextField("", text: $EventNameSet)
+            Section {
+                TextField("Event name", text: $EventNameSet)
+            } header: {
+                SectionLabel("Name")
             }
-            Section("Event Start Date") {
-                DatePicker("Select Date",
-                           selection: $EventStartDateSet,
-                           displayedComponents: .date)
-                .datePickerStyle(.compact)
-            }
+            .listRowBackground(Theme.surface)
 
-            Toggle("Choose days of the week to repeat on?", isOn: $EventUseDOWSet)
-            if EventUseDOWSet == true {
-                Toggle("Repeat on Sunday", isOn: $EventOnSunSet)
-                Toggle("Repeat on Monday", isOn: $EventOnMonSet)
-                Toggle("Repeat on Tuesday", isOn: $EventOnTuesSet)
-                Toggle("Repeat on Wednesday", isOn: $EventOnWedSet)
-                Toggle("Repeat on Thursday", isOn: $EventOnThursSet)
-                Toggle("Repeat on Friday", isOn: $EventOnFriSet)
-                Toggle("Repeat on Saturday", isOn: $EventOnSatSet)
-            } else {
-                Section(header: Text("Event Interval (1 = Daily, 7 = Weekly, etc):")) {
-                    TextField("", value: $EventRepetitionSet, format: .number)
+            ScheduleSection(startDate: $EventStartDateSet,
+                            useDow: $EventUseDOWSet,
+                            interval: $EventRepetitionSet,
+                            days: [$EventOnSunSet, $EventOnMonSet, $EventOnTuesSet, $EventOnWedSet,
+                                   $EventOnThursSet, $EventOnFriSet, $EventOnSatSet])
+
+            Section {
+                Picker("Notify", selection: $EventUseExactTimeSet) {
+                    Text("Exact time").tag(true)
+                    Text("Time of day").tag(false)
                 }
-            }
+                .pickerStyle(.segmented)
 
-            Toggle("Notify at an exact time?", isOn: $EventUseExactTimeSet)
-            if EventUseExactTimeSet == true {
-                Section("Event Time") {
-                    DatePicker("Select Time",
+                if EventUseExactTimeSet == true {
+                    DatePicker("Time",
                                selection: $EventFireTimeSet,
                                displayedComponents: .hourAndMinute)
                     .datePickerStyle(.compact)
-                }
-            } else {
-                Section(header: Text("Time of day (event joins that region's reminder digests):")) {
+                } else {
                     Picker("Time of day", selection: $EventTimeRegionSet) {
                         ForEach(timeRegionOptions, id: \.self) { region in
                             Text(region)
                         }
                     }
                 }
+            } header: {
+                SectionLabel("Notify")
+            } footer: {
+                if EventUseExactTimeSet == false {
+                    Text("Joins that part of the day's reminder digest")
+                }
             }
-
-            Section(header: Text("Event Details")) {
-                TextEditor(text: $EventDescriptionSet)
-                    .frame(minHeight: 100)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                    )
-            }
+            .listRowBackground(Theme.surface)
 
             Section {
-                Button {addEvent()} label: {Text("Save Event")}
+                NotesEditor(text: $EventDescriptionSet)
+            } header: {
+                SectionLabel("Notes")
+            }
+            .listRowBackground(Theme.surface)
+        }
+        .daybookForm()
+    }
+
+    // One form for both create and edit; only the title and the Save action differ
+    private func eventFormSheet(title: String, onCancel: @escaping () -> Void, onSave: @escaping () -> Void) -> some View {
+        NavigationStack {
+            eventBuilderForm
+                .formSheetToolbar(title: title, onCancel: onCancel, onSave: onSave)
+        }
+    }
+
+    // The form fields are shared state, so a new event starts from the defaults rather than
+    // from whatever was last edited
+    private func resetForm() {
+        EventNameSet = ""
+        EventDescriptionSet = ""
+        EventStartDateSet = Date()
+        EventRepetitionSet = 1
+        EventUseExactTimeSet = false
+        EventFireTimeSet = Date()
+        EventTimeRegionSet = "None"
+
+        EventUseDOWSet = false
+        EventOnMonSet = false
+        EventOnTuesSet = false
+        EventOnWedSet = false
+        EventOnThursSet = false
+        EventOnFriSet = false
+        EventOnSatSet = false
+        EventOnSunSet = false
+    }
+
+    private func eventDetail(_ eventNdx: eventItem) -> some View {
+
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+
+                Text(eventNdx.name)
+                    .font(Theme.detailTitle)
+                    .foregroundStyle(Theme.text1)
+                    .accessibilityAddTraits(.isHeader)
+
+                RowCard {
+                    CardRow(label: "Starts", value: eventNdx.startDate.formatted(date: .abbreviated, time: .omitted))
+                    CardRow(label: "Repeats", value: scheduleSummary(useDow: eventNdx.useDow, repeatValue: eventNdx.repeatValue, dow: eventNdx.dow, short: false))
+                    CardRow(label: "Notifies", value: eventNdx.useExactTime
+                            ? eventNdx.fireTime.formatted(date: .omitted, time: .shortened)
+                            : "During \(eventNdx.timeRegion)")
+                }
+
+                if eventNdx.descript != "" {
+                    TextCard(text: eventNdx.descript)
+                }
+
+                VStack(spacing: 12) {
+                    Button("Edit event") {
+                        EventNameSet = eventNdx.name
+                        EventDescriptionSet = eventNdx.descript
+                        EventStartDateSet = eventNdx.startDate
+                        EventRepetitionSet = Int16(eventNdx.repeatValue)
+                        EventUseExactTimeSet = eventNdx.useExactTime
+                        EventFireTimeSet = eventNdx.fireTime
+                        EventTimeRegionSet = eventNdx.timeRegion
+
+                        EventUseDOWSet = eventNdx.useDow
+
+                        EventOnSunSet = eventNdx.dow.onSun
+                        EventOnMonSet = eventNdx.dow.onMon
+                        EventOnTuesSet = eventNdx.dow.onTues
+                        EventOnWedSet = eventNdx.dow.onWed
+                        EventOnThursSet = eventNdx.dow.onThurs
+                        EventOnFriSet = eventNdx.dow.onFri
+                        EventOnSatSet = eventNdx.dow.onSat
+
+                        DisplayEventEditor = true
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
+
+                    Button("Remove event") {
+                        confirmRemove = true
+                    }
+                    .buttonStyle(SecondaryButtonStyle(destructive: true))
+                }
+            }
+            .padding(16)
+        }
+        .background(Theme.bg)
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear {DisplayEventEditor = false}
+        .sheet(isPresented: $DisplayEventEditor) {
+            eventFormSheet(title: "Edit event", onCancel: { DisplayEventEditor = false }) {
+                updateEvent(eventToEdit: eventNdx)
+                DisplayEventEditor = false
             }
         }
     }
@@ -104,208 +195,87 @@ struct EventBuilderView: View {
 
     var body: some View {
 
-        ZStack{
+        NavigationStack(path: $path) {
 
-            VStack{
+            VStack(spacing: 0) {
 
-                HStack{
-                    Text("Events")
-                        .fontWeight(.bold)
-                        .font(.title)
-                        .padding(.bottom)
-
-                    Button {
+                ScreenHeader(title: "Events") {
+                    IconButton(systemName: "plus", label: "New event") {
+                        resetForm()
                         DisplayEventMaker = true
-                    } label: {
-                        Text("+")
-                            .font(.title)
-                            .padding(.bottom)
                     }
-                }.foregroundColor(ForeColor)
+                }
 
                 if eventData.isEmpty == false {
 
-                    NavigationView {
+                    List {
+                        ForEach(eventData) { eventNdx in
 
-                        List {
-                            ForEach(eventData) { eventNdx in
+                            NavigationLink(value: eventNdx) {
+                                HStack(spacing: 12) {
+                                    Image(systemName: "bell")
+                                        .font(.system(size: 15))
+                                        .foregroundStyle(Theme.text2)
+                                        .accessibilityHidden(true)
 
-                                NavigationLink{
-                                    ZStack{
-                                        VStack {
+                                    Text(eventNdx.name)
+                                        .font(Theme.body)
+                                        .foregroundStyle(Theme.text1)
+                                        .lineLimit(3)
 
-                                            List{
-                                                Text(eventNdx.name)
-                                                    .font(.title)
-                                                    .padding()
-                                                Text("Event start date: \(eventNdx.startDate, formatter: itemFormatter)" )
+                                    Spacer(minLength: 0)
 
-                                                if eventNdx.useDow == true {
-
-                                                    if eventNdx.dow.onSun == true {Text("Event repeats on Sunday")} else {}
-                                                    if eventNdx.dow.onMon == true {Text("Event repeats on Monday")} else {}
-                                                    if eventNdx.dow.onTues == true {Text("Event repeats on Tuesday")} else {}
-                                                    if eventNdx.dow.onWed == true {Text("Event repeats on Wednesday")} else {}
-                                                    if eventNdx.dow.onThurs == true {Text("Event repeats on Thursday")} else {}
-                                                    if eventNdx.dow.onFri == true {Text("Event repeats on Friday")} else {}
-                                                    if eventNdx.dow.onSat == true {Text("Event repeats on Saturday")} else {}
-
-                                                } else {
-                                                    Text("Event repeats every \(eventNdx.repeatValue) days." )
-                                                }
-
-                                                if eventNdx.useExactTime == true {
-                                                    Text("Notifies at \(eventNdx.fireTime, style: .time)")
-                                                } else {
-                                                    Text("Notifies during region: \(eventNdx.timeRegion)")
-                                                }
-
-                                                Text("Event Description: \n\n \(eventNdx.descript)" )
-
-                                            }
-
-                                            Button{DisplayEventEditor = true} label: {
-                                                Text("Edit event").bckMod()
-                                            }
-                                            Button{deleteEntityEvent(withUUID: eventNdx.id, modelContext: modelContext)} label: {
-                                                Text("Remove this event").bckMod()
-                                            }
-                                        }
-
-                                        if DisplayEventEditor == true {
-
-                                            Form {
-
-                                                Section(header: Text("Event Name:")) {
-                                                    TextField("", text: $EventNameSet)
-                                                }
-                                                Section("Event Start Date") {
-                                                    DatePicker("Select Date",
-                                                               selection: $EventStartDateSet,
-                                                               displayedComponents: .date)
-                                                    .datePickerStyle(.compact)
-                                                }
-
-                                                Toggle("Choose days of the week to repeat on?", isOn: $EventUseDOWSet)
-                                                if EventUseDOWSet == true {
-                                                    Toggle("Repeat on Sunday", isOn: $EventOnSunSet)
-                                                    Toggle("Repeat on Monday", isOn: $EventOnMonSet)
-                                                    Toggle("Repeat on Tuesday", isOn: $EventOnTuesSet)
-                                                    Toggle("Repeat on Wednesday", isOn: $EventOnWedSet)
-                                                    Toggle("Repeat on Thursday", isOn: $EventOnThursSet)
-                                                    Toggle("Repeat on Friday", isOn: $EventOnFriSet)
-                                                    Toggle("Repeat on Saturday", isOn: $EventOnSatSet)
-                                                } else {
-                                                    Section(header: Text("Event Interval (1 = Daily, 7 = Weekly, etc):")) {
-                                                        TextField("", value: $EventRepetitionSet, format: .number)
-                                                    }
-                                                }
-
-                                                Toggle("Notify at an exact time?", isOn: $EventUseExactTimeSet)
-                                                if EventUseExactTimeSet == true {
-                                                    Section("Event Time") {
-                                                        DatePicker("Select Time",
-                                                                   selection: $EventFireTimeSet,
-                                                                   displayedComponents: .hourAndMinute)
-                                                        .datePickerStyle(.compact)
-                                                    }
-                                                } else {
-                                                    Section(header: Text("Time of day (event joins that region's reminder digests):")) {
-                                                        Picker("Time of day", selection: $EventTimeRegionSet) {
-                                                            ForEach(timeRegionOptions, id: \.self) { region in
-                                                                Text(region)
-                                                            }
-                                                        }
-                                                    }
-                                                }
-
-                                                Section(header: Text("Event Details")) {
-                                                    TextEditor(text: $EventDescriptionSet)
-                                                        .frame(minHeight: 100)
-                                                        .overlay(
-                                                            RoundedRectangle(cornerRadius: 8)
-                                                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                                        )
-                                                }
-
-                                                Section {
-                                                    Button {
-                                                        updateEvent(eventToEdit: eventNdx)
-                                                        DisplayEventEditor = false
-                                                    } label: {Text("Save Event")}
-                                                }
-                                            }
-                                            .onAppear{
-
-                                                EventNameSet = eventNdx.name
-                                                EventDescriptionSet = eventNdx.descript
-                                                EventStartDateSet = eventNdx.startDate
-                                                EventRepetitionSet = Int16(eventNdx.repeatValue)
-                                                EventUseExactTimeSet = eventNdx.useExactTime
-                                                EventFireTimeSet = eventNdx.fireTime
-                                                EventTimeRegionSet = eventNdx.timeRegion
-
-                                                EventUseDOWSet = eventNdx.useDow
-
-                                                EventOnSunSet = eventNdx.dow.onSun
-                                                EventOnMonSet = eventNdx.dow.onMon
-                                                EventOnTuesSet = eventNdx.dow.onTues
-                                                EventOnWedSet = eventNdx.dow.onWed
-                                                EventOnThursSet = eventNdx.dow.onThurs
-                                                EventOnFriSet = eventNdx.dow.onFri
-                                                EventOnSatSet = eventNdx.dow.onSat
-
-                                            }
-
-                                        } else {}
-                                    }// end zstack
-                                    .onAppear {DisplayEventEditor = false}
-                                } label: {
-                                    HStack {
-                                        Text(eventNdx.name)
-
-                                        Spacer()
-
+                                    Group {
                                         if eventNdx.useExactTime == true {
                                             Text("\(eventNdx.fireTime, style: .time)")
                                         } else {
                                             Text(eventNdx.timeRegion)
                                         }
                                     }
+                                    .font(Theme.value)
+                                    .foregroundStyle(Theme.text2)
                                 }
+                                .frame(minHeight: 44)
                             }
+                            .listRowBackground(Theme.surface)
+                            .listRowSeparatorTint(Theme.separator)
                         }
                     }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
 
-                } else {Text("No Events").foregroundColor(ForeColor)}
+                } else {
+                    EmptyState(symbol: "bell",
+                               title: "No events",
+                               sentence: "Events send reminders without adding to your checklist.",
+                               buttonTitle: "New event") {
+                        resetForm()
+                        DisplayEventMaker = true
+                    }
+                }
 
             }
-
-            if DisplayEventMaker == true {
-
-                VStack{
-                    Button {
-                        DisplayEventMaker = false
-                    } label: {
-                        closeButton
-                    }.padding()
-
-                    eventBuilderForm
-
-                } // VSTACK
-                .frame(width:300,height:700)
-                .cornerRadius(10)
-                .background(Rectangle()
-                    .foregroundColor(.black))
-                .cornerRadius(20)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(Color.gray, lineWidth: 1)
-                )
-                .shadow(radius: 20)
-
-            } else {}
-
+            .background(Theme.bg)
+            .toolbar(.hidden, for: .navigationBar)
+            .navigationDestination(for: eventItem.self) { eventNdx in
+                eventDetail(eventNdx)
+            }
+        }
+        // Presented from the stack rather than the detail page: the page is popped by the
+        // Remove action, and a dialog whose presenter disappears mid-dismissal eats the next tap.
+        .confirmationDialog("Remove this event?", isPresented: $confirmRemove, titleVisibility: .visible) {
+            Button("Remove", role: .destructive) {
+                if let eventNdx = path.last {
+                    path.removeAll()
+                    deleteEntityEvent(withUUID: eventNdx.id, modelContext: modelContext)
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        }
+        .sheet(isPresented: $DisplayEventMaker) {
+            eventFormSheet(title: "New event", onCancel: { DisplayEventMaker = false }) {
+                addEvent()
+            }
         }
     }
 

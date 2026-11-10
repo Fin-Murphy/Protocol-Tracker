@@ -14,6 +14,7 @@ struct HabitBuilderView: View {
     var its: [habItem]
 
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
         
     @State var DisplayHabitMaker: Bool = false
     @State var DisplayHabitEditor: Bool = false
@@ -50,621 +51,435 @@ struct HabitBuilderView: View {
     
     @State var listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol")
     
-//    private var habLister: some View {
-//        ForEach($habitData){ superTaskHabit in
-//            
-//            if superTaskHabit.isSubtask == false {
-//                Button{
-//                    HabitSuperTaskSet = superTaskHabit.id
-//                } label: {
-//                    Text(superTaskHabit.HabitName)
-//                }
-//            }
-//        }
-//    }
-    
-    private var subhabitEditor: some View {
-        Section(header: Text("Subhabits:")) {
-            ForEach(HabitSubhabitsSet.indices, id: \.self) { ndx in
-                HStack {
-                    TextField("Subhabit name", text: Binding(
-                        get: { ndx < HabitSubhabitsSet.count ? HabitSubhabitsSet[ndx] : "" },
-                        set: { if ndx < HabitSubhabitsSet.count { HabitSubhabitsSet[ndx] = $0 } }))
-                    Button { HabitSubhabitsSet.remove(at: ndx) } label: {
-                        Image(systemName: "minus.circle")
-                    }
-                    .buttonStyle(.borderless)
+    // Pushed habit detail pages; emptied to pop back to the list after a removal
+    @State private var path: [habItem] = []
+    @State private var confirmRemove: Bool = false
+
+    private enum Tracking { case checkbox, count, steps }
+
+    // The segmented Tracking control is a view onto the two stored flags
+    private var trackingSelection: Binding<Tracking> {
+        Binding(
+            get: { HabitHasSubTaskSet ? .steps : (HabitHasCheckboxSet ? .checkbox : .count) },
+            set: { choice in
+                switch choice {
+                case .checkbox:
+                    HabitHasSubTaskSet = false
+                    HabitHasCheckboxSet = true
+                case .count:
+                    HabitHasSubTaskSet = false
+                    HabitHasCheckboxSet = false
+                case .steps:
+                    HabitHasSubTaskSet = true
                 }
+            })
+    }
+
+    @ViewBuilder
+    private var subhabitEditor: some View {
+        ForEach(HabitSubhabitsSet.indices, id: \.self) { ndx in
+            HStack {
+                TextField("Step name", text: Binding(
+                    get: { ndx < HabitSubhabitsSet.count ? HabitSubhabitsSet[ndx] : "" },
+                    set: { if ndx < HabitSubhabitsSet.count { HabitSubhabitsSet[ndx] = $0 } }))
+                Button { HabitSubhabitsSet.remove(at: ndx) } label: {
+                    Image(systemName: "minus.circle")
+                        .foregroundStyle(Theme.destructive)
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.borderless)
+                .accessibilityLabel("Remove step")
             }
-            Button { HabitSubhabitsSet.append("") } label: { Text("+ Add subhabit") }
         }
+        Button { HabitSubhabitsSet.append("") } label: { Label("Add step", systemImage: "plus") }
     }
 
     private var habitBuilderForm: some View {
 
         Form {
-            Section(header: Text("Habit Name:")) {
-                TextField("", text: $HabitNameSet)
-            }
-            Section("Habit Start Date") {
-                DatePicker("Select Date",
-                           selection: $HabitStartDateSet,
-                           displayedComponents: .date)
-                .datePickerStyle(.compact)
-            }
-            
-            Toggle("Use subhabits instead of units?", isOn: $HabitHasSubTaskSet)
-            if HabitHasSubTaskSet == false {
-                Toggle("Use checkbox instead of units?",isOn: $HabitHasCheckboxSet)
-            }
-            if (HabitHasCheckboxSet || HabitHasSubTaskSet) == false {
-                Section(header: Text("Habit Goal:")) {
-                    TextField("", value: $HabitGoalSet, format: .number)
-                }
-                Section(header: Text("Habit Unit:")) {
-                    TextField("", text: $HabitUnitSet)
-                }
-            }
-            if HabitHasSubTaskSet == true {
-
-                subhabitEditor
-
-            }
-
-                Toggle("Choose days of the week to repeat on?", isOn: $HabitUseDOWSet)
-                if HabitUseDOWSet == true {
-                    Toggle("Repeat on Sunday", isOn: $HabitOnSunSet)
-                    Toggle("Repeat on Monday", isOn: $HabitOnMonSet)
-                    Toggle("Repeat on Tuesday", isOn: $HabitOnTuesSet)
-                    Toggle("Repeat on Wednesday", isOn: $HabitOnWedSet)
-                    Toggle("Repeat on Thursday", isOn: $HabitOnThursSet)
-                    Toggle("Repeat on Friday", isOn: $HabitOnFriSet)
-                    Toggle("Repeat on Saturday", isOn: $HabitOnSatSet)
-                } else {
-                    Section(header: Text("Habit Interval (1 = Daily, 7 = Weekly, etc):")) {
-                        TextField("", value: $HabitRepetitionSet, format: .number)
-                    }
-                }
-                
-                Section(header: Text("Habit Protocol:")) {
-                    TextField("", text: $HabitProtocolSet)
-                }
- 
-                Section(header: Text("Habit Details")) {
-                    TextEditor(text: $HabitDescriptionSet)
-                        .frame(minHeight: 100)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                        )
-                }
- 
-                Section(header: Text("Time of day (narrows reminder notifications):")) {
-                    Picker("Time of day", selection: $HabitTimeRegionSet) {
-                        ForEach(timeRegionOptions, id: \.self) { region in
-                            Text(region)
-                        }
-                    }
-                }
-                Picker("Habit Color:", selection: $HabitColorSet) {
-                    ForEach(habitColorOptions, id: \.self) { name in
-                        HStack {
-                            Circle()
-                                .fill(habitColor(name))
-                                .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 1))
-                                .frame(width: 20, height: 20)
-                            Text(name)
-                        }
-                        .tag(name)
-                    }
-                }
-                .pickerStyle(.inline)
-            
-                Section(header: Text("Habit Reward (Points for completion)")) {
-                    TextField("", value: $HabitRewardSet, format: .number)
-                }
-            
-            Toggle("Include status update", isOn: $HabitHasStatusSet)
-                    
-            
             Section {
-                Button {addItem()} label: {Text("Save Habit")}
+                TextField("Habit name", text: $HabitNameSet)
+            } header: {
+                SectionLabel("Name")
             }
+            .listRowBackground(Theme.surface)
+
+            Section {
+                ColourSwatchRow(selection: $HabitColorSet)
+                    .listRowInsets(EdgeInsets(top: 4, leading: 4, bottom: 4, trailing: 4))
+            } header: {
+                SectionLabel("Colour")
+            }
+            .listRowBackground(Theme.surface)
+
+            Section {
+                Picker("Tracking", selection: trackingSelection) {
+                    Text("Checkbox").tag(Tracking.checkbox)
+                    Text("Count").tag(Tracking.count)
+                    Text("Steps").tag(Tracking.steps)
+                }
+                .pickerStyle(.segmented)
+
+                if (HabitHasCheckboxSet || HabitHasSubTaskSet) == false {
+                    LabeledContent("Goal") {
+                        TextField("1", value: $HabitGoalSet, format: .number)
+                            .multilineTextAlignment(.trailing)
+                    }
+                    LabeledContent("Unit") {
+                        TextField("units", text: $HabitUnitSet)
+                            .multilineTextAlignment(.trailing)
+                    }
+                }
+                if HabitHasSubTaskSet == true {
+
+                    subhabitEditor
+
+                }
+            } header: {
+                SectionLabel("Tracking")
+            }
+            .listRowBackground(Theme.surface)
+
+            ScheduleSection(startDate: $HabitStartDateSet,
+                            useDow: $HabitUseDOWSet,
+                            interval: $HabitRepetitionSet,
+                            days: [$HabitOnSunSet, $HabitOnMonSet, $HabitOnTuesSet, $HabitOnWedSet,
+                                   $HabitOnThursSet, $HabitOnFriSet, $HabitOnSatSet])
+
+            Section {
+                Picker("Time of day", selection: $HabitTimeRegionSet) {
+                    ForEach(timeRegionOptions, id: \.self) { region in
+                        Text(region)
+                    }
+                }
+            } footer: {
+                Text("Narrows reminder notifications")
+            }
+            .listRowBackground(Theme.surface)
+
+            Section {
+                LabeledContent("Protocol") {
+                    TextField("Daily", text: $HabitProtocolSet)
+                        .multilineTextAlignment(.trailing)
+                }
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Notes")
+                        .font(Theme.meta)
+                        .foregroundStyle(Theme.text2)
+                    NotesEditor(text: $HabitDescriptionSet)
+                }
+            } header: {
+                SectionLabel("Details")
+            }
+            .listRowBackground(Theme.surface)
+
+            Section {
+                LabeledContent("Reward") {
+                    TextField("1", value: $HabitRewardSet, format: .number)
+                        .multilineTextAlignment(.trailing)
+                }
+            } footer: {
+                Text("Points for completing")
+            }
+            .listRowBackground(Theme.surface)
+
+            Section {
+                Toggle("Include status update", isOn: $HabitHasStatusSet)
+            }
+            .listRowBackground(Theme.surface)
         }
+        .daybookForm()
         .onChange(of: HabitHasCheckboxSet) { if HabitHasCheckboxSet { HabitHasSubTaskSet = false } }
         .onChange(of: HabitHasSubTaskSet) { if HabitHasSubTaskSet { HabitHasCheckboxSet = false } }
+    }
+
+    // One form for both create and edit; only the title and the Save action differ
+    private func habitFormSheet(title: String, onCancel: @escaping () -> Void, onSave: @escaping () -> Void) -> some View {
+        NavigationStack {
+            habitBuilderForm
+                .formSheetToolbar(title: title, onCancel: onCancel, onSave: onSave)
+        }
+    }
+
+    // The form fields are shared state, so a new habit starts from the defaults rather than
+    // from whatever was last edited
+    private func resetForm() {
+        HabitNameSet = ""
+        HabitGoalSet = 1
+        HabitProtocolSet = "Daily"
+        HabitUnitSet = "Units"
+        HabitRepetitionSet = 1
+        HabitDescriptionSet = ""
+        HabitHasStatusSet = false
+        HabitRewardSet = 1
+        HabitStartDateSet = Date()
+        HabitHasCheckboxSet = true
+        HabitHasSubTaskSet = false
+        HabitSubhabitsSet = []
+        HabitTimeRegionSet = "None"
+        HabitColorSet = "Default"
+
+        HabitUseDOWSet = false
+        HabitOnMonSet = false
+        HabitOnTuesSet = false
+        HabitOnWedSet = false
+        HabitOnThursSet = false
+        HabitOnFriSet = false
+        HabitOnSatSet = false
+        HabitOnSunSet = false
+    }
+
+    private func loadForm(from habitNdx: habItem) {
+        HabitNameSet = habitNdx.name
+        HabitGoalSet = Int16(habitNdx.goal)
+        HabitUnitSet = habitNdx.unit
+        HabitProtocolSet = habitNdx.whichProtocol
+        HabitRepetitionSet = Int16(habitNdx.repeatValue)
+        HabitDescriptionSet = habitNdx.descript
+        HabitStartDateSet = habitNdx.startDate
+        HabitRewardSet = Int16(habitNdx.reward)
+        HabitHasCheckboxSet = habitNdx.hasCheckbox
+        HabitHasStatusSet = habitNdx.hasStatus
+        HabitHasSubTaskSet = habitNdx.hasSubtask
+        HabitSubhabitsSet = habitNdx.subhabits
+        HabitTimeRegionSet = habitNdx.timeRegion
+        HabitColorSet = habitNdx.colorName
+
+        HabitUseDOWSet = habitNdx.useDow
+
+        HabitOnSunSet = habitNdx.dow.onSun
+        HabitOnMonSet = habitNdx.dow.onMon
+        HabitOnTuesSet = habitNdx.dow.onTues
+        HabitOnWedSet = habitNdx.dow.onWed
+        HabitOnThursSet = habitNdx.dow.onThurs
+        HabitOnFriSet = habitNdx.dow.onFri
+        HabitOnSatSet = habitNdx.dow.onSat
+    }
+
+    // -----------------------------------------------
+    //                  LIST ROW + DETAIL
+    // ----------------------------------------------
+
+    private func habitRow(_ habitNdx: habItem) -> some View {
+
+        NavigationLink(value: habitNdx) {
+            HStack(spacing: 12) {
+                //-----------------------------------------------------
+                Circle()
+                    .fill(habitColor(habitNdx.colorName))
+                    .frame(width: 10, height: 10)
+                    .accessibilityHidden(true)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(habitNdx.name)
+                        .font(Theme.body)
+                        .foregroundStyle(Theme.text1)
+                        .lineLimit(3)
+                    Text(rowMeta(habitNdx))
+                        .font(Theme.meta)
+                        .foregroundStyle(Theme.text2)
+
+                    // At accessibility sizes the trailing value moves under the name
+                    if habitNdx.hasCheckbox == false && dynamicTypeSize.isAccessibilitySize {
+                        Text("\(habitNdx.goal) \(habitNdx.unit)")
+                            .font(Theme.value)
+                            .foregroundStyle(Theme.text2)
+                    }
+                }
+
+                Spacer(minLength: 0)
+
+                if habitNdx.hasCheckbox == false && dynamicTypeSize.isAccessibilitySize == false {
+                    Text("\(habitNdx.goal) \(habitNdx.unit)")
+                        .font(Theme.value)
+                        .foregroundStyle(Theme.text2)
+                }
+                //-----------------------------------------------------
+            }
+            .frame(minHeight: 44)
+        }
+        .listRowBackground(Theme.surface)
+        .listRowSeparatorTint(Theme.separator)
+    }
+
+    private func rowMeta(_ habitNdx: habItem) -> String {
+        var parts = [scheduleSummary(useDow: habitNdx.useDow, repeatValue: habitNdx.repeatValue, dow: habitNdx.dow, short: true)]
+        if habitNdx.timeRegion != "" && habitNdx.timeRegion != "None" { parts.append(habitNdx.timeRegion) }
+        return parts.joined(separator: " · ")
+    }
+
+    private func habitDetail(_ habitNdx: habItem) -> some View {
+
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+
+                Text(habitNdx.name)
+                    .font(Theme.detailTitle)
+                    .foregroundStyle(habitColor(habitNdx.colorName))
+                    .accessibilityAddTraits(.isHeader)
+
+                RowCard {
+                    CardRow(label: "Protocol", value: habitNdx.whichProtocol)
+                    CardRow(label: "Starts", value: habitNdx.startDate.formatted(date: .abbreviated, time: .omitted))
+                    if habitNdx.subhabits.isEmpty == false {
+                        CardRow(label: "Goal", value: "\(habitNdx.subhabits.count) steps")
+                    } else if habitNdx.hasCheckbox == false {
+                        CardRow(label: "Goal", value: "\(habitNdx.goal) \(habitNdx.unit)")
+                    }
+                    CardRow(label: "Repeats", value: scheduleSummary(useDow: habitNdx.useDow, repeatValue: habitNdx.repeatValue, dow: habitNdx.dow, short: false))
+                    CardRow(label: "Time of day", value: habitNdx.timeRegion)
+                    CardRow(label: "Reward", value: "\(habitNdx.reward) pts")
+                }
+
+                if habitNdx.descript != "" {
+                    TextCard(text: habitNdx.descript)
+                }
+
+                if habitNdx.subhabits.isEmpty == false {
+                    RowCard {
+                        ForEach(habitNdx.subhabits.indices, id: \.self) { ndx in
+                            Text(habitNdx.subhabits[ndx])
+                                .font(Theme.body)
+                                .foregroundStyle(Theme.text1)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.vertical, 12)
+                        }
+                    }
+                }
+
+                VStack(spacing: 12) {
+                    Button("Edit habit") {
+                        loadForm(from: habitNdx)
+                        DisplayHabitEditor = true
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
+
+                    Button("Remove habit") {
+                        confirmRemove = true
+                    }
+                    .buttonStyle(SecondaryButtonStyle(destructive: true))
+                }
+            }
+            .padding(16)
+        }
+        .background(Theme.bg)
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear {DisplayHabitEditor = false}
+        .sheet(isPresented: $DisplayHabitEditor) {
+            habitFormSheet(title: "Edit habit", onCancel: { DisplayHabitEditor = false }) {
+                //------------------------------------
+                updateHabit(habitToEdit: habitNdx)
+                //------------------------------------
+                DisplayHabitEditor = false
+                indexProtocols(modelContext: modelContext)
+                listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol")
+            }
+        }
     }
 
     // -----------------------------------------------
     //                  END VAR DECLARATIONS
     // ----------------------------------------------
-    
+
     var body: some View {
-        
-        ZStack{
-            
-            VStack{
-                
-                HStack{
-                    Button {
+
+        NavigationStack(path: $path) {
+
+            VStack(spacing: 0) {
+
+                ScreenHeader(title: "Habits") {
+                    IconButton(systemName: "books.vertical", label: "Browse library") {
                         displayProtocolLibrary = true
-                    } label: {
-                        Image(systemName: "chevron.down")
-                            .font(.title2)
-                            .padding(.bottom)
                     }
-
-                    Text("Habits")
-                        .fontWeight(.bold)
-                        .font(.title)
-                        .padding(.bottom)
-
-                    Button {
+                    IconButton(systemName: "plus", label: "New habit") {
+                        resetForm()
                         DisplayHabitMaker = true
-                    } label: {
-                        Text("+")
-                            .font(.title)
-                            .padding(.bottom)
                     }
-                }.foregroundColor(ForeColor)
-                
-                Toggle("Display by Protocol", isOn: $displayByProtocol).frame(maxWidth: 210)
-                
-//                if let listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol") {
+                }
+
+                Picker("Display", selection: $displayByProtocol) {
+                    Text("All").tag(false)
+                    Text("By protocol").tag(true)
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal, 16)
+                .padding(.bottom, 8)
 
                 if its.isEmpty != true {
-                    
-                        NavigationView {
-                            
-                            List {
-                                if displayByProtocol == true {
-                                    ForEach(listOfProtocols!) { index in
 
-                                        Text(index.ProtocolName)
-                                            .font(.title2)
-                                            .fontWeight(.bold)
-                                            .padding(.top)
+                    List {
+                        if displayByProtocol == true {
+                            ForEach(listOfProtocols ?? []) { index in
 
-                                        ForEach(its) { habitNdx in
+                                SectionLabel(index.ProtocolName)
+                                    .padding(.top, 8)
+                                    .listRowBackground(Theme.bg)
+                                    .listRowSeparator(.hidden)
+                                    .accessibilityAddTraits(.isHeader)
 
-                                            if habitNdx.whichProtocol == index.ProtocolName {
+                                ForEach(its) { habitNdx in
 
-                                                NavigationLink{
-                                                    ZStack{
-                                                        VStack {
-                                                                                                           
-                                                            List{
-                                                                Text(habitNdx.name)
-                                                                    .font(.title)
-                                                                    .padding()
-                                                                Text("Item is part of protocol \(habitNdx.whichProtocol).")
-                                                                Text("Item start date: \(habitNdx.startDate, formatter: itemFormatter)" )
-                                                                Text("Item goal value: \(habitNdx.goal) \(habitNdx.unit)" )
-                                                                
-                                                                if habitNdx.useDow == true {
-                                                                    
-                                                                    if habitNdx.dow.onSun == true {Text("Item repeats on Sunday")} else {}
-                                                                    if habitNdx.dow.onMon == true {Text("Item repeats on Monday")} else {}
-                                                                    if habitNdx.dow.onTues == true {Text("Item repeats on Tuesday")} else {}
-                                                                    if habitNdx.dow.onWed == true {Text("Item repeats on Wednesday")} else {}
-                                                                    if habitNdx.dow.onThurs == true {Text("Item repeats on Thursday")} else {}
-                                                                    if habitNdx.dow.onFri == true {Text("Item repeats on Friday")} else {}
-                                                                    if habitNdx.dow.onSat == true {Text("Item repeats on Saturday")} else {}
-
-                                                                } else {
-                                                                    Text("Item repeats every \(habitNdx.repeatValue) days." )
-                                                                }
-                                                                
-                                                                
-                                                                
-                                                                
-                                                                Text("Item Description: \n\n \(habitNdx.descript)" )
-                                                                
-    //                                                            if habitNdx.hasSubtask == true {
-    //                                                                Text("Subhabits:")
-    //                                                                ForEach(habitData){ indexr in
-    //                                                                    if indexr.superTask == habitNdx.id {
-    //                                                                        Text(indexr.name)
-    //                                                                    }
-    //                                                                }
-    //                                                            }
-                                                                
-                                                            }
-                                                                                                                    
-                                                            Button{DisplayHabitEditor = true} label: {
-                                                                Text("Edit habit")
-                                                            }
-                                                            Button{modelContext.delete(habitNdx); try? modelContext.save()} label: {
-                                                                Text("Remove this habit")
-                                                            }
-                                                        }
-
-                                                        if DisplayHabitEditor == true {
-
-                                                            Form {
-
-                                                                Section(header: Text("Habit Name:")) {
-                                                                    TextField("", text: $HabitNameSet)
-                                                                }
-                                                                Toggle("Use subhabits instead of units?", isOn: $HabitHasSubTaskSet)
-                                                                if HabitHasSubTaskSet == false {
-                                                                    Toggle("Use checkbox instead of units",isOn: $HabitHasCheckboxSet)
-                                                                }
-                                                                if (HabitHasCheckboxSet || HabitHasSubTaskSet) == false {
-                                                                    Section(header: Text("Habit Goal:")) {
-                                                                        TextField("", value: $HabitGoalSet, format: .number)
-                                                                    }
-                                                                    Section(header: Text("Habit Unit:")) {
-                                                                        TextField("", text: $HabitUnitSet)
-                                                                    }
-                                                                }
-                                                                if HabitHasSubTaskSet == true {
-                                                                    subhabitEditor
-                                                                }
-
-                                                                Toggle("Choose days of the week to repeat on?", isOn: $HabitUseDOWSet)
-                                                                if HabitUseDOWSet == true {
-                                                                    Toggle("Repeat on Sunday", isOn: $HabitOnSunSet)
-                                                                    Toggle("Repeat on Monday", isOn: $HabitOnMonSet)
-                                                                    Toggle("Repeat on Tuesday", isOn: $HabitOnTuesSet)
-                                                                    Toggle("Repeat on Wednesday", isOn: $HabitOnWedSet)
-                                                                    Toggle("Repeat on Thursday", isOn: $HabitOnThursSet)
-                                                                    Toggle("Repeat on Friday", isOn: $HabitOnFriSet)
-                                                                    Toggle("Repeat on Saturday", isOn: $HabitOnSatSet)
-                                                                } else {
-                                                                    Section(header: Text("Habit Interval (1 = Daily, 7 = Weekly, etc):")) {
-                                                                        TextField("", value: $HabitRepetitionSet, format: .number)
-                                                                    }
-                                                                }
-
-                                                                Section(header: Text("Habit Protocol:")) {
-                                                                    TextField("", text: $HabitProtocolSet)
-                                                                }
-                                                                
-                                                                Section(header: Text("Habit Details")) {
-                                                                    TextEditor(text: $HabitDescriptionSet)
-                                                                        .frame(minHeight: 100)
-                                                                        .overlay(
-                                                                            RoundedRectangle(cornerRadius: 8)
-                                                                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                                                        )
-                                                                }
-                                                                Section("Habit Start Date") {
-                                                                    DatePicker("Select Date",
-                                                                               selection: $HabitStartDateSet,
-                                                                               displayedComponents: .date)
-                                                                    .datePickerStyle(.compact)
-                                                                }
-                                                                Section(header: Text("Time of day (narrows reminder notifications):")) {
-                                                                    Picker("Time of day", selection: $HabitTimeRegionSet) {
-                                                                        ForEach(timeRegionOptions, id: \.self) { region in
-                                                                            Text(region)
-                                                                        }
-                                                                    }
-                                                                }
-                                                                Picker("Habit Color:", selection: $HabitColorSet) {
-                                                                    ForEach(habitColorOptions, id: \.self) { name in
-                                                                        HStack {
-                                                                            Circle()
-                                                                                .fill(habitColor(name))
-                                                                                .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 1))
-                                                                                .frame(width: 20, height: 20)
-                                                                            Text(name)
-                                                                        }
-                                                                        .tag(name)
-                                                                    }
-                                                                }
-                                                                .pickerStyle(.inline)
-                                                                Section(header: Text("Habit Reward (Points for completion)")) {
-                                                                    TextField("", value: $HabitRewardSet, format: .number)
-                                                                }
-                                                                Toggle("Include status update", isOn: $HabitHasStatusSet)
-                                                                Section {
-                                                                    Button {
-                                                                        //------------------------------------
-                                                                        updateHabit(habitToEdit: habitNdx)
-                                                                        //------------------------------------
-                                                                        DisplayHabitEditor = false
-                                                                        indexProtocols(modelContext: modelContext)
-                                                                        listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol")
-                                                                        
-                                                                    } label: {Text("Save Habit")}
-                                                                }
-                                                            }
-                                                            .onChange(of: HabitHasCheckboxSet) { if HabitHasCheckboxSet { HabitHasSubTaskSet = false } }
-                                                            .onChange(of: HabitHasSubTaskSet) { if HabitHasSubTaskSet { HabitHasCheckboxSet = false } }
-                                                            .onAppear{
-
-                                                                //Keep commented out for now, possibly problematic
-
-//
-                                                        HabitNameSet = habitNdx.name
-                                                        HabitGoalSet = Int16(habitNdx.goal)
-                                                        HabitUnitSet = habitNdx.unit
-                                                        HabitProtocolSet = habitNdx.whichProtocol
-                                                        HabitRepetitionSet = Int16(habitNdx.repeatValue)
-                                                        HabitDescriptionSet = habitNdx.descript
-                                                        HabitStartDateSet = habitNdx.startDate
-                                                        HabitRewardSet = Int16(habitNdx.reward)
-                                                        HabitHasCheckboxSet = habitNdx.hasCheckbox
-                                                        HabitHasStatusSet = habitNdx.hasStatus
-                                                        HabitHasSubTaskSet = habitNdx.hasSubtask
-                                                        HabitSubhabitsSet = habitNdx.subhabits
-                                                        HabitTimeRegionSet = habitNdx.timeRegion
-                                                        HabitColorSet = habitNdx.colorName
-//
-                                                        HabitUseDOWSet = habitNdx.useDow
-//
-                                                        HabitOnSunSet = habitNdx.dow.onSun
-                                                        HabitOnMonSet = habitNdx.dow.onMon
-                                                        HabitOnTuesSet = habitNdx.dow.onTues
-                                                        HabitOnWedSet = habitNdx.dow.onWed
-                                                        HabitOnThursSet = habitNdx.dow.onThurs
-                                                        HabitOnFriSet = habitNdx.dow.onFri
-                                                        HabitOnSatSet = habitNdx.dow.onSat//
-//
-                                                            }
-
-                                                        } else {}
-                                                    }
-                                                } label: {
-                                                    HStack {
-                                                        //-----------------------------------------------------
-                                                        Text(habitNdx.name)
-                                                            .foregroundColor(habitColor(habitNdx.colorName))
-
-                                                        Spacer()
-
-                                                        Text("\(habitNdx.goal) \(habitNdx.unit)")
-                                                        //-----------------------------------------------------
-                                                    }
-                                                }
-                                            } else {}
-                                        }.onMove(perform: move)
-                                    }
-                        
-                                } else {
-                                    
-                                    ForEach(its) { habitNdx in
-                                        
-                                            
-                                            NavigationLink{
-                                                ZStack{
-                                                    VStack {
-                                                                                                       
-                                                        List{
-                                                            Text(habitNdx.name)
-                                                                .font(.title)
-                                                                .padding()
-                                                            Text("Item is part of protocol \(habitNdx.whichProtocol).")
-                                                            Text("Item start date: \(habitNdx.startDate, formatter: itemFormatter)" )
-                                                            Text("Item goal value: \(habitNdx.goal) \(habitNdx.unit)" )
-                                                            
-                                                            if habitNdx.useDow == true {
-                                                                
-                                                                if habitNdx.dow.onSun == true {Text("Item repeats on Sunday")} else {}
-                                                                if habitNdx.dow.onMon == true {Text("Item repeats on Monday")} else {}
-                                                                if habitNdx.dow.onTues == true {Text("Item repeats on Tuesday")} else {}
-                                                                if habitNdx.dow.onWed == true {Text("Item repeats on Wednesday")} else {}
-                                                                if habitNdx.dow.onThurs == true {Text("Item repeats on Thursday")} else {}
-                                                                if habitNdx.dow.onFri == true {Text("Item repeats on Friday")} else {}
-                                                                if habitNdx.dow.onSat == true {Text("Item repeats on Saturday")} else {}
-
-                                                            } else {
-                                                                Text("Item repeats every \(habitNdx.repeatValue) days." )
-                                                            }
-                                                            
-                                                            
-                                                            
-                                                            
-                                                            Text("Item Description: \n\n \(habitNdx.descript)" )
-                                                            
-//                                                            if habitNdx.hasSubtask == true {
-//                                                                Text("Subhabits:")
-//                                                                ForEach(habitData){ indexr in
-//                                                                    if indexr.superTask == habitNdx.id {
-//                                                                        Text(indexr.name)
-//                                                                    }
-//                                                                }
-//                                                            }
-                                                            
-                                                        }
-                                                                                                                
-                                                        Button{DisplayHabitEditor = true} label: {
-                                                            Text("Edit habit")
-                                                        }
-                                                        Button{modelContext.delete(habitNdx); try? modelContext.save()} label: {
-                                                            Text("Remove this habit")
-                                                        }
-                                                    }
-                                                    
-                                                    if DisplayHabitEditor == true {
-                                                        
-                                                        Form {
-
-                                                            Section(header: Text("Habit Name:")) {
-                                                                TextField("", text: $HabitNameSet)
-                                                            }
-                                                            Toggle("Use subhabits instead of units?", isOn: $HabitHasSubTaskSet)
-                                                            if HabitHasSubTaskSet == false {
-                                                                Toggle("Use checkbox instead of units",isOn: $HabitHasCheckboxSet)
-                                                            }
-                                                            if (HabitHasCheckboxSet || HabitHasSubTaskSet) == false {
-                                                                Section(header: Text("Habit Goal:")) {
-                                                                    TextField("", value: $HabitGoalSet, format: .number)
-                                                                }
-                                                                Section(header: Text("Habit Unit:")) {
-                                                                    TextField("", text: $HabitUnitSet)
-                                                                }
-                                                            }
-                                                            if HabitHasSubTaskSet == true {
-                                                                subhabitEditor
-                                                            }
-
-                                                            Toggle("Choose days of the week to repeat on?", isOn: $HabitUseDOWSet)
-                                                            if HabitUseDOWSet == true {
-                                                                Toggle("Repeat on Sunday", isOn: $HabitOnSunSet)
-                                                                Toggle("Repeat on Monday", isOn: $HabitOnMonSet)
-                                                                Toggle("Repeat on Tuesday", isOn: $HabitOnTuesSet)
-                                                                Toggle("Repeat on Wednesday", isOn: $HabitOnWedSet)
-                                                                Toggle("Repeat on Thursday", isOn: $HabitOnThursSet)
-                                                                Toggle("Repeat on Friday", isOn: $HabitOnFriSet)
-                                                                Toggle("Repeat on Saturday", isOn: $HabitOnSatSet)
-                                                            } else {
-                                                                Section(header: Text("Habit Interval (1 = Daily, 7 = Weekly, etc):")) {
-                                                                    TextField("", value: $HabitRepetitionSet, format: .number)
-                                                                }
-                                                            }
-                                                            
-                                                            Section(header: Text("Habit Protocol:")) {
-                                                                TextField("", text: $HabitProtocolSet)
-                                                            }
-                                                            
-                                                      
-                                                            
-                                                            Section(header: Text("Habit Details")) {
-                                                                TextEditor(text: $HabitDescriptionSet)
-                                                                    .frame(minHeight: 100)
-                                                                    .overlay(
-                                                                        RoundedRectangle(cornerRadius: 8)
-                                                                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                                                    )
-                                                            }
-                                                            Section("Habit Start Date") {
-                                                                DatePicker("Select Date",
-                                                                           selection: $HabitStartDateSet,
-                                                                           displayedComponents: .date)
-                                                                .datePickerStyle(.compact)
-                                                            }
-                                                            Section(header: Text("Time of day (narrows reminder notifications):")) {
-                                                                Picker("Time of day", selection: $HabitTimeRegionSet) {
-                                                                    ForEach(timeRegionOptions, id: \.self) { region in
-                                                                        Text(region)
-                                                                    }
-                                                                }
-                                                            }
-                                                            Picker("Habit Color:", selection: $HabitColorSet) {
-                                                                ForEach(habitColorOptions, id: \.self) { name in
-                                                                    HStack {
-                                                                        Circle()
-                                                                            .fill(habitColor(name))
-                                                                            .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 1))
-                                                                            .frame(width: 20, height: 20)
-                                                                        Text(name)
-                                                                    }
-                                                                    .tag(name)
-                                                                }
-                                                            }
-                                                            .pickerStyle(.inline)
-                                                            Section(header: Text("Habit Reward (Points for completion)")) {
-                                                                TextField("", value: $HabitRewardSet, format: .number)
-                                                            }
-                                                            Toggle("Include status update", isOn: $HabitHasStatusSet)
-                                                            Section {
-                                                                Button {
-                                                                    //------------------------------------
-                                                                    //Keep commented out for now, possibly problematic
-                                                                    updateHabit(habitToEdit: habitNdx)
-                                                                    //------------------------------------
-                                                                    DisplayHabitEditor = false
-                                                                    indexProtocols(modelContext: modelContext)
-                                                                    listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol")
-
-                                                                    //crap commit
-                                                                } label: {Text("Save Habit")}
-                                                            }
-                                                        }
-                                                        .onChange(of: HabitHasCheckboxSet) { if HabitHasCheckboxSet { HabitHasSubTaskSet = false } }
-                                                        .onChange(of: HabitHasSubTaskSet) { if HabitHasSubTaskSet { HabitHasCheckboxSet = false } }
-                                                        .onAppear{
-                                                            
-                                                            
-                                                            HabitNameSet = habitNdx.name
-                                                            HabitGoalSet = Int16(habitNdx.goal)
-                                                            HabitUnitSet = habitNdx.unit
-                                                            HabitProtocolSet = habitNdx.whichProtocol
-                                                            HabitRepetitionSet = Int16(habitNdx.repeatValue)
-                                                            HabitDescriptionSet = habitNdx.descript
-                                                            HabitStartDateSet = habitNdx.startDate
-                                                            HabitRewardSet = Int16(habitNdx.reward)
-                                                            HabitHasCheckboxSet = habitNdx.hasCheckbox
-                                                            HabitHasStatusSet = habitNdx.hasStatus
-                                                            HabitHasSubTaskSet = habitNdx.hasSubtask
-                                                            HabitSubhabitsSet = habitNdx.subhabits
-                                                            HabitTimeRegionSet = habitNdx.timeRegion
-                                                            HabitColorSet = habitNdx.colorName
-//
-                                                            HabitUseDOWSet = habitNdx.useDow
-//                                                            
-                                                            HabitOnSunSet = habitNdx.dow.onSun
-                                                            HabitOnMonSet = habitNdx.dow.onMon
-                                                            HabitOnTuesSet = habitNdx.dow.onTues
-                                                            HabitOnWedSet = habitNdx.dow.onWed
-                                                            HabitOnThursSet = habitNdx.dow.onThurs
-                                                            HabitOnFriSet = habitNdx.dow.onFri
-                                                            HabitOnSatSet = habitNdx.dow.onSat
-                                                            
-                                                        }
-                                                    } else {}
-                                                }// end zstack
-                                                .onAppear {DisplayHabitEditor = false}
-                                            } label: {
-                                                HStack {
-                                                    //-----------------------------------------------------
-                                                    Text(habitNdx.name)
-                                                        .foregroundColor(habitColor(habitNdx.colorName))
-                                                    
-                                                    Spacer()
-                                                    
-                                                    Text("\(habitNdx.goal) \(habitNdx.unit)")
-                                                    //-----------------------------------------------------
-                                                }
-                                            }
-                                    }.onMove(perform: move)
-                                } // END ELSE (DISPLAY BY PROTOCOL)
+                                    if habitNdx.whichProtocol == index.ProtocolName {
+                                        habitRow(habitNdx)
+                                    } else {}
+                                }.onMove(perform: move)
                             }
-                        }
-                    
-                    
-                    } else {Text("No Habits")}
-//                } // END PROT LIST CONDITIONAL
 
+                        } else {
+
+                            ForEach(its) { habitNdx in
+                                habitRow(habitNdx)
+                            }.onMove(perform: move)
+                        } // END ELSE (DISPLAY BY PROTOCOL)
+                    }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
+
+                } else {
+                    EmptyState(symbol: "repeat",
+                               title: "No habits yet",
+                               sentence: "Create one, or adopt a set from the library.",
+                               buttonTitle: "Browse library") {
+                        displayProtocolLibrary = true
+                    }
+                }
             }
-            
-            if DisplayHabitMaker == true {
-                
-                VStack{
-                    Button {
-                        DisplayHabitMaker = false
-                    } label: {
-                        closeButton
-                    }.padding()
-
-                   habitBuilderForm
-                    
-                } // VSTACK
-                .frame(width:300,height:700)
-                .cornerRadius(10)
-                .background(Rectangle()
-                    .foregroundColor(.black))
-                .cornerRadius(20)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(Color.gray, lineWidth: 1)
-                )
-                .shadow(radius: 20)
-                
-            } else {}
-
-            if displayProtocolLibrary == true {
-                ProtocolLibraryModal(isPresented: $displayProtocolLibrary, onIncorporate: {
-                    listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol")
-                })
-            } else {}
-
-        }.onAppear{indexProtocols(modelContext: modelContext)}
+            .background(Theme.bg)
+            .toolbar(.hidden, for: .navigationBar)
+            .navigationDestination(for: habItem.self) { habitNdx in
+                habitDetail(habitNdx)
+            }
+        }
+        // Presented from the stack rather than the detail page: the page is popped by the
+        // Remove action, and a dialog whose presenter disappears mid-dismissal eats the next tap.
+        .confirmationDialog("Remove this habit?", isPresented: $confirmRemove, titleVisibility: .visible) {
+            Button("Remove", role: .destructive) {
+                if let habitNdx = path.last {
+                    path.removeAll()
+                    modelContext.delete(habitNdx); try? modelContext.save()
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        }
+        .sheet(isPresented: $DisplayHabitMaker) {
+            habitFormSheet(title: "New habit", onCancel: { DisplayHabitMaker = false }) {
+                addItem()
+                // addItem re-indexes the protocols; re-read them so By protocol shows the new habit
+                listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol")
+            }
+        }
+        .sheet(isPresented: $displayProtocolLibrary) {
+            ProtocolLibraryModal(isPresented: $displayProtocolLibrary, onIncorporate: {
+                listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol")
+            })
+        }
+        .onAppear{
+            indexProtocols(modelContext: modelContext)
+            listOfProtocols = UserDefaults.standard.getDecodable([HabitProtocol].self, forKey: "protocol")
+        }
     }
-        
+
     // ------------------------------------ Spacer
     
     private func updateHabit(habitToEdit: habItem) {

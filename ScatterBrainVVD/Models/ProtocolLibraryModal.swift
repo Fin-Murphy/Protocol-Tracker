@@ -6,7 +6,33 @@
 import SwiftUI
 import SwiftData
 
-// The popup browser for the built-in protocol library (AppDefinedProtocolLibrary),
+// Primary button that confirms a library add: turns into "Added" on success fill for 1.5s
+private struct LibraryAddButton: View {
+
+    let title: String
+    let action: () -> Void
+
+    @State private var added = false
+
+    var body: some View {
+        Button {
+            action()
+            added = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                added = false
+            }
+        } label: {
+            if added {
+                Label("Added", systemImage: "checkmark")
+            } else {
+                Text(title)
+            }
+        }
+        .buttonStyle(PrimaryButtonStyle(fill: added ? Theme.success : Theme.accent))
+    }
+}
+
+// The sheet browser for the built-in protocol library (AppDefinedProtocolLibrary),
 // extracted from ProtocolListView so it can be presented from other pages too.
 struct ProtocolLibraryModal: View {
 
@@ -17,63 +43,106 @@ struct ProtocolLibraryModal: View {
 
     @Environment(\.modelContext) private var modelContext
 
+    private func habitPage(_ cont: Habit) -> some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+
+                Text(cont.HabitName)
+                    .font(Theme.detailTitle)
+                    .foregroundStyle(Theme.text1)
+                    .accessibilityAddTraits(.isHeader)
+
+                if cont.HabitHasCheckbox == false {
+                    RowCard {
+                        CardRow(label: "Goal", value: "\(cont.HabitGoal) \(cont.HabitUnit)")
+                    }
+                }
+
+                if cont.HabitDescription != "" {
+                    TextCard(text: cont.HabitDescription)
+                }
+
+                LibraryAddButton(title: "Add this habit") {
+                    incorporateHabit(refHab: cont)
+                }
+            }
+            .padding(16)
+        }
+        .background(Theme.bg)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func protocolPage(_ adp: HabitProtocol) -> some View {
+        List{
+            LibraryAddButton(title: "Add all \(adp.ProtocolContent.count) habits") {
+                incorporateProtocol(refProt: adp)
+            }
+            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 16, trailing: 16))
+            .listRowBackground(Theme.bg)
+            .listRowSeparator(.hidden)
+
+            ForEach(adp.ProtocolContent){cont in
+                NavigationLink {
+                    habitPage(cont)
+                } label: {
+                    Text(cont.HabitName)
+                        .font(Theme.body)
+                        .foregroundStyle(Theme.text1)
+                        .frame(minHeight: 44)
+                }
+                .listRowBackground(Theme.surface)
+                .listRowSeparatorTint(Theme.separator)
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(Theme.bg)
+        .navigationTitle(adp.ProtocolName)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
     var body: some View {
 
-        VStack{
-            Button{
-                isPresented = false
-            } label: {
-                closeButton
-            }
-            .padding()
+        NavigationStack{
+            List{
 
-            NavigationView{
-                List{
+                ForEach(AppDefinedProtocolLibrary){adp in
 
+                    NavigationLink{
 
-                    ForEach(AppDefinedProtocolLibrary){adp in
+                        protocolPage(adp)
 
-                        NavigationLink{
-
-                            Button {
-                                incorporateProtocol(refProt: adp)
-                            } label: {
-                                Text("Add this protocol")
-                                    .bckMod()
-                            }
-
-                            List{
-                                ForEach(adp.ProtocolContent){cont in
-                                    NavigationLink {
-                                        Text(cont.HabitName)
-                                        Button{incorporateHabit(refHab: cont)} label:
-                                        {Text("Add this habit")}
-                                    } label: {  Text(cont.HabitName) }
-
-                                }
-                            }
-
-
-                        } label: {
+                    } label: {
+                        VStack(alignment: .leading, spacing: 2) {
                             Text(adp.ProtocolName)
+                                .font(Theme.body)
+                                .foregroundStyle(Theme.text1)
+                            Text("\(adp.ProtocolContent.count) habits")
+                                .font(Theme.meta)
+                                .foregroundStyle(Theme.text2)
                         }
-
-
+                        .frame(minHeight: 44)
                     }
-                }//end list
-            }// end navview
+                    .listRowBackground(Theme.surface)
+                    .listRowSeparatorTint(Theme.separator)
 
-        }
-        .frame(width:300,height:700)
-        .cornerRadius(10)
-        .background(Rectangle()
-            .foregroundColor(.black))
-        .cornerRadius(20)
-        .overlay(
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(Color.gray, lineWidth: 1)
-        )
-        .shadow(radius: 20)
+                }
+            }//end list
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            .background(Theme.bg)
+            .navigationTitle("Library")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        isPresented = false
+                    }
+                    .fontWeight(.semibold)
+                }
+            }
+        }// end navstack
+        .presentationDetents([.large])
 
     } // end body
 
