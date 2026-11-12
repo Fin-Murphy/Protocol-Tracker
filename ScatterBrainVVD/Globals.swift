@@ -9,6 +9,7 @@ import Foundation
 import SwiftData
 import SwiftUI
 import CoreHaptics
+import AudioToolbox
 
 import UserNotifications // IMPORT FOR NOTIFICATION SERVICES
 
@@ -667,6 +668,9 @@ func goalFor(date: Date, modelContext: ModelContext) -> Int {
 // ---------------------------------------------------------------------------------------------------------------------
 
 func addValue(item: listItem, value: Int, modelContext: ModelContext, Celebrate: inout Int){
+    let wasComplete = item.complete
+    var dayDone = false
+
     if Calendar.current.isDate(item.timestamp, equalTo: Date(), toGranularity: .day) == true {
 
         item.value = item.value + value
@@ -683,7 +687,7 @@ func addValue(item: listItem, value: Int, modelContext: ModelContext, Celebrate:
             item.complete = true
         }
 
-        checkDayCompletion(modelContext: modelContext)
+        dayDone = checkDayCompletion(modelContext: modelContext)
     } else {
         item.value = item.value + value
         if item.value >= item.goal {
@@ -691,6 +695,10 @@ func addValue(item: listItem, value: Int, modelContext: ModelContext, Celebrate:
                 item.complete = true
             }
         }
+    }
+
+    if dayDone == false {
+        progressFeedback(completed: item.complete && wasComplete == false)
     }
 
 
@@ -701,6 +709,9 @@ func addValue(item: listItem, value: Int, modelContext: ModelContext, Celebrate:
 }
 
 func completeHabit(item: listItem, modelContext: ModelContext, Celebrate: inout Int) {
+
+    let wasComplete = item.complete
+    var dayDone = false
 
     if Calendar.current.isDate(item.timestamp, equalTo: Date(), toGranularity: .day) == true {
 
@@ -720,7 +731,7 @@ func completeHabit(item: listItem, modelContext: ModelContext, Celebrate: inout 
             item.notFloater = true
         }
 
-        checkDayCompletion(modelContext: modelContext)
+        dayDone = checkDayCompletion(modelContext: modelContext)
     } else {
         if item.complete == false {
             item.value = item.goal
@@ -732,6 +743,10 @@ func completeHabit(item: listItem, modelContext: ModelContext, Celebrate: inout 
 
             item.notFloater = true
         }
+    }
+
+    if dayDone == false && wasComplete == false {
+        progressFeedback(completed: true)
     }
 
     saveContext(modelContext: modelContext)
@@ -785,27 +800,43 @@ func setStatus(refItem: listItem, modelContext: ModelContext, updateItemStatus: 
 
 func celebrationProcedure () {
         print("Goal for the day has been completed!")
-    
-    
+
+    // Tier 3 feedback: the day-complete "super buzz" + fanfare
+    playCustomHaptic()
+    AudioServicesPlaySystemSound(1025) // Fanfare
 }
 
 // Fires at most once per calendar day: the latch date means a docket that grows after the goal
-// was already met doesn't re-trigger the event.
-func checkDayCompletion(modelContext: ModelContext) {
+// was already met doesn't re-trigger the event. Returns true when it fires, so the caller can
+// skip its own (lower-tier) feedback.
+func checkDayCompletion(modelContext: ModelContext) -> Bool {
     let today = calendar.startOfDay(for: Date())
 
     if let last = UserDefaults.standard.object(forKey: "lastCelebrationDay") as? Date,
        calendar.isDate(last, inSameDayAs: today) {
-        return
+        return false
     }
 
     let goal = goalFor(date: Date(), modelContext: modelContext)
 
     // goal == 0 means nothing is on the docket — an empty day isn't a completed one
-    guard goal > 0, scoreFor(date: Date(), modelContext: modelContext) >= goal else { return }
+    guard goal > 0, scoreFor(date: Date(), modelContext: modelContext) >= goal else { return false }
 
     UserDefaults.standard.set(today, forKey: "lastCelebrationDay")
     celebrationProcedure()
+    return true
+}
+
+// Tier 1 (progress) and tier 2 (item completed) feedback. System sounds follow the silent
+// switch and mix with whatever audio is already playing.
+func progressFeedback(completed: Bool) {
+    if completed {
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        AudioServicesPlaySystemSound(1113) // begin_record chime
+    } else {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        AudioServicesPlaySystemSound(1104) // keyboard Tock
+    }
 }
 
 var hapticEngine: CHHapticEngine?
@@ -813,23 +844,34 @@ var hapticEngine: CHHapticEngine?
 func setupHapticEngine() {
     do {
         hapticEngine = try CHHapticEngine()
+        hapticEngine?.playsHapticsOnly = true
+        hapticEngine?.isAutoShutdownEnabled = true
         try hapticEngine?.start()
     } catch {
         print("Error creating or starting haptic engine: \(error)")
     }
 }
 
+// Day-complete pattern: four rising taps, a long full-strength buzz, then a closing hit (~1.4s).
+// A fresh engine is made per play (once a day), so a stopped/reset engine can't swallow it.
 func playCustomHaptic() {
+    setupHapticEngine()
     guard let engine = hapticEngine else { return }
 
-    // Create a strong, sharp impact event
-    let intensity = CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0)
-    let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness, value: 1.0)
-    let event = CHHapticEvent(eventType: .hapticTransient, parameters: [intensity, sharpness], relativeTime: 0)
+    func params(_ intensity: Float, _ sharpness: Float) -> [CHHapticEventParameter] {
+        [CHHapticEventParameter(parameterID: .hapticIntensity, value: intensity),
+         CHHapticEventParameter(parameterID: .hapticSharpness, value: sharpness)]
+    }
 
-    // Create a pattern from the event
+    var events: [CHHapticEvent] = []
+    for step in 0..<4 {
+        events.append(CHHapticEvent(eventType: .hapticTransient, parameters: params(0.55 + 0.15 * Float(step), 0.8), relativeTime: 0.1 * Double(step)))
+    }
+    events.append(CHHapticEvent(eventType: .hapticContinuous, parameters: params(1.0, 0.5), relativeTime: 0.45, duration: 0.8))
+    events.append(CHHapticEvent(eventType: .hapticTransient, parameters: params(1.0, 1.0), relativeTime: 1.35))
+
     do {
-        let pattern = try CHHapticPattern(events: [event], parameters: [])
+        let pattern = try CHHapticPattern(events: events, parameters: [])
         let player = try engine.makePlayer(with: pattern)
         try player.start(atTime: CHHapticTimeImmediate)
     } catch {

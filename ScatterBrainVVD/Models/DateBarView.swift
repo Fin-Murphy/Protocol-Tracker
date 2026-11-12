@@ -110,7 +110,6 @@ struct DateBarView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
             scoreFlash = false
         }
-        UINotificationFeedbackGenerator().notificationOccurred(.success)
     }
 
     private var scoreText: some View {

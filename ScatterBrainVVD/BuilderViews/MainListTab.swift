@@ -349,8 +349,6 @@ struct dayListView: View {
         completeHabit(item: item, modelContext: modelContext, Celebrate: &Celebrate)
 //                                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
 //                                                impactFeedback.impactOccurred()
-
-        playCustomHaptic()
     }
 
     // Tap shortcuts on the check control; anything it can't finish in one tap opens the detail
