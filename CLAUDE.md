@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Wiki
+
+A page-per-topic map of this repository for agents lives in `wiki/`. Start at `wiki/index.md`; `wiki/SCHEMA.md` says how to keep it current when you change code.
+
 ## Project Overview
 
 Protocol Tracker (Xcode project name: **ScatterBrainVVD**) is a native SwiftUI iOS app that auto-populates a daily checklist from user-defined recurring habits ("protocols") and one-off tasks. The repo folder is named Protocol-Tracker but all targets, schemes, and source directories use the ScatterBrainVVD name.
