@@ -177,6 +177,7 @@ func generateNotifications (modelContext: ModelContext) {
         // -------- Large-scale pass: every NotifFreq hours, list of everything incomplete --------
 
         var hourlyCount = 0
+        var digestDates: [Date] = [] // Fire dates of the digests actually scheduled; the mini pass yields to these
 
         if !hourlyDisabled {
             var hour = calendar.component(.hour, from: now) + 1
@@ -202,6 +203,7 @@ func generateNotifications (modelContext: ModelContext) {
                     if let fireDate = calendar.date(bySettingHour: hour, minute: 0, second: 0, of: now) {
                         manager.scheduleReminder(at: fireDate, identifier: "daily-habit-reminder \(hour) 0", title: "Incomplete Task!", body: notifBody)
                         hourlyCount += 1
+                        digestDates.append(fireDate)
                         print("Scheduling notification for \(hour)")
                     }
                 }
@@ -233,7 +235,9 @@ func generateNotifications (modelContext: ModelContext) {
             var scheduled = 0
 
             while fireDate < endOfDay && scheduled < miniBudget {
-                if let item = topIncompleteItem(forHour: calendar.component(.hour, from: fireDate)) {
+                // Skip (don't shift) any mini landing under 10 minutes either side of a digest
+                if !digestDates.contains(where: { abs($0.timeIntervalSince(fireDate)) < 600 }),
+                   let item = topIncompleteItem(forHour: calendar.component(.hour, from: fireDate)) {
                     manager.scheduleReminder(at: fireDate, identifier: "mini-habit-reminder \(scheduled)", title: "Quick check-in!", body: "\(item.name) (\(item.value)/\(item.goal))")
                     scheduled += 1
                 }

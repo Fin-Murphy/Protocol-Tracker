@@ -229,6 +229,9 @@ max(miniNotifFreq minutes, time left until midnight / mini budget):
     - The widened interval spreads the budgeted reminders evenly
       over the rest of the day instead of running out early; it
       applies to that rebuild only and is never saved
+    - A fire time under 10 minutes before or after an hourly
+      digest scheduled in this rebuild is skipped (not shifted,
+      not counted against the budget); exactly 10 minutes is allowed
     - Body names ONE habit: the top incomplete item (list
       order) whose timeRegion matches the fire time's region,
       falling back to "None"-region items, then any
